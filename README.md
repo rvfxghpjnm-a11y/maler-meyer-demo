@@ -1,1 +1,1 @@
-# -maler-meyer-demo
+# maler-meyer-demo
