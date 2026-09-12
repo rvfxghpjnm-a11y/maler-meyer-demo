@@ -23,6 +23,7 @@ const sizes = [
         if (!['127.0.0.1', 'localhost'].includes(requestUrl.hostname)) external.push(request.url());
       });
       await page.goto(url, { waitUntil: 'networkidle' });
+      await page.locator('.meyer-wordmark:visible').first().waitFor();
       await page.getByRole('heading', { name: /Guten (Morgen|Tag|Abend), Torben/ }).waitFor();
       await page.getByRole('heading', { name: 'Aufmerksamkeit nötig' }).waitFor();
       await page.getByText('Bau-Nr. 25148', { exact: true }).first().waitFor();
@@ -80,6 +81,31 @@ const sizes = [
       await page.getByRole('heading', { name: /Guten (Morgen|Tag|Abend), Max/ }).waitFor();
       await page.getByRole('button', { name: 'ARBEIT STARTEN' }).click();
       await page.getByText('Arbeitet seit 07:00', { exact: true }).waitFor();
+
+      await page.locator('button[data-action="open-employee-action"][data-kind="extra"]:visible').first().click();
+      await page.getByRole('heading', { name: 'Zusatzarbeit melden' }).waitFor();
+      await page.getByLabel('Was wurde zusätzlich gemacht?').fill('Zusätzliche Türzarge gespachtelt');
+      await page.getByLabel('Menge oder Umfang – optional').fill('2 Türzargen');
+      await page.screenshot({ path: path.join(os.tmpdir(), `maler-meyer-action-${size.name}.png`), fullPage: true });
+      await page.getByRole('button', { name: 'Zusatzarbeit speichern' }).click();
+      await page.getByRole('heading', { name: 'Meine Meldungen' }).waitFor();
+      await page.getByText('Zusatzarbeit gemeldet', { exact: true }).first().waitFor();
+
+      await page.locator('button[data-action="open-employee-action"][data-kind="note"]:visible').first().click();
+      await page.getByRole('textbox', { name: 'Notiz', exact: true }).fill('Fensterbank ist für den zweiten Anstrich vorbereitet.');
+      await page.getByRole('button', { name: 'Notiz speichern' }).click();
+      await page.getByText('Baustellennotiz gespeichert', { exact: true }).first().waitFor();
+
+      await page.locator('button[data-action="open-employee-action"][data-kind="correction"]:visible').click();
+      await page.getByLabel('Richtige Uhrzeit').fill('06:55');
+      await page.getByLabel('Was soll korrigiert werden?').fill('Arbeitsbeginn war fünf Minuten früher.');
+      await page.getByRole('button', { name: 'Korrektur senden' }).click();
+      await page.getByText('Korrektur gemeldet', { exact: true }).first().waitFor();
+
+      await page.locator('button[data-action="open-employee-action"][data-kind="feedback"]:visible').click();
+      await page.getByLabel('Deine Nachricht').fill('Die großen Baustellenbuttons sind gut lesbar.');
+      await page.getByRole('button', { name: 'Feedback senden' }).click();
+      await page.getByText('Feedback gesendet', { exact: true }).first().waitFor();
 
       await page.screenshot({ path: path.join(os.tmpdir(), `maler-meyer-employee-${size.name}.png`), fullPage: true });
       await page.getByRole('button', { name: 'PAUSE STARTEN' }).click();

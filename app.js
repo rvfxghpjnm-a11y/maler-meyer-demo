@@ -80,7 +80,8 @@ const statusKind = { WORKING: 'ok', ON_BREAK: 'warn', TRAVELING: 'travel', NOT_S
 const state = {
   role: 'management', view: 'today', query: '', selectedSite: null, selectedEmployee: null,
   employeeFilter: 'all', extraFilter: 'all', editProblem: null, corrections: [], corrected: {},
-  employeeStep: 0, employeeLog: [], loginPreview: false, toast: '',
+  employeeStep: 0, employeeLog: [], employeeAction: null, employeeSubmissions: [],
+  loginPreview: false, toast: '',
 };
 
 const app = document.getElementById('app');
@@ -96,6 +97,7 @@ function greeting(name) {
 }
 
 function badge(text, kind = '') { return `<span class="badge ${kind}">${escapeHtml(text)}</span>`; }
+function meyerLogo(size = '') { return `<span class="meyer-wordmark ${size}" aria-hidden="true"><span>maler</span><span>meyer</span></span>`; }
 function person(id) { return employees.find(item => item.id === id); }
 function siteByNumber(number) { return sites.find(item => item.number === number); }
 
@@ -123,8 +125,8 @@ function managerLayout() {
   const content = renderManagerView();
   return `<div class="test-strip">TESTSYSTEM – KEINE PRODUKTIVDATEN <span>Alle Namen, Bau-Nrn. und Vorgänge sind erfunden.</span></div>
   <div class="app-shell">
-    <aside class="sidebar"><a class="brand" href="#" data-action="navigate" data-view="today"><span class="brand-mark">MM</span><span><strong>Maler Meyer</strong><small>Digitale Baustellenorganisation</small></span></a><nav class="side-nav" aria-label="Hauptnavigation">${navItems.map(item => navButton(item)).join('')}</nav><div class="sidebar-footer"><strong>Torben</strong><small>Geschäftsführung · Demo</small><small>powered by ShoreLogic</small></div></aside>
-    <div class="main-column"><header class="topbar"><a class="mobile-brand" href="#" data-action="navigate" data-view="today" aria-label="Maler Meyer – Heute"><span class="brand-mark">MM</span><strong>Maler Meyer</strong></a><div class="search-wrap"><span class="search-symbol" aria-hidden="true">⌕</span><label class="sr-only" for="global-search">Bau-Nr., Baustelle oder Mitarbeiter suchen</label><input id="global-search" class="search-box" autocomplete="off" value="${escapeHtml(state.query)}" placeholder="Bau-Nr., Baustelle oder Mitarbeiter suchen">${searchResults()}</div><button class="profile-button" data-action="navigate" data-view="more"><span class="avatar">T</span><span class="profile-copy"><strong>Torben</strong><small>Geschäftsführung</small></span></button></header><main id="main-content" class="content" tabindex="-1">${content}</main></div>
+    <aside class="sidebar"><a class="brand" href="#" data-action="navigate" data-view="today" aria-label="Maler Meyer – Heute">${meyerLogo()}<small>Digitale Baustellenorganisation</small></a><nav class="side-nav" aria-label="Hauptnavigation">${navItems.map(item => navButton(item)).join('')}</nav><div class="sidebar-footer"><strong>Torben</strong><small>Geschäftsführung · Demo</small><small>powered by ShoreLogic</small></div></aside>
+    <div class="main-column"><header class="topbar"><a class="mobile-brand" href="#" data-action="navigate" data-view="today" aria-label="Maler Meyer – Heute">${meyerLogo('compact')}</a><div class="search-wrap"><span class="search-symbol" aria-hidden="true">⌕</span><label class="sr-only" for="global-search">Bau-Nr., Baustelle oder Mitarbeiter suchen</label><input id="global-search" class="search-box" autocomplete="off" value="${escapeHtml(state.query)}" placeholder="Bau-Nr., Baustelle oder Mitarbeiter suchen">${searchResults()}</div><button class="profile-button" data-action="navigate" data-view="more"><span class="avatar">T</span><span class="profile-copy"><strong>Torben</strong><small>Geschäftsführung</small></span></button></header><main id="main-content" class="content" tabindex="-1">${content}</main></div>
   </div><nav class="mobile-nav" aria-label="Mobile Navigation">${[['today','H','Heute'],['sites','B','Baustellen'],['times','Z','Zeiten'],['more','···','Mehr']].map(item => navButton(item, true)).join('')}</nav>${renderOverlays()}`;
 }
 
@@ -220,7 +222,7 @@ function renderWeeks() {
 }
 
 function renderMore() {
-  return `${pageHead('Mehr', 'Selten benötigte Bereiche und Demo-Perspektive')}<div class="more-grid"><section class="card more-card"><h2>Demo-Perspektive</h2><p>Wechsle zur einfachen Baustellenansicht für Max.</p><button class="primary" data-action="switch-role" data-role="employee">Als Mitarbeiter ansehen</button></section><section class="card more-card"><h2>Anmeldung</h2><p>So soll die ruhige Maler-Meyer-Anmeldung aussehen.</p><button class="secondary" data-action="show-login">Anmeldeseite ansehen</button></section><section class="card more-card"><h2>Support</h2><p>Rückmeldungen und Hilfefälle – nicht im täglichen Hauptmenü.</p><button class="secondary" data-action="demo-message" data-message="Der Supportbereich ist in dieser Demo nur ein Beispiel.">Support öffnen</button></section><section class="card more-card"><h2>Einstellungen</h2><p>Benutzer, Rechte und betriebliche Einstellungen gehören hierher.</p><button class="secondary" data-action="demo-message" data-message="Einstellungen werden in der öffentlichen Demo nicht gespeichert.">Einstellungen öffnen</button></section></div><details class="developer-area"><summary>Entwickler- und Testinformationen</summary><p>Statische öffentliche Bedienungsdemo ohne Backend, echte Anmeldung oder Produktivdaten. Rollenwechsel und Eingaben sind Simulationen und werden beim Neuladen verworfen.</p><p>Demo-Version 4 · responsive Oberfläche · keine Verbindung zu Maler Meyer.</p></details>`;
+  return `${pageHead('Mehr', 'Selten benötigte Bereiche und Demo-Perspektive')}<div class="more-grid"><section class="card more-card"><h2>Demo-Perspektive</h2><p>Wechsle zur einfachen Baustellenansicht für Max.</p><button class="primary" data-action="switch-role" data-role="employee">Als Mitarbeiter ansehen</button></section><section class="card more-card"><h2>Anmeldung</h2><p>So soll die ruhige Maler-Meyer-Anmeldung aussehen.</p><button class="secondary" data-action="show-login">Anmeldeseite ansehen</button></section><section class="card more-card"><h2>Support</h2><p>Rückmeldungen und Hilfefälle – nicht im täglichen Hauptmenü.</p><button class="secondary" data-action="demo-message" data-message="Der Supportbereich ist in dieser Demo nur ein Beispiel.">Support öffnen</button></section><section class="card more-card"><h2>Einstellungen</h2><p>Benutzer, Rechte und betriebliche Einstellungen gehören hierher.</p><button class="secondary" data-action="demo-message" data-message="Einstellungen werden in der öffentlichen Demo nicht gespeichert.">Einstellungen öffnen</button></section></div><details class="developer-area"><summary>Entwickler- und Testinformationen</summary><p>Statische öffentliche Bedienungsdemo ohne Backend, echte Anmeldung oder Produktivdaten. Rollenwechsel und Eingaben sind Simulationen und werden beim Neuladen verworfen.</p><p>Demo-Version 5 · responsive Oberfläche · keine Verbindung zu Maler Meyer.</p></details>`;
 }
 
 const employeeSteps = [
@@ -234,12 +236,33 @@ const employeeSteps = [
 ];
 
 function employeeLayout() {
-  return `<div class="test-strip">TESTSYSTEM – KEINE PRODUKTIVDATEN <span>Einfacher Beispielablauf für Mitarbeiter.</span></div><div class="main-column"><header class="topbar"><a class="brand" href="#" style="color:var(--navy);margin:0" data-action="employee-home"><span class="brand-mark">MM</span><span><strong style="color:var(--navy)">Maler Meyer</strong><small style="color:var(--muted)">Digitale Baustellenorganisation</small></span></a><button class="profile-button" data-action="employee-more"><span class="avatar">M</span><span class="profile-copy"><strong>Max</strong><small>Mitarbeiter · Demo</small></span></button></header><main id="main-content" class="content" tabindex="-1">${state.view === 'more' ? renderEmployeeMore() : renderEmployeeDay()}</main></div><nav class="mobile-nav" aria-label="Mitarbeiter-Navigation"><button class="nav-button ${state.view !== 'more' ? 'active' : ''}" data-action="employee-home"><span class="nav-icon">H</span><span>Heute</span></button><button class="nav-button" data-action="employee-message" data-message="Zusatzarbeit als Beispiel geöffnet."><span class="nav-icon">+</span><span>Zusatzarbeit</span></button><button class="nav-button" data-action="employee-message" data-message="Notiz und Foto als Beispiel geöffnet."><span class="nav-icon">N</span><span>Notiz</span></button><button class="nav-button ${state.view === 'more' ? 'active' : ''}" data-action="employee-more"><span class="nav-icon">···</span><span>Mehr</span></button></nav>${renderOverlays()}`;
+  return `<div class="test-strip">TESTSYSTEM – KEINE PRODUKTIVDATEN <span>Einfacher Beispielablauf für Mitarbeiter.</span></div><div class="main-column"><header class="topbar"><a class="brand employee-header-brand" href="#" data-action="employee-home" aria-label="Maler Meyer – Heute">${meyerLogo()}<small>Digitale Baustellenorganisation</small></a><button class="profile-button" data-action="employee-more"><span class="avatar">M</span><span class="profile-copy"><strong>Max</strong><small>Mitarbeiter · Demo</small></span></button></header><main id="main-content" class="content" tabindex="-1">${state.view === 'more' ? renderEmployeeMore() : renderEmployeeDay()}</main></div><nav class="mobile-nav" aria-label="Mitarbeiter-Navigation"><button class="nav-button ${state.view !== 'more' ? 'active' : ''}" data-action="employee-home"><span class="nav-icon">H</span><span>Heute</span></button><button class="nav-button" data-action="open-employee-action" data-kind="extra"><span class="nav-icon">+</span><span>Zusatzarbeit</span></button><button class="nav-button" data-action="open-employee-action" data-kind="note"><span class="nav-icon">N</span><span>Notiz</span></button><button class="nav-button ${state.view === 'more' ? 'active' : ''}" data-action="employee-more"><span class="nav-icon">···</span><span>Mehr</span></button></nav>${renderOverlays()}`;
 }
 
 function renderEmployeeDay() {
   const step = employeeSteps[state.employeeStep];
-  return `<div class="employee-day">${pageHead(greeting('Max'), DEMO_DATE)}<section class="card employee-project"><span class="build-number">Bau-Nr. 25148</span><h2>M&B Schinkel</h2><p>Musterstraße 12 · Beispielstadt</p><div class="employee-status"><small>Dein Status</small><strong>${step.status}</strong></div><button class="primary employee-main-action" data-action="employee-step">${step.action}</button></section>${state.employeeLog.length ? `<section class="section card card-pad"><h2>Heute</h2><ol class="timeline">${state.employeeLog.map(item => `<li><time>${item.slice(0,5)}</time><span><strong>${item.slice(8)}</strong><small>Nur in dieser Demo angezeigt</small></span></li>`).join('')}</ol></section>` : ''}<section class="section"><div class="section-title"><h2>Weitere Aktionen</h2></div><div class="employee-actions"><button class="employee-action" data-action="employee-message" data-message="Zusatzarbeit melden – Beispiel geöffnet.">Zusatzarbeit</button><button class="employee-action" data-action="employee-message" data-message="Notiz oder Foto – Beispiel geöffnet.">Notiz / Foto</button><button class="employee-action" data-action="employee-message" data-message="Korrekturmeldung – Beispiel geöffnet.">Korrektur melden</button><button class="employee-action" data-action="employee-message" data-message="Feedback – Beispiel geöffnet.">Feedback</button></div></section><p class="meta section">Große Hauptaktion, wenige Entscheidungen. Alle Zeiten und Baustellen sind erfunden.</p></div>`;
+  return `<div class="employee-day">${pageHead(greeting('Max'), DEMO_DATE)}<section class="card employee-project"><span class="build-number">Bau-Nr. 25148</span><h2>M&B Schinkel</h2><p>Musterstraße 12 · Beispielstadt</p><div class="employee-status"><small>Dein Status</small><strong>${step.status}</strong></div><button class="primary employee-main-action" data-action="employee-step">${step.action}</button></section>${state.employeeLog.length ? `<section class="section card card-pad"><h2>Heute</h2><ol class="timeline">${state.employeeLog.map(item => `<li><time>${item.slice(0,5)}</time><span><strong>${item.slice(8)}</strong><small>Nur in dieser Demo angezeigt</small></span></li>`).join('')}</ol></section>` : ''}${renderEmployeeSubmissions()}<section class="section"><div class="section-title"><h2>Weitere Aktionen</h2></div><div class="employee-actions"><button class="employee-action" data-action="open-employee-action" data-kind="extra">Zusatzarbeit</button><button class="employee-action" data-action="open-employee-action" data-kind="note">Notiz / Foto</button><button class="employee-action" data-action="open-employee-action" data-kind="correction">Korrektur melden</button><button class="employee-action" data-action="open-employee-action" data-kind="feedback">Feedback</button></div></section><p class="meta section">Große Hauptaktion, wenige Entscheidungen. Alle Zeiten und Baustellen sind erfunden.</p></div>`;
+}
+
+function renderEmployeeSubmissions() {
+  if (!state.employeeSubmissions.length) return '';
+  return `<section class="section card card-pad"><div class="section-title"><h2>Meine Meldungen</h2><span class="meta">nur in dieser Demo</span></div><div class="submission-list">${state.employeeSubmissions.map(item => `<article class="submission"><span class="submission-icon" aria-hidden="true">✓</span><span><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.time)} · ${escapeHtml(item.detail)}</small></span></article>`).join('')}</div></section>`;
+}
+
+function renderEmployeeActionDialog() {
+  const kind = state.employeeAction;
+  if (!kind) return '';
+  const settings = {
+    extra: ['Zusatzarbeit melden', 'Zusatzarbeit speichern'],
+    note: ['Notiz oder Foto hinzufügen', 'Notiz speichern'],
+    correction: ['Korrektur melden', 'Korrektur senden'],
+    feedback: ['Feedback geben', 'Feedback senden'],
+  }[kind];
+  const fields = kind === 'extra' ? `<label>Was wurde zusätzlich gemacht?<textarea name="description" required maxlength="300" placeholder="Zum Beispiel: zusätzliche Türzarge gespachtelt"></textarea></label><label>Menge oder Umfang – optional<input name="quantity" maxlength="80" placeholder="Zum Beispiel: 2 Türzargen"></label><label>Foto – optional<input name="photo" type="file" accept="image/*" capture="environment"><small>Das Foto wird in dieser Demo nicht hochgeladen.</small></label><label>Dokumentierte Bestätigung – optional<select name="confirmation"><option>Noch keine Bestätigung</option><option>Kunde wurde informiert</option><option>Bauleitung wurde informiert</option></select></label>`
+    : kind === 'note' ? `<label>Notiz<textarea name="note" required maxlength="400" placeholder="Was soll zur Baustelle festgehalten werden?"></textarea></label><label>Foto – optional<input name="photo" type="file" accept="image/*" capture="environment"><small>Das Foto wird in dieser Demo nicht hochgeladen.</small></label>`
+    : kind === 'correction' ? `<label>Welche Buchung betrifft es?<select name="event"><option>Arbeitsbeginn</option><option>Pause</option><option>Baustellenwechsel</option><option>Feierabend</option></select></label><label>Richtige Uhrzeit<input name="time" type="time" required value="07:00"></label><label>Was soll korrigiert werden?<textarea name="reason" required maxlength="300" placeholder="Zum Beispiel: Arbeitsbeginn war um 06:55 Uhr"></textarea></label>`
+    : `<label>Worum geht es?<select name="category"><option>Verbesserungsvorschlag</option><option>Problem bei der Bedienung</option><option>Frage an das Büro</option></select></label><label>Deine Nachricht<textarea name="feedback" required maxlength="500" placeholder="Schreibe kurz, was dir aufgefallen ist."></textarea></label>`;
+  return `<div class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="employee-action-title"><form class="login-card employee-action-card" data-form="employee-action" data-kind="${kind}"><div class="action-modal-head"><div><span class="build-number">Bau-Nr. 25148</span><h2 id="employee-action-title">${settings[0]}</h2><p>M&B Schinkel</p></div><button class="modal-close" type="button" data-action="close-employee-action" aria-label="Fenster schließen">×</button></div><div class="action-form-fields">${fields}</div><div class="demo-save-note"><strong>Nur Demo</strong><span>Deine Eingabe wird nur bis zum Neuladen auf diesem Gerät angezeigt.</span></div><div class="login-actions"><button class="primary">${settings[1]}</button><button class="secondary" type="button" data-action="close-employee-action">Abbrechen</button></div></form></div>`;
 }
 
 function renderEmployeeMore() {
@@ -248,11 +271,11 @@ function renderEmployeeMore() {
 
 function renderLogin() {
   if (!state.loginPreview) return '';
-  return `<div class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="login-title"><form class="login-card" data-form="demo-login"><div class="login-brand"><span class="brand-mark">MM</span><h2 id="login-title">Maler Meyer</h2><p>Digitale Baustellenorganisation</p><span class="powered">powered by ShoreLogic</span></div><div class="test-strip" style="border-radius:9px">TESTSYSTEM – KEINE PRODUKTIVDATEN</div><label>Benutzername<input name="username" value="torben-demo" autocomplete="username"></label><label>Passwort<input name="password" type="password" value="beispiel" autocomplete="current-password"></label><label class="checkbox-line"><input type="checkbox" name="shared"><span>Dieses Gerät wird von mehreren Mitarbeitern genutzt</span></label><details class="info-note"><summary>Was bedeutet das?</summary><p>Auf gemeinsam genutzten Geräten soll die echte App schneller sperren und beim Benutzerwechsel eine neue Anmeldung verlangen.</p></details><div class="login-actions"><button class="primary">Demo als Torben öffnen</button><button class="secondary" type="button" data-action="hide-login">Schließen</button></div><p class="meta">Keine echte Anmeldung. Bitte keine echten Zugangsdaten eingeben.</p></form></div>`;
+  return `<div class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="login-title"><form class="login-card" data-form="demo-login"><div class="login-brand">${meyerLogo('large')}<h2 id="login-title" class="sr-only">Maler Meyer</h2><p>Digitale Baustellenorganisation</p><span class="powered">powered by ShoreLogic</span></div><div class="test-strip" style="border-radius:9px">TESTSYSTEM – KEINE PRODUKTIVDATEN</div><label>Benutzername<input name="username" value="torben-demo" autocomplete="username"></label><label>Passwort<input name="password" type="password" value="beispiel" autocomplete="current-password"></label><label class="checkbox-line"><input type="checkbox" name="shared"><span>Dieses Gerät wird von mehreren Mitarbeitern genutzt</span></label><details class="info-note"><summary>Was bedeutet das?</summary><p>Auf gemeinsam genutzten Geräten soll die echte App schneller sperren und beim Benutzerwechsel eine neue Anmeldung verlangen.</p></details><div class="login-actions"><button class="primary">Demo als Torben öffnen</button><button class="secondary" type="button" data-action="hide-login">Schließen</button></div><p class="meta">Keine echte Anmeldung. Bitte keine echten Zugangsdaten eingeben.</p></form></div>`;
 }
 
 function renderOverlays() {
-  return `${state.toast ? `<div class="toast" role="status">${escapeHtml(state.toast)}</div>` : ''}${renderLogin()}`;
+  return `${state.toast ? `<div class="toast" role="status">${escapeHtml(state.toast)}</div>` : ''}${renderLogin()}${renderEmployeeActionDialog()}`;
 }
 
 function render() {
@@ -301,6 +324,32 @@ app.addEventListener('submit', event => {
     state.corrected[problem.id] = after;
     state.corrections.unshift({ problemId: problem.id, before, after, editor, reason, when: new Intl.DateTimeFormat('de-DE', { dateStyle: 'short', timeStyle: 'short' }).format(new Date()) });
     state.editProblem = null; render(); showToast('Demo-Korrektur mit Verlauf ergänzt.');
+    return;
+  }
+  if (form.dataset.form === 'employee-action') {
+    const values = new FormData(form);
+    const kind = form.dataset.kind;
+    const photoSelected = Boolean(form.querySelector('[name="photo"]')?.files?.length);
+    const time = new Intl.DateTimeFormat('de-DE', { hour: '2-digit', minute: '2-digit' }).format(new Date());
+    let title = 'Meldung gespeichert';
+    let detail = '';
+    if (kind === 'extra') {
+      title = 'Zusatzarbeit gemeldet';
+      detail = `${values.get('description')}${values.get('quantity') ? ` · ${values.get('quantity')}` : ''}${photoSelected ? ' · Foto ausgewählt' : ''}`;
+    } else if (kind === 'note') {
+      title = 'Baustellennotiz gespeichert';
+      detail = `${values.get('note')}${photoSelected ? ' · Foto ausgewählt' : ''}`;
+    } else if (kind === 'correction') {
+      title = 'Korrektur gemeldet';
+      detail = `${values.get('event')} auf ${values.get('time')} Uhr · ${values.get('reason')}`;
+    } else if (kind === 'feedback') {
+      title = 'Feedback gesendet';
+      detail = `${values.get('category')} · ${values.get('feedback')}`;
+    }
+    state.employeeSubmissions.unshift({ title, detail, time });
+    state.employeeAction = null;
+    render();
+    showToast(`${title}. Nur in dieser Demo gespeichert.`);
   }
 });
 
@@ -327,12 +376,18 @@ app.addEventListener('click', event => {
   if (action === 'switch-role') { state.role = target.dataset.role; state.view = 'today'; state.toast = ''; render(); window.scrollTo(0,0); }
   if (action === 'employee-home') navigate('today');
   if (action === 'employee-more') navigate('more');
+  if (action === 'open-employee-action') { state.employeeAction = target.dataset.kind; render(); document.querySelector('.employee-action-card textarea, .employee-action-card input')?.focus(); }
+  if (action === 'close-employee-action') { state.employeeAction = null; render(); }
   if (action === 'employee-message') showToast(target.dataset.message);
   if (action === 'employee-step') {
     if (state.employeeStep === employeeSteps.length - 1) { state.employeeStep = 0; state.employeeLog = []; }
     else { const eventText = employeeSteps[state.employeeStep].log; if (eventText) state.employeeLog.push(eventText); state.employeeStep += 1; }
     render();
   }
+});
+
+app.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && state.employeeAction) { state.employeeAction = null; render(); }
 });
 
 render();
