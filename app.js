@@ -1,393 +1,535 @@
 'use strict';
 
 const DEMO_DATE = 'Donnerstag, 10. September';
-
-const employees = [
-  { id: 'M-0042', name: 'Max Mustermann', job: 'Mitarbeiter', status: 'NOT_STARTED', site: '25148', since: 'noch nicht', issue: true },
-  { id: 'M-0047', name: 'Erika Beispiel', job: 'Mitarbeiterin', status: 'WORKING', site: '25148', since: '07:05', issue: false },
-  { id: 'M-0051', name: 'Jan Testmann', job: 'Vorarbeiter', status: 'ON_BREAK', site: '25152', since: '12:15', issue: false },
-  { id: 'M-0056', name: 'Lea Muster', job: 'Mitarbeiterin', status: 'TRAVELING', site: '25160 → 25163', since: '12:08', issue: true },
-  { id: 'M-0062', name: 'Sam Beispiel', job: 'Mitarbeiter', status: 'WORKING', site: '25160', since: '07:12', issue: false },
-  { id: 'M-0068', name: 'Nora Test', job: 'Mitarbeiterin', status: 'NOT_PLANNED', site: '–', since: '–', issue: false },
-  { id: 'M-0073', name: 'Luis Muster', job: 'Auszubildender', status: 'WORKING', site: '25148', since: '09:45', issue: false },
-  { id: 'M-0079', name: 'Mia Beispiel', job: 'Vorarbeiterin', status: 'WORKING', site: '25170', since: '06:42', issue: false },
-  { id: 'M-0084', name: 'Paul Probier', job: 'Mitarbeiter', status: 'WORKING', site: '25152', since: '06:58', issue: false },
-  { id: 'M-0088', name: 'Sina Beispiel', job: 'Mitarbeiterin', status: 'ON_BREAK', site: '25163', since: '12:22', issue: false },
-  { id: 'M-0091', name: 'Tom Muster', job: 'Mitarbeiter', status: 'NOT_STARTED', site: '25170', since: 'noch nicht', issue: false },
-  { id: 'M-0095', name: 'Eva Test', job: 'Mitarbeiterin', status: 'NOT_PLANNED', site: '–', since: '–', issue: false },
-];
-
-const sites = [
-  { id: 's-25148', number: '25148', name: 'M&B Schinkel', address: 'Musterstraße 12 · Beispielstadt', status: 'Läuft planmäßig', statusKind: 'ok', people: ['Max Mustermann', 'Erika Beispiel', 'Luis Muster'], time: '2 arbeiten · 1 Start fehlt', extras: 2, issues: ['Arbeitsbeginn von Max fehlt'], notes: ['Untergrund im Treppenhaus geprüft', 'Materiallieferung für Freitag bestätigt'], photo: 'Treppenhaus · erfundener Foto-Platzhalter' },
-  { id: 's-25152', number: '25152', name: 'BBS Ahrensburg', address: 'Schulweg 18 · Beispielort', status: 'Läuft', statusKind: 'ok', people: ['Jan Testmann', 'Paul Probier'], time: '1 arbeitet · 1 Pause', extras: 1, issues: [], notes: ['Flur im 2. OG heute abschließen', 'Hausmeister wurde beispielhaft informiert'], photo: '' },
-  { id: 's-25160', number: '25160', name: 'Kita Sonnenhof', address: 'Sonnenring 3 · Musterstadt', status: 'Wechsel im Tagesplan', statusKind: 'warn', people: ['Sam Beispiel', 'Lea Muster'], time: '1 arbeitet · 1 unterwegs', extras: 1, issues: ['Ankunftsbuchung von Lea steht noch aus'], notes: ['Gruppenraum Blau fertig', 'Lea wechselt mittags zur Bau-Nr. 25163'], photo: 'Gruppenraum · erfundener Foto-Platzhalter' },
-  { id: 's-25163', number: '25163', name: 'Praxis Elbpark', address: 'Hafenallee 21 · Beispielort', status: 'Rückfrage offen', statusKind: 'warn', people: ['Sina Beispiel', 'Lea Muster (unterwegs)'], time: '1 Pause · 1 angekündigt', extras: 1, issues: ['Zusatzarbeit wegen Feuchtigkeit prüfen'], notes: ['Empfangsbereich abgeklebt', 'Beispielhafte Feuchtstelle dokumentiert'], photo: 'Wandfläche · erfundener Foto-Platzhalter' },
-  { id: 's-25170', number: '25170', name: 'Wohnanlage Lindenhof', address: 'Lindenweg 14 · Musterstadt', status: 'Start prüfen', statusKind: 'problem', people: ['Mia Beispiel', 'Tom Muster'], time: '1 arbeitet · 1 Start fehlt', extras: 1, issues: ['Tom hat noch nicht gestartet'], notes: ['Mia beginnt im Treppenhaus A', 'Sockelleisten als Zusatzarbeit gemeldet'], photo: '' },
-];
-
-const employeeEvents = {
-  'M-0042': [
-    ['–', 'Arbeitsbeginn fehlt', 'Bau-Nr. 25148', 'Prüfung nötig'],
-  ],
-  'M-0047': [
-    ['07:05', 'Arbeit gestartet', 'Bau-Nr. 25148', 'Erika Beispiel'],
-    ['09:35', 'Pause gestartet', 'Bau-Nr. 25148', 'Erika Beispiel'],
-    ['10:05', 'Pause beendet', 'Bau-Nr. 25148', 'Erika Beispiel'],
-  ],
-  'M-0051': [
-    ['06:55', 'Arbeit gestartet', 'Bau-Nr. 25152', 'Jan Testmann'],
-    ['12:15', 'Pause gestartet', 'Bau-Nr. 25152', 'Jan Testmann'],
-  ],
-  'M-0056': [
-    ['07:10', 'Arbeit gestartet', 'Bau-Nr. 25160', 'Lea Muster'],
-    ['12:08', 'Arbeit auf Baustelle abgeschlossen', 'Bau-Nr. 25160', 'Lea Muster'],
-    ['12:08', 'Fahrt zur nächsten Baustelle begonnen', '25160 → 25163', 'Lea Muster'],
-    ['–', 'Ankunft und Arbeitsfortsetzung fehlen', 'Bau-Nr. 25163', 'Prüfung nötig'],
-  ],
-  'M-0062': [['07:12', 'Arbeit gestartet', 'Bau-Nr. 25160', 'Sam Beispiel']],
-  'M-0073': [['09:45', 'Arbeit gestartet', 'Bau-Nr. 25148', 'Jan Testmann · Vorarbeiter']],
-  'M-0079': [['06:42', 'Arbeit gestartet', 'Bau-Nr. 25170', 'Mia Beispiel']],
-  'M-0084': [['06:58', 'Arbeit gestartet', 'Bau-Nr. 25152', 'Paul Probier']],
-  'M-0088': [['07:03', 'Arbeit gestartet', 'Bau-Nr. 25163', 'Sina Beispiel'], ['12:22', 'Pause gestartet', 'Bau-Nr. 25163', 'Sina Beispiel']],
-  'M-0091': [['–', 'Noch nicht gestartet', 'Bau-Nr. 25170', 'Kein Ereignis']],
-};
-
-const extraWorks = [
-  { id: 'ZA-104', site: '25148', siteName: 'M&B Schinkel', employee: 'Erika Beispiel', title: 'Zusätzliche Spachtelarbeiten im Flur', time: 'Heute · 09:42', quantity: '18 m²', photo: true, confirmation: 'Noch keine Bestätigung', status: 'Neu', kind: 'new' },
-  { id: 'ZA-105', site: '25152', siteName: 'BBS Ahrensburg', employee: 'Jan Testmann', title: 'Vier Türzargen zusätzlich lackieren', time: 'Heute · 10:18', quantity: '4 Stück', photo: false, confirmation: 'Bestätigung dokumentiert', status: 'Prüfung', kind: 'review' },
-  { id: 'ZA-106', site: '25163', siteName: 'Praxis Elbpark', employee: 'Sina Beispiel', title: 'Feuchtstelle vor weiterer Arbeit dokumentieren', time: 'Heute · 11:06', quantity: '1 Wandfläche', photo: true, confirmation: 'Rückfrage beim Bauleiter', status: 'Neu', kind: 'new' },
-  { id: 'ZA-107', site: '25160', siteName: 'Kita Sonnenhof', employee: 'Sam Beispiel', title: 'Zusätzlicher zweiter Deckenanstrich', time: 'Heute · 11:34', quantity: '45 m²', photo: true, confirmation: 'Noch keine Bestätigung', status: 'Neu', kind: 'new' },
-  { id: 'ZA-108', site: '25170', siteName: 'Wohnanlage Lindenhof', employee: 'Mia Beispiel', title: 'Sockelleisten im Treppenhaus ergänzen', time: 'Heute · 08:52', quantity: '23 m', photo: false, confirmation: 'Bestätigung dokumentiert', status: 'Neu', kind: 'new' },
-  { id: 'ZA-109', site: '25148', siteName: 'M&B Schinkel', employee: 'Luis Muster', title: 'Schutzabdeckung im Eingangsbereich erweitern', time: 'Gestern · 14:21', quantity: '12 m²', photo: false, confirmation: 'Wartet auf Prüfung', status: 'Prüfung', kind: 'review' },
-];
-
-const weeks = [
-  { id: 'W-42', employee: 'Max Mustermann', week: 'KW 37', status: 'Nacharbeit nötig', kind: 'problem', detail: 'Arbeitsbeginn am Donnerstag fehlt', progress: 70 },
-  { id: 'W-47', employee: 'Erika Beispiel', week: 'KW 37', status: 'Wartet auf Prüfung', kind: 'warn', detail: 'Vom Mitarbeiter bestätigt', progress: 100 },
-  { id: 'W-51', employee: 'Jan Testmann', week: 'KW 37', status: 'Wartet auf Freigabe', kind: 'warn', detail: 'Alle fünf Tage vollständig', progress: 100 },
-  { id: 'W-79', employee: 'Mia Beispiel', week: 'KW 37', status: 'Freigegeben', kind: 'ok', detail: 'Beispielhaft durch das Büro geprüft', progress: 100 },
-];
-
-const timeProblems = [
-  { id: 'TP-01', employeeId: 'M-0042', employee: 'Max Mustermann', site: '25148', title: 'Arbeitsbeginn fehlt', original: 'Kein Arbeitsbeginn vorhanden', suggestion: '07:00' },
-  { id: 'TP-02', employeeId: 'M-0056', employee: 'Lea Muster', site: '25163', title: 'Ankunftsbuchung fehlt', original: 'Fahrt läuft seit 12:08', suggestion: '12:27' },
-];
-
-const editors = ['Torben · Geschäftsführung', 'Sabine Beispiel · Büro', 'Petra Muster · Büro'];
-const statusText = { WORKING: 'Arbeitet', ON_BREAK: 'Pause', TRAVELING: 'Unterwegs', NOT_STARTED: 'Noch nicht gestartet', NOT_PLANNED: 'Nicht eingeplant' };
-const statusKind = { WORKING: 'ok', ON_BREAK: 'warn', TRAVELING: 'travel', NOT_STARTED: 'problem', NOT_PLANNED: '' };
-
-const state = {
-  role: 'management', view: 'today', query: '', selectedSite: null, selectedEmployee: null,
-  employeeFilter: 'all', extraFilter: 'all', editProblem: null, corrections: [], corrected: {},
-  employeeStep: 0, employeeLog: [], employeeAction: null, employeeSubmissions: [],
-  loginPreview: false, toast: '',
-};
-
+const STORAGE_KEY = 'maler-meyer-demo-v6';
 const app = document.getElementById('app');
 
-function escapeHtml(value) {
-  return String(value).replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]);
+const profiles = {
+  management: { name: 'Torben', label: 'Geschäftsführung', initial: 'T' },
+  office: { name: 'Sabine Beispiel', label: 'Büro', initial: 'S' },
+  foreman: { name: 'Jan Testmann', label: 'Vorarbeiter', initial: 'J', employeeId: 'M-0003' },
+  employee: { name: 'Max Beispiel', label: 'Mitarbeiter', initial: 'M', employeeId: 'M-0001' }
+};
+const statusText = { WORKING: 'Arbeitet', ON_BREAK: 'Pause', TRAVELING: 'Unterwegs', NOT_STARTED: 'Noch nicht gestartet', NOT_PLANNED: 'Nicht eingeplant', FINISHED: 'Beendet', REVIEW: 'Prüfbedarf' };
+const statusKind = { WORKING: 'ok', ON_BREAK: 'warn', TRAVELING: 'travel', NOT_STARTED: 'problem', NOT_PLANNED: '', FINISHED: 'ok', REVIEW: 'problem' };
+const eventText = { WORK_START: 'Arbeit gestartet', BREAK_START: 'Pause gestartet', BREAK_END: 'Pause beendet', SITE_LEAVE: 'Baustelle verlassen', TRAVEL_START: 'Fahrt begonnen', TRAVEL_END: 'Fahrt beendet', WORK_RESUME: 'Arbeit fortgesetzt', WORK_END: 'Feierabend', CORRECTION: 'Korrektur ergänzt' };
+const weekText = { DRAFT: 'Entwurf', EMPLOYEE_CONFIRMED: 'Vom Mitarbeiter bestätigt', ADMIN_APPROVED: 'Freigegeben', NEEDS_CORRECTION: 'Unvollständig', NEEDS_REVIEW: 'Erneute Prüfung nötig' };
+
+let db = loadDb();
+const ui = { role: 'management', view: 'today', query: '', employeeFilter: 'all', selectedSite: null, selectedEmployee: null, selectedWeek: null, editCorrection: null, decisionExtra: null, employeeAction: null, switchSite: false, login: false, toast: '' };
+let toastTimer = null;
+
+function loadDb() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (saved && saved.version === window.DEMO_DATA_VERSION && saved.data) return saved.data;
+  } catch (_) {}
+  return window.createDemoSeed();
 }
-
-function greeting(name) {
-  const hour = new Date().getHours();
-  const words = hour < 11 ? 'Guten Morgen' : hour < 18 ? 'Guten Tag' : 'Guten Abend';
-  return `${words}, ${name}`;
+function saveDb() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: window.DEMO_DATA_VERSION, data: db })); } catch (_) {}
 }
+function resetDb() { db = window.createDemoSeed(); saveDb(); Object.assign(ui, { view: 'today', query: '', employeeFilter: 'all', selectedSite: null, selectedEmployee: null, selectedWeek: null, editCorrection: null, decisionExtra: null, employeeAction: null, switchSite: false }); }
+function esc(value) { return String(value == null ? '' : value).replace(/[&<>'"]/g, function (char) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]; }); }
+function timeNow() { return new Intl.DateTimeFormat('de-DE', { hour: '2-digit', minute: '2-digit' }).format(new Date()); }
+function makeId(prefix) { return prefix + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 6); }
+function person(id) { return db.employees.find(function (item) { return item.id === id; }); }
+function site(number) { return db.sites.find(function (item) { return item.number === number; }); }
+function employeeName(id) { const item = person(id); return item ? item.name : id; }
+function siteName(number) { const item = site(number); return item ? item.name : 'Keine Baustelle'; }
+function assignment(employeeId) { return db.assignments.find(function (item) { return item.employeeId === employeeId; }); }
+function profile() { return profiles[ui.role]; }
+function actor() { return profile().name + ' · ' + profile().label; }
+function isOfficeRole() { return ui.role === 'management' || ui.role === 'office'; }
+function eventsFor(id) { return db.events.filter(function (item) { return item.employeeId === id; }); }
+function openCorrections() { return db.correctionRequests.filter(function (item) { return item.status === 'OPEN'; }); }
+function openExtras() { return db.extras.filter(function (item) { return item.commercialStatus === 'OPEN'; }); }
+function pendingWeeks() { return db.weeklySheets.filter(function (item) { return item.status !== 'ADMIN_APPROVED'; }); }
+function greeting(name) { const hour = new Date().getHours(); return (hour < 11 ? 'Guten Morgen' : hour < 18 ? 'Guten Tag' : 'Guten Abend') + ', ' + name; }
+function badge(text, kind) { return `<span class="badge ${kind || ''}">${esc(text)}</span>`; }
+function logo(size) { return `<span class="meyer-wordmark ${size || ''}" aria-hidden="true"><span>maler</span><span>meyer</span></span>`; }
+function assumption(text) { return `<p class="assumption"><strong>Demo-Annahme</strong><span>${esc(text)}</span></p>`; }
+function head(title, subtitle) { return `<div class="page-head"><div><h1>${esc(title)}</h1><p>${esc(subtitle)}</p></div><span class="demo-context">Erfundener Beispieltag</span></div>`; }
 
-function badge(text, kind = '') { return `<span class="badge ${kind}">${escapeHtml(text)}</span>`; }
-function meyerLogo(size = '') { return `<span class="meyer-wordmark ${size}" aria-hidden="true"><span>maler</span><span>meyer</span></span>`; }
-function person(id) { return employees.find(item => item.id === id); }
-function siteByNumber(number) { return sites.find(item => item.number === number); }
-
-const navItems = [
-  ['today', 'H', 'Heute'], ['sites', 'B', 'Baustellen'], ['employees', 'M', 'Mitarbeiter'],
-  ['times', 'Z', 'Zeiten prüfen'], ['extras', '+', 'Zusatzarbeiten'], ['weeks', 'W', 'Wochenzettel'], ['more', '···', 'Mehr'],
-];
-
-function navButton(item, mobile = false) {
-  const active = state.view === item[0] || (mobile && item[0] === 'more' && ['employees', 'extras', 'weeks', 'more'].includes(state.view));
-  return `<button class="nav-button ${active ? 'active' : ''}" data-action="navigate" data-view="${item[0]}" ${active ? 'aria-current="page"' : ''}><span class="nav-icon" aria-hidden="true">${item[1]}</span><span>${item[2]}</span></button>`;
+function navItems() {
+  if (ui.role === 'employee') return [['today', 'H', 'Heute'], ['employee-extra', '+', 'Zusatzarbeit'], ['employee-note', 'N', 'Notiz'], ['more', '···', 'Mehr']];
+  if (ui.role === 'foreman') return [['today', 'H', 'Heute'], ['crew', 'K', 'Kolonne'], ['sites', 'B', 'Baustelle'], ['more', '···', 'Mehr']];
+  return [['today', 'H', 'Heute'], ['planning', 'P', 'Planung'], ['sites', 'B', 'Baustellen'], ['employees', 'M', 'Mitarbeiter'], ['times', 'Z', 'Zeiten prüfen'], ['extras', '+', 'Zusatzarbeiten'], ['weeks', 'W', 'Wochenzettel'], ['exports', '⇩', 'Exporte'], ['more', '···', 'Mehr']];
 }
-
+function mobileItems() {
+  if (ui.role === 'employee' || ui.role === 'foreman') return navItems();
+  return ui.role === 'office' ? [['today', 'H', 'Heute'], ['times', 'Z', 'Zeiten'], ['extras', '+', 'Zusätze'], ['more', '···', 'Mehr']] : [['today', 'H', 'Heute'], ['sites', 'B', 'Baustellen'], ['times', 'Z', 'Zeiten'], ['more', '···', 'Mehr']];
+}
+function navButton(item) {
+  const mobileMore = item[0] === 'more' && ['planning', 'employees', 'weeks', 'exports'].includes(ui.view);
+  const active = ui.view === item[0] || mobileMore;
+  return `<button class="nav-button ${active ? 'active' : ''}" data-action="navigate" data-view="${item[0]}" ${active ? 'aria-current="page"' : ''}><span class="nav-icon">${item[1]}</span><span>${item[2]}</span></button>`;
+}
 function searchResults() {
-  const query = state.query.trim().toLowerCase();
-  if (query.length < 2) return '';
-  const matches = [
-    ...sites.filter(site => `${site.number} ${site.name} ${site.address}`.toLowerCase().includes(query)).map(site => ({ type: 'site', id: site.id, main: `Bau-Nr. ${site.number} · ${site.name}`, sub: site.address })),
-    ...employees.filter(employee => `${employee.name} ${employee.id} ${employee.site}`.toLowerCase().includes(query)).map(employee => ({ type: 'employee', id: employee.id, main: employee.name, sub: `${employee.job} · ${employee.site === '–' ? 'nicht eingeplant' : `Bau-Nr. ${employee.site}`}` })),
-  ].slice(0, 8);
-  return `<div class="search-results" role="listbox" aria-label="Suchergebnisse">${matches.length ? matches.map(match => `<button class="search-result" data-action="open-${match.type}" data-id="${match.id}"><span><strong>${escapeHtml(match.main)}</strong></span><span>${escapeHtml(match.sub)}</span></button>`).join('') : '<div class="empty-note">Keine passende Bau-Nr., Baustelle oder Person gefunden.</div>'}</div>`;
+  const q = ui.query.trim().toLowerCase();
+  if (q.length < 2) return '';
+  const matches = [];
+  db.sites.forEach(function (item) { if ((item.number + ' ' + item.name + ' ' + item.address).toLowerCase().includes(q)) matches.push({ type: 'site', id: item.number, main: 'Bau-Nr. ' + item.number + ' · ' + item.name, sub: item.address }); });
+  db.employees.forEach(function (item) { if ((item.name + ' ' + item.id + ' ' + (item.site || '')).toLowerCase().includes(q)) matches.push({ type: 'employee', id: item.id, main: item.name, sub: statusText[item.status] + (item.site ? ' · Bau-Nr. ' + item.site : '') }); });
+  return `<div class="search-results" role="listbox">${matches.length ? matches.slice(0, 10).map(function (item) { return `<button class="search-result" data-action="open-${item.type}" data-id="${item.id}"><span><strong>${esc(item.main)}</strong></span><span>${esc(item.sub)}</span></button>`; }).join('') : '<div class="empty-note">Kein passender Eintrag.</div>'}</div>`;
+}
+function renderShell() {
+  const p = profile();
+  return `<div class="test-strip">TESTSYSTEM – KEINE PRODUKTIVDATEN <span>Alle Personen, Baustellen, Bilder und Vorgänge sind erfunden.</span></div><div class="app-shell"><aside class="sidebar"><a class="brand" href="#" data-action="navigate" data-view="today">${logo()}<small>Digitale Baustellenorganisation</small></a><nav class="side-nav">${navItems().map(navButton).join('')}</nav><div class="sidebar-footer"><strong>${esc(p.name)}</strong><small>${esc(p.label)} · Demo</small><small>powered by ShoreLogic</small></div></aside><div class="main-column"><header class="topbar"><a class="mobile-brand" href="#" data-action="navigate" data-view="today">${logo('compact')}</a>${isOfficeRole() ? `<div class="search-wrap"><span class="search-symbol">⌕</span><label class="sr-only" for="global-search">Bau-Nr., Baustelle oder Mitarbeiter suchen</label><input id="global-search" class="search-box" value="${esc(ui.query)}" placeholder="Bau-Nr., Baustelle oder Mitarbeiter suchen">${searchResults()}</div>` : '<div></div>'}<button class="profile-button" data-action="navigate" data-view="more"><span class="avatar">${p.initial}</span><span class="profile-copy"><strong>${esc(p.name)}</strong><small>${esc(p.label)}</small></span></button></header><main id="main-content" class="content" tabindex="-1">${renderView()}</main></div></div><nav class="mobile-nav">${mobileItems().map(navButton).join('')}</nav>${renderOverlays()}`;
+}
+function renderView() {
+  if (ui.view === 'employee-extra') { ui.employeeAction = 'extra'; ui.view = 'today'; }
+  if (ui.view === 'employee-note') { ui.employeeAction = 'note'; ui.view = 'today'; }
+  if (ui.role === 'employee') return ui.view === 'more' ? renderMoreV6() : renderEmployee();
+  if (ui.role === 'foreman') {
+    if (ui.view === 'crew') return renderCrew();
+    if (ui.view === 'sites') { ui.selectedSite = person(profile().employeeId).site; return renderSites(true); }
+    if (ui.view === 'more') return renderMoreV6();
+    return renderForeman();
+  }
+  if (ui.view === 'planning') return renderPlanning();
+  if (ui.view === 'sites') return renderSites(false);
+  if (ui.view === 'employees') return renderEmployees();
+  if (ui.view === 'times') return renderTimes();
+  if (ui.view === 'extras') return renderExtras();
+  if (ui.view === 'weeks') return renderWeeks();
+  if (ui.view === 'exports') return renderExports();
+  if (ui.view === 'more') return renderMoreV6();
+  return ui.role === 'office' ? renderOffice() : renderManagement();
+}
+function statusGrid() {
+  const counts = db.employees.reduce(function (all, item) { all[item.status] = (all[item.status] || 0) + 1; return all; }, {});
+  return `<div class="status-grid status-grid-wide">${[['WORKING', 'Arbeiten'], ['ON_BREAK', 'Pause'], ['TRAVELING', 'Unterwegs'], ['NOT_STARTED', 'Noch nicht gestartet'], ['FINISHED', 'Beendet'], ['NOT_PLANNED', 'Nicht eingeplant'], ['REVIEW', 'Prüfbedarf']].map(function (item) { return `<button class="status-card" data-action="filter-status" data-status="${item[0]}"><strong>${counts[item[0]] || 0}</strong><span><i class="status-dot ${statusKind[item[0]] || 'free'}"></i>${item[1]}</span><small>Personen anzeigen</small></button>`; }).join('')}</div>`;
+}
+function renderManagement() {
+  const newCount = db.extras.filter(function (item) { return item.docStatus === 'REPORTED'; }).length;
+  const decided = db.extras.filter(function (item) { return item.commercialStatus !== 'OPEN'; }).length;
+  return `${head(greeting('Torben'), DEMO_DATE + ' · Dein Betrieb auf einem Bildschirm')}${statusGrid()}${assumption('Der Beispieltag wird um 08:15 betrachtet. Erst ab diesem fiktiven Prüfzeitpunkt erscheinen fehlende Starts als Hinweis. Eine echte Schwelle ist noch offen.')}<div class="dashboard-grid section"><section class="attention-card"><div class="attention-head"><div><h2>Aufmerksamkeit nötig</h2><p>Nur Vorgänge, bei denen ein Blick sinnvoll ist.</p></div><span class="attention-count">${openCorrections().length + openExtras().length + pendingWeeks().length}</span></div><div class="attention-list"><button class="attention-item" data-action="navigate" data-view="times"><span><strong>${openCorrections().length} Zeitkorrekturen offen</strong><small>Originale bleiben erhalten</small></span><span class="action-word">Prüfen</span></button><button class="attention-item" data-action="navigate" data-view="extras"><span><strong>${openExtras().length} Zusatzarbeiten kaufmännisch offen</strong><small>Dokumentation und Abrechnung getrennt</small></span><span class="action-word">Ansehen</span></button><button class="attention-item" data-action="navigate" data-view="weeks"><span><strong>${pendingWeeks().length} Wochenzettel nicht freigegeben</strong><small>Fehler und erneute Prüfungen zuerst</small></span><span class="action-word">Prüfen</span></button></div></section><section class="card extra-summary"><h2>Zusatzarbeiten</h2><p>Zusätzliche Leistungen früh festhalten.</p><div class="metric-row"><div class="metric"><strong>${newCount}</strong><span>neu</span></div><div class="metric"><strong>${openExtras().length}</strong><span>offen</span></div><div class="metric"><strong>${decided}</strong><span>entschieden</span></div></div><button class="primary light" data-action="navigate" data-view="extras">Zusatzarbeiten öffnen</button></section></div><section class="section"><div class="section-title"><h2>Aktive Baustellen</h2><button data-action="navigate" data-view="sites">Alle Baustellen</button></div><div class="site-mini-grid">${db.sites.map(siteMini).join('')}</div></section>`;
+}
+function renderOffice() {
+  return `${head(greeting(profile().name), 'Arbeitsvorrat im Büro · ' + DEMO_DATE)}<div class="work-queue"><button class="queue-card problem-card" data-action="navigate" data-view="times"><strong>${openCorrections().length}</strong><span>Zeitkorrekturen offen</span><small>Original und Änderung bleiben sichtbar</small></button><button class="queue-card" data-action="navigate" data-view="extras"><strong>${openExtras().length}</strong><span>Zusatzarbeiten offen</span><small>kaufmännische Prüfung</small></button><button class="queue-card" data-action="navigate" data-view="weeks"><strong>${pendingWeeks().length}</strong><span>Wochenzettel offen</span><small>prüfen oder freigeben</small></button><button class="queue-card" data-action="navigate" data-view="exports"><strong>3</strong><span>Exportarten</span><small>PDF und CSV</small></button></div>${assumption('Welche Bürokraft welche kaufmännische Entscheidung treffen darf, ist noch nicht endgültig beschlossen. In der Demo kann die Büro-Rolle beide Varianten testen.')}`;
+}
+function siteMini(item) {
+  const workers = db.employees.filter(function (employee) { return employee.site === item.number && ['WORKING', 'ON_BREAK'].includes(employee.status); }).length;
+  return `<button class="card site-mini" data-action="open-site" data-id="${item.number}"><span class="build-number">Bau-Nr. ${item.number}</span><h3>${esc(item.name)}</h3><p>${workers} vor Ort · ${item.open.length + openExtras().filter(function (extra) { return extra.site === item.number; }).length} offene Hinweise</p>${badge(item.status, item.kind)}</button>`;
 }
 
-function managerLayout() {
-  const content = renderManagerView();
-  return `<div class="test-strip">TESTSYSTEM – KEINE PRODUKTIVDATEN <span>Alle Namen, Bau-Nrn. und Vorgänge sind erfunden.</span></div>
-  <div class="app-shell">
-    <aside class="sidebar"><a class="brand" href="#" data-action="navigate" data-view="today" aria-label="Maler Meyer – Heute">${meyerLogo()}<small>Digitale Baustellenorganisation</small></a><nav class="side-nav" aria-label="Hauptnavigation">${navItems.map(item => navButton(item)).join('')}</nav><div class="sidebar-footer"><strong>Torben</strong><small>Geschäftsführung · Demo</small><small>powered by ShoreLogic</small></div></aside>
-    <div class="main-column"><header class="topbar"><a class="mobile-brand" href="#" data-action="navigate" data-view="today" aria-label="Maler Meyer – Heute">${meyerLogo('compact')}</a><div class="search-wrap"><span class="search-symbol" aria-hidden="true">⌕</span><label class="sr-only" for="global-search">Bau-Nr., Baustelle oder Mitarbeiter suchen</label><input id="global-search" class="search-box" autocomplete="off" value="${escapeHtml(state.query)}" placeholder="Bau-Nr., Baustelle oder Mitarbeiter suchen">${searchResults()}</div><button class="profile-button" data-action="navigate" data-view="more"><span class="avatar">T</span><span class="profile-copy"><strong>Torben</strong><small>Geschäftsführung</small></span></button></header><main id="main-content" class="content" tabindex="-1">${content}</main></div>
-  </div><nav class="mobile-nav" aria-label="Mobile Navigation">${[['today','H','Heute'],['sites','B','Baustellen'],['times','Z','Zeiten'],['more','···','Mehr']].map(item => navButton(item, true)).join('')}</nav>${renderOverlays()}`;
+function renderPlanning() {
+  return `${head('Tagesplanung', 'Aktuelle Zuordnung für ' + DEMO_DATE)}${assumption('Geschäftsführung und Büro dürfen in dieser Demo die Tagesplanung ändern. Die endgültigen Planungsrechte und die vollständige Wochenplanung sind noch offen.')}<div class="toolbar"><span><strong>${db.assignments.length}</strong> geplante Einsätze</span><button class="secondary" data-action="download-planning">Planung als CSV</button></div><div class="list">${db.employees.map(function (employee) {
+    const current = assignment(employee.id);
+    return `<article class="card planning-card"><div><strong>${esc(employee.name)}</strong><small>${esc(employee.job)} · ${statusText[employee.status]}</small></div><form data-form="planning-change" data-employee="${employee.id}"><select name="site" aria-label="Baustelle für ${esc(employee.name)}"><option value="">Nicht eingeplant</option>${db.sites.map(function (item) { return `<option value="${item.number}" ${current && current.site === item.number ? 'selected' : ''}>Bau-Nr. ${item.number} · ${esc(item.name)}</option>`; }).join('')}</select><input name="reason" aria-label="Grund der Umplanung" placeholder="Grund der Änderung" required><button class="secondary">Zuordnung speichern</button></form>${current && current.originalSite ? `<div class="change-note"><strong>Geändert:</strong> ${esc(current.originalSite || 'nicht eingeplant')} → ${esc(current.site || 'nicht eingeplant')}<small>${esc(current.changedBy)} · ${esc(current.changedAt)} · ${esc(current.note)}</small></div>` : ''}</article>`;
+  }).join('')}</div>`;
 }
 
-function renderManagerView() {
-  if (state.view === 'sites') return renderSites();
-  if (state.view === 'employees') return renderEmployees();
-  if (state.view === 'times') return renderTimes();
-  if (state.view === 'extras') return renderExtras();
-  if (state.view === 'weeks') return renderWeeks();
-  if (state.view === 'more') return renderMore();
-  return renderToday();
+function renderSites(single) {
+  const items = single ? db.sites.filter(function (item) { return item.number === ui.selectedSite; }) : db.sites;
+  return `${head(single ? 'Meine Baustelle' : 'Baustellen', 'Die Bau-Nr. verbindet Planung, Zeiten und Dokumentation')}<div class="site-grid">${items.map(function (item) { return siteCard(item, single || ui.selectedSite === item.number); }).join('')}</div>`;
 }
-
-function pageHead(title, text) {
-  return `<div class="page-head"><div><h1>${title}</h1><p>${text}</p></div><span class="demo-context">Erfundener Beispieltag</span></div>`;
+function siteCard(item, open) {
+  const members = db.employees.filter(function (employee) { return employee.site === item.number; });
+  return `<article class="card site-card"><button class="site-button" data-action="open-site" data-id="${item.number}" aria-expanded="${open}"><div class="site-top"><span class="build-number">Bau-Nr. ${item.number}</span>${badge(item.status, item.kind)}</div><h3>${esc(item.name)}</h3><p>${esc(item.address)}</p><div class="team-line">${members.slice(0, 5).map(function (employee) { return `<span class="person-chip">${esc(employee.name)} · ${statusText[employee.status]}</span>`; }).join('')}${members.length > 5 ? `<span class="person-chip">+${members.length - 5} weitere</span>` : ''}</div></button>${open ? siteFolder(item) : ''}</article>`;
 }
-
-function renderToday() {
-  const counts = ['WORKING','ON_BREAK','TRAVELING','NOT_STARTED','NOT_PLANNED'].map(status => [status, employees.filter(item => item.status === status).length]);
-  return `${pageHead(greeting('Torben'), DEMO_DATE)}
-  <section aria-labelledby="today-status"><div class="section-title"><h2 id="today-status">Heute im Betrieb</h2><span class="meta">12 Testmitarbeiter · 5 aktive Baustellen</span></div><div class="status-grid">${counts.map(([status,count]) => `<button class="status-card" data-action="filter-employees" data-filter="${status}"><strong>${count}</strong><span><i class="status-dot ${status === 'ON_BREAK' ? 'pause' : status === 'TRAVELING' ? 'travel' : status === 'NOT_STARTED' ? 'wait' : status === 'NOT_PLANNED' ? 'free' : ''}"></i>${statusText[status]}</span><small>Personen ansehen</small></button>`).join('')}</div></section>
-  <div class="dashboard-grid section"><section class="attention-card" aria-labelledby="attention-title"><div class="attention-head"><div><h2 id="attention-title">Aufmerksamkeit nötig</h2><p>Vier Punkte solltest du heute prüfen.</p></div><span class="attention-count">4</span></div><div class="attention-list">
-    <button class="attention-item" data-action="filter-employees" data-filter="NOT_STARTED"><span><strong>2 Mitarbeiter haben noch nicht gestartet</strong><small>Bau-Nr. 25148 und 25170</small></span><span class="action-word">Ansehen</span></button>
-    <button class="attention-item" data-action="navigate" data-view="times"><span><strong>2 Zeitbuchungen sind unvollständig</strong><small>Arbeitsbeginn und Ankunft fehlen</small></span><span class="action-word">Prüfen</span></button>
-    <button class="attention-item" data-action="navigate" data-view="extras"><span><strong>4 neue Zusatzarbeiten</strong><small>Abrechenbare Arbeiten nicht vergessen</small></span><span class="action-word">Ansehen</span></button>
-    <button class="attention-item" data-action="navigate" data-view="weeks"><span><strong>3 Wochenzettel warten</strong><small>Prüfung, Nacharbeit oder Freigabe</small></span><span class="action-word">Prüfen</span></button>
-  </div></section>
-  <section class="card extra-summary" aria-labelledby="extra-summary-title"><h2 id="extra-summary-title">Zusatzarbeiten</h2><p>Neue Arbeiten früh festhalten, bevor sie bei der Abrechnung fehlen.</p><div class="metric-row"><div class="metric"><strong>4</strong><span>neu</span></div><div class="metric"><strong>2</strong><span>zu prüfen</span></div><div class="metric"><strong>7</strong><span>diese Woche erledigt</span></div></div><button class="primary light" data-action="navigate" data-view="extras">Zusatzarbeiten öffnen</button></section></div>
-  <section class="section"><div class="section-title"><h2>Aktive Baustellen</h2><button data-action="navigate" data-view="sites">Alle Baustellen</button></div><div class="site-grid">${sites.slice(0,4).map(siteCard).join('')}</div></section>`;
-}
-
-function siteCard(site) {
-  return `<article class="card site-card"><button class="site-button" data-action="open-site" data-id="${site.id}" aria-expanded="${state.selectedSite === site.id}"><div class="site-top"><span class="build-number">Bau-Nr. ${site.number}</span>${badge(site.status, site.statusKind)}</div><h3>${site.name}</h3><p>${site.address}</p><div class="team-line">${site.people.map(name => `<span class="person-chip">${name}</span>`).join('')}</div><p class="meta">${site.time} · ${site.extras} Zusatzarbeit${site.extras === 1 ? '' : 'en'}</p></button>${state.selectedSite === site.id ? siteDetail(site) : ''}</article>`;
-}
-
-function siteDetail(site) {
-  const siteExtras = extraWorks.filter(item => item.site === site.number);
-  return `<div class="folder-detail"><div class="folder-head"><div><span class="build-number">Bau-Nr. ${site.number}</span><h2>${site.name}</h2><p>${site.address}</p></div><button class="secondary" data-action="close-site">Mappe schließen</button></div><div class="detail-grid">
-    <section class="detail-block"><h3>Heute auf der Baustelle</h3><div class="team-line">${site.people.map(name => `<span class="person-chip">${name}</span>`).join('')}</div><p class="meta">${site.time}</p></section>
-    <section class="detail-block"><h3>Offene Punkte</h3>${site.issues.length ? `<ul>${site.issues.map(issue => `<li>${issue}</li>`).join('')}</ul>` : '<p>Für heute ist kein offener Punkt hinterlegt.</p>'}</section>
-    <section class="detail-block"><h3>Zusatzarbeiten</h3>${siteExtras.length ? siteExtras.map(item => `<p><strong>${item.status}:</strong> ${item.title}</p>`).join('') : '<p>Keine offene Zusatzarbeit.</p>'}<button class="secondary" data-action="navigate" data-view="extras">Alle Zusatzarbeiten</button></section>
-    <section class="detail-block"><h3>Baustellennotizen</h3><ul>${site.notes.map(note => `<li>${note}</li>`).join('')}</ul></section>
-    <section class="detail-block"><h3>Foto-Dokumentation</h3>${photoPlaceholder(site.photo || 'Noch kein Beispielbild hinterlegt')}</section>
-    <section class="detail-block"><h3>Zeitüberblick</h3><p>${site.time}</p><p class="meta">Nur Rohstatus des Beispieltages. Keine Lohn-, Überstunden- oder Kostenberechnung.</p></section>
+function siteFolder(item) {
+  const members = db.employees.filter(function (employee) { return employee.site === item.number; });
+  const eventList = db.events.filter(function (event) { return event.site === item.number || event.fromSite === item.number; }).slice().reverse();
+  const notes = db.notes.filter(function (note) { return note.site === item.number; });
+  const extras = db.extras.filter(function (extra) { return extra.site === item.number; });
+  const documents = db.documents.filter(function (doc) { return doc.site === item.number; });
+  return `<div class="folder-detail"><div class="folder-head"><div><span class="eyebrow">Digitale Baustellenmappe</span><h2>Bau-Nr. ${item.number} · ${esc(item.name)}</h2><p>${esc(item.customer)}</p></div><button class="secondary" data-action="close-site">Schließen</button></div><div class="detail-grid">
+    <section class="detail-block"><h3>Stammdaten</h3><dl class="facts"><dt>Adresse</dt><dd>${esc(item.address)}</dd><dt>Ansprechpartner</dt><dd>${esc(item.contact)}</dd><dt>Zugang</dt><dd>${esc(item.access)}</dd><dt>Zeitraum</dt><dd>${esc(item.dates)}</dd><dt>Abrechnungshinweis</dt><dd>${esc(item.invoice)}</dd></dl></section>
+    <section class="detail-block"><h3>Aufgaben & Materialhinweise</h3><strong>Aufgaben</strong><ul>${item.tasks.map(function (text) { return `<li>${esc(text)}</li>`; }).join('')}</ul>${item.extraTasks.length ? `<strong>Zusätzliche Aufgaben</strong><ul>${item.extraTasks.map(function (text) { return `<li>${esc(text)}</li>`; }).join('')}</ul>` : ''}<strong>Mitzubringen</strong><p>${esc(item.materials.join(', '))}</p></section>
+    <section class="detail-block full-span"><h3>Heute auf der Baustelle</h3><div class="people-table">${members.map(function (employee) { return `<button data-action="open-employee" data-id="${employee.id}"><span><strong>${esc(employee.name)}</strong><small>${esc(employee.job)}</small></span>${badge(statusText[employee.status], statusKind[employee.status])}</button>`; }).join('')}</div></section>
+    <section class="detail-block"><h3>Offene Punkte</h3>${item.open.length ? `<ul>${item.open.map(function (text) { return `<li>${esc(text)}</li>`; }).join('')}</ul>` : '<p>Keine offenen Punkte im Beispiel.</p>'}</section>
+    <section class="detail-block"><h3>Zusatzarbeiten</h3>${extras.length ? extras.map(function (extra) { return `<button class="compact-link" data-action="open-extra" data-id="${extra.id}"><strong>${esc(extra.description)}</strong><small>${extraCommercial(extra)}</small></button>`; }).join('') : '<p>Keine Zusatzarbeit im Beispiel.</p>'}</section>
+    <section class="detail-block full-span"><h3>Notizen und synthetische Bilder</h3><div class="documentation-grid">${notes.map(renderNote).join('') || '<p>Keine Notizen.</p>'}</div></section>
+    <section class="detail-block full-span"><h3>Zeit- und Baustellenverlauf</h3><ol class="timeline compact">${eventList.slice(0, 14).map(function (event) { return `<li><time>${event.time}</time><span><strong>${esc(eventText[event.type] || event.type)} · ${esc(employeeName(event.employeeId))}</strong><small>${event.createdBy !== event.createdFor ? 'Gebucht durch ' + esc(employeeName(event.createdBy)) : 'Selbst gebucht'}${event.note ? ' · ' + esc(event.note) : ''}</small></span></li>`; }).join('')}</ol></section>
+    <section class="detail-block full-span"><h3>Dokumente</h3>${documents.length ? documents.map(function (doc) { return `<div class="document-row"><span><strong>${esc(doc.title)}</strong><small>${esc(doc.type)}</small></span>${badge(doc.status, 'warn')}</div>`; }).join('') : '<p>Noch keine Beispieldokumente.</p>'}<p class="meta">Baubesprechungsprotokoll und Aufmaß bleiben als spätere Ausbaustufe klar gekennzeichnet.</p></section>
   </div></div>`;
 }
-
-function photoPlaceholder(label) {
-  return `<div class="photo-placeholder" role="img" aria-label="${escapeHtml(label)}"><div><svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><rect x="5" y="12" width="38" height="27" rx="4" stroke-width="2"/><path d="M15 12l3-5h12l3 5" stroke-width="2"/><circle cx="24" cy="25" r="7" stroke-width="2"/></svg><strong>Foto-Platzhalter</strong><small>${escapeHtml(label)}</small></div></div>`;
+function renderNote(note) {
+  return `<article class="note-card"><div><strong>${esc(note.category)}</strong><small>${esc(note.author)} · ${esc(note.time)}</small><p>${esc(note.text)}</p></div>${note.photo ? syntheticPhoto(note.photo, note.id) : ''}</article>`;
 }
-
-function renderSites() {
-  const selected = sites.find(site => site.id === state.selectedSite);
-  return `${pageHead('Baustellen', 'Digitale Baustellenmappen · Bau-Nr. steht immer zuerst')}${selected ? `<section class="section">${siteCard(selected)}</section>` : ''}<section class="section"><div class="section-title"><h2>${selected ? 'Weitere aktive Baustellen' : '5 aktive Baustellen'}</h2><span class="meta">Heute</span></div><div class="site-grid">${sites.filter(site => !selected || site.id !== selected.id).map(siteCard).join('')}</div></section>`;
+function syntheticPhoto(label, seed) {
+  const variant = String(seed).charCodeAt(String(seed).length - 1) % 3;
+  return `<figure class="synthetic-photo variant-${variant}" role="img" aria-label="Synthetisches Beispielbild: ${esc(label)}"><div class="photo-wall"><span></span><i></i></div><figcaption><strong>Synthetisches Beispielbild</strong><small>${esc(label)}</small></figcaption></figure>`;
 }
 
 function renderEmployees() {
-  const filtered = state.employeeFilter === 'all' ? employees : employees.filter(item => item.status === state.employeeFilter);
-  return `${pageHead('Mitarbeiter', 'Wer ist heute wo – ohne jeden Zettel einzeln zu prüfen')}<div class="filter-row" aria-label="Mitarbeiter filtern">${[['all','Alle'],['WORKING','Arbeitet'],['ON_BREAK','Pause'],['TRAVELING','Unterwegs'],['NOT_STARTED','Noch nicht gestartet'],['NOT_PLANNED','Nicht eingeplant']].map(([value,label]) => `<button class="filter-button ${state.employeeFilter === value ? 'active' : ''}" data-action="employee-filter" data-filter="${value}">${label}</button>`).join('')}</div><div class="list">${filtered.map(employee => employeeCard(employee)).join('')}</div>`;
+  const filters = [['all', 'Alle'], ['WORKING', 'Arbeitet'], ['ON_BREAK', 'Pause'], ['TRAVELING', 'Unterwegs'], ['NOT_STARTED', 'Nicht gestartet'], ['FINISHED', 'Beendet'], ['NOT_PLANNED', 'Nicht eingeplant'], ['REVIEW', 'Prüfbedarf']];
+  const list = ui.employeeFilter === 'all' ? db.employees : db.employees.filter(function (item) { return item.status === ui.employeeFilter; });
+  return `${head('Mitarbeiter', 'Wer ist heute wo – mit Ereignisverlauf direkt bei der Person')}<div class="filter-row">${filters.map(function (item) { return `<button class="filter-button ${ui.employeeFilter === item[0] ? 'active' : ''}" data-action="employee-filter" data-status="${item[0]}">${item[1]}</button>`; }).join('')}</div><div class="list">${list.map(employeeCard).join('')}</div>`;
 }
-
 function employeeCard(employee) {
-  const open = state.selectedEmployee === employee.id;
-  const events = employeeEvents[employee.id] || [];
-  return `<article class="card employee-card ${employee.issue ? 'problem-card' : ''}"><button class="item-button" data-action="open-employee" data-id="${employee.id}" aria-expanded="${open}"><span><strong>${employee.name}</strong><small>${employee.job} · ${employee.site === '–' ? 'heute nicht eingeplant' : `Bau-Nr. ${employee.site}`}</small></span><span>${badge(statusText[employee.status], statusKind[employee.status])}<small>seit ${employee.since}</small></span></button>${open ? `<div class="inline-detail" aria-label="Tagesverlauf ${employee.name}"><h3>Tagesverlauf · ${DEMO_DATE}</h3>${events.length ? `<ol class="timeline">${events.map(event => `<li><time>${event[0]}</time><span><strong>${event[1]}</strong><small>${event[2]} · erfasst durch ${event[3]}</small></span></li>`).join('')}</ol>` : '<p class="empty-note">Heute nicht eingeplant. Es liegen keine Zeitereignisse vor.</p>'}${employee.issue ? '<button class="primary" data-action="navigate" data-view="times">Zeitproblem prüfen</button>' : ''}<p class="meta">Alle Angaben sind erfundene Testdaten.</p></div>` : ''}</article>`;
+  const open = ui.selectedEmployee === employee.id;
+  const current = assignment(employee.id);
+  const items = eventsFor(employee.id).slice().reverse();
+  return `<article class="card employee-card ${employee.status === 'REVIEW' ? 'problem-card' : ''}"><button class="item-button" data-action="open-employee" data-id="${employee.id}" aria-expanded="${open}"><span><strong>${esc(employee.name)}</strong><small>${esc(employee.job)} · ${employee.id}</small></span><span>${badge(statusText[employee.status], statusKind[employee.status])}<small>${employee.site ? 'Bau-Nr. ' + employee.site + ' · seit ' + employee.since : 'Heute ohne Zuordnung'}</small></span></button>${open ? `<div class="inline-detail"><div class="inline-summary"><span><small>Geplant</small><strong>${current ? 'Bau-Nr. ' + current.site : 'Nicht eingeplant'}</strong></span><span><small>Aktuell</small><strong>${employee.site ? 'Bau-Nr. ' + employee.site : '–'}</strong></span></div><h3>Heutiger Ereignisverlauf</h3><ol class="timeline">${items.length ? items.map(function (event) { return `<li><time>${event.time}</time><span><strong>${esc(eventText[event.type] || event.type)}</strong><small>${event.site ? 'Bau-Nr. ' + event.site : ''}${event.createdBy !== event.createdFor ? ' · durch ' + esc(employeeName(event.createdBy)) : ''}</small></span></li>`; }).join('') : `<li><time>–</time><span><strong>Noch keine Zeitbuchung</strong><small>${current ? 'Geplant für Bau-Nr. ' + current.site : 'Nicht eingeplant'}</small></span></li>`}</ol></div>` : ''}</article>`;
 }
 
 function renderTimes() {
-  return `${pageHead('Zeiten prüfen', 'Nur Abweichungen zuerst – vollständige Tage bleiben ruhig im Hintergrund')}<section class="section"><div class="section-title"><h2>2 offene Zeitprobleme</h2><span class="meta">Korrekturen benötigen immer einen Grund</span></div><div class="list">${timeProblems.map(problem => timeProblemCard(problem)).join('')}</div></section><section class="section"><div class="section-title"><h2>Heutiger Überblick</h2><span class="meta">12 Testmitarbeiter</span></div><div class="list">${employees.map(employee => `<article class="card time-card ${employee.issue ? 'problem-card' : ''}"><div class="item-button"><span><strong>${employee.name}</strong><small>${employee.site === '–' ? 'Nicht eingeplant' : `Bau-Nr. ${employee.site}`}</small></span><span>${badge(employee.issue ? 'Prüfung nötig' : statusText[employee.status], employee.issue ? 'problem' : statusKind[employee.status])}<small>${employee.since}</small></span></div></article>`).join('')}</div></section>${state.corrections.length ? `<section class="section"><div class="section-title"><h2>Korrekturverlauf dieser Demo</h2><span class="meta">verschwindet beim Neuladen</span></div><div class="list">${state.corrections.map(correction => `<article class="audit-box"><strong>${correction.editor}</strong><p><strong>Vorher:</strong> ${correction.before}<br><strong>Nachher:</strong> ${correction.after}</p><p><strong>Grund:</strong> ${correction.reason}</p><small>${correction.when} · Original ${correction.problemId} bleibt erhalten</small></article>`).join('')}</div></section>` : ''}`;
+  return `${head('Zeiten prüfen', 'Fehlende oder auffällige Buchungen zuerst')}<section><div class="section-title"><h2>${openCorrections().length} offene Korrekturmeldungen</h2><span class="meta">Keine stille Überschreibung</span></div><div class="list">${openCorrections().map(correctionCard).join('') || '<div class="empty-note">Keine offene Korrekturmeldung.</div>'}</div></section><section class="section"><div class="section-title"><h2>Bereits bearbeitet</h2><span class="meta">Vorher, nachher, Bearbeiter und Grund</span></div><div class="list">${db.corrections.map(function (item) { return `<article class="audit-box"><strong>${esc(employeeName(item.employeeId))}</strong><p><strong>Vorher:</strong> ${esc(item.before)}<br><strong>Nachher:</strong> ${esc(item.after)}</p><p><strong>Grund:</strong> ${esc(item.reason)}</p><small>${esc(item.editor)} · ${esc(item.when)} · Original bleibt erhalten</small></article>`; }).join('')}</div></section><section class="section"><button class="secondary" data-action="download-times">Zeitereignisse als CSV herunterladen</button></section>`;
+}
+function correctionCard(request) {
+  const employee = person(request.employeeId);
+  const open = ui.editCorrection === request.id;
+  return `<article class="card correction-card problem-card"><button class="item-button" data-action="open-correction" data-id="${request.id}"><span><strong>${esc(employee.name)}</strong><small>${esc(request.description)}</small></span><span>${badge('Prüfung nötig', 'problem')}<small>Bau-Nr. ${request.site}</small></span></button>${open ? `<form class="inline-detail" data-form="time-correction" data-id="${request.id}"><div class="before-after"><div><small>Original</small><strong>${esc(request.original)}</strong></div><div><small>Vorschlag</small><strong>${esc(request.suggestion)}</strong></div></div><div class="form-grid"><label>Korrigierter Wert<input name="after" value="${esc(request.suggestion)}" required></label><label>Bearbeitet durch<input value="${esc(actor())}" disabled></label><label class="full">Begründung<textarea name="reason" required placeholder="Wie wurde die Angabe geprüft?"></textarea></label></div><div class="form-actions"><button class="primary" type="button" data-action="submit-correction">Korrektur protokollieren</button><button class="secondary" type="button" data-action="close-correction">Abbrechen</button></div></form>` : ''}</article>`;
 }
 
-function timeProblemCard(problem) {
-  const corrected = state.corrected[problem.id];
-  const editing = state.editProblem === problem.id;
-  return `<article class="card time-card ${corrected ? 'resolved-card' : 'problem-card'}"><div class="item-button"><span><strong>${problem.employee}</strong><small>Bau-Nr. ${problem.site} · ${problem.title}</small></span><span>${badge(corrected ? 'Demo-korrigiert' : 'Prüfung nötig', corrected ? 'ok' : 'problem')}</span></div><div class="inline-detail"><p><strong>Aktueller Stand:</strong> ${corrected || problem.original}</p>${!editing ? `<button class="${corrected ? 'secondary' : 'primary'}" data-action="edit-time" data-id="${problem.id}">${corrected ? 'Erneut nachvollziehbar korrigieren' : 'Prüfen und korrigieren'}</button>` : correctionForm(problem)}</div></article>`;
+function saveTimeCorrection(form) {
+  if (!form || !form.reportValidity()) return;
+  const values = new FormData(form);
+  const request = db.correctionRequests.find(function (item) { return item.id === form.dataset.id; });
+  const after = values.get('after');
+  request.status = 'RESOLVED';
+  db.corrections.unshift({ id: makeId('K'), requestId: request.id, employeeId: request.employeeId, before: request.original, after: after, editor: actor(), when: timeNow(), reason: values.get('reason') });
+  db.events.push({ id: makeId('E'), employeeId: request.employeeId, type: 'CORRECTION', time: timeNow(), site: request.site, createdBy: profile().employeeId || ui.role, createdFor: request.employeeId, note: request.original + ' → ' + after });
+  const employee = person(request.employeeId);
+  if (['REVIEW', 'NOT_STARTED'].includes(employee.status)) { employee.status = 'WORKING'; employee.since = (String(after).match(/\d\d:\d\d/) || [timeNow()])[0]; }
+  db.weeklySheets.filter(function (sheet) { return sheet.employeeId === request.employeeId; }).forEach(function (sheet) {
+    if (['EMPLOYEE_CONFIRMED', 'ADMIN_APPROVED'].includes(sheet.status)) { sheet.version += 1; sheet.status = 'NEEDS_REVIEW'; sheet.history.push('Korrektur durch ' + actor() + '; Version ' + sheet.version + ' benötigt erneute Prüfung'); }
+  });
+  audit('TIME_CORRECTED', request.id, 'Zeitkorrektur protokolliert', request.original, after, values.get('reason'));
+  ui.editCorrection = null;
+  saveDb();
+  toast('Korrektur gespeichert; Original und Verlauf bleiben sichtbar.');
 }
 
-function correctionForm(problem) {
-  return `<form data-form="time-correction" data-id="${problem.id}"><div class="form-grid"><label>Wirksame Uhrzeit<input name="time" type="time" value="${problem.suggestion}" required></label><label>Bearbeitet durch<select name="editor">${editors.map(editor => `<option>${editor}</option>`).join('')}</select></label><label class="full">Grund der Korrektur<textarea name="reason" required maxlength="300" placeholder="Zum Beispiel: Uhrzeit telefonisch mit Mitarbeiter geklärt"></textarea></label></div><div class="form-actions"><button class="primary">Korrektur protokollieren</button><button class="secondary" type="button" data-action="cancel-time">Abbrechen</button></div><p class="meta">Demo: Das Original wird nicht überschrieben. In der echten App entsteht ein unveränderbarer Eintrag mit Vorher, Nachher, Person und Zeitpunkt.</p></form>`;
+function extraCommercial(extra) {
+  return extra.commercialStatus === 'BILLING' ? 'Zur Abrechnung vorgesehen' : extra.commercialStatus === 'NOT_BILLABLE' ? 'Nicht abrechenbar' : extra.commercialStatus === 'CLOSED' ? 'Erledigt' : 'Kaufmännische Prüfung offen';
 }
-
+function extraDocument(extra) {
+  return extra.docStatus === 'COMPLETE' ? 'Dokumentation vollständig' : extra.docStatus === 'REVIEW' ? 'Dokumentation prüfen' : 'Neu gemeldet';
+}
 function renderExtras() {
-  const visible = state.extraFilter === 'all' ? extraWorks : extraWorks.filter(item => item.kind === state.extraFilter);
-  return `${pageHead('Zusatzarbeiten', 'Zusätzliche Leistungen früh sichern – die kaufmännische Entscheidung bleibt bei dir und dem Büro')}<div class="status-grid"><button class="status-card" data-action="extra-filter" data-filter="new"><strong>4</strong><span><i class="status-dot wait"></i>Neu</span><small>heute gemeldet</small></button><button class="status-card" data-action="extra-filter" data-filter="review"><strong>2</strong><span><i class="status-dot pause"></i>Zu prüfen</span><small>Entscheidung offen</small></button><div class="status-card"><strong>7</strong><span><i class="status-dot"></i>Abgeschlossen</span><small>diese Woche</small></div></div><div class="filter-row section"><button class="filter-button ${state.extraFilter === 'all' ? 'active' : ''}" data-action="extra-filter" data-filter="all">Alle offenen</button><button class="filter-button ${state.extraFilter === 'new' ? 'active' : ''}" data-action="extra-filter" data-filter="new">Neu</button><button class="filter-button ${state.extraFilter === 'review' ? 'active' : ''}" data-action="extra-filter" data-filter="review">Zu prüfen</button></div><div class="list">${visible.map(extraCard).join('')}</div><p class="meta section">Keine automatische Rechnungsfreigabe. Eine „Bestätigung der dokumentierten Zusatzarbeit“ ist keine rechtsverbindliche Abnahme.</p>`;
+  const list = db.extras.slice().sort(function (a, b) { return (a.commercialStatus === 'OPEN' ? 0 : 1) - (b.commercialStatus === 'OPEN' ? 0 : 1); });
+  return `${head('Zusatzarbeiten', 'Dokumentation und kaufmännische Entscheidung bleiben getrennt')}<div class="status-grid extra-status-grid"><div class="status-card"><strong>${db.extras.filter(function (item) { return item.docStatus === 'REPORTED'; }).length}</strong><span>Neu gemeldet</span><small>Dokumentation ergänzen</small></div><div class="status-card"><strong>${openExtras().length}</strong><span>Prüfung offen</span><small>noch keine Entscheidung</small></div><div class="status-card"><strong>${db.extras.filter(function (item) { return item.commercialStatus === 'BILLING'; }).length}</strong><span>Zur Abrechnung</span><small>Beispielentscheidung</small></div><div class="status-card"><strong>${db.extras.filter(function (item) { return item.commercialStatus === 'NOT_BILLABLE'; }).length}</strong><span>Nicht abrechenbar</span><small>bleibt erhalten</small></div></div>${assumption('In der Demo dürfen Geschäftsführung und Büro kaufmännische Entscheidungen testen. Die endgültige Rechteverteilung ist noch offen.')}<div class="list section">${list.map(extraCard).join('')}</div><p class="meta section">Eine Bestätigung der dokumentierten Zusatzarbeit ist keine rechtsverbindliche Abnahme und keine automatische Rechnungsfreigabe.</p>`;
 }
-
-function extraCard(item) {
-  return `<article class="card extra-card"><div class="item-top"><span class="build-number">Bau-Nr. ${item.site}</span>${badge(item.status, item.kind === 'new' ? 'problem' : 'warn')}</div><h3>${item.title}</h3><p>${item.siteName}</p><div class="extra-meta"><span>Gemeldet von<strong>${item.employee}</strong></span><span>Zeitpunkt<strong>${item.time}</strong></span><span>Menge<strong>${item.quantity}</strong></span></div>${item.photo ? `<div class="confirmation"><strong>Foto vorhanden</strong><small>Erfundener Bildplatzhalter in der Baustellenmappe</small></div>` : ''}<div class="confirmation"><strong>Bestätigung der dokumentierten Zusatzarbeit</strong><small>${item.confirmation}</small></div><div class="form-actions"><button class="secondary" data-action="open-site-number" data-number="${item.site}">Baustellenmappe öffnen</button><button class="primary" data-action="demo-extra-check" data-id="${item.id}">Als geprüft simulieren</button></div></article>`;
+function extraCard(extra) {
+  const employee = person(extra.employeeId);
+  const decided = extra.commercialStatus !== 'OPEN';
+  return `<article class="card extra-card ${decided ? 'resolved-card' : ''}" id="extra-${extra.id}"><div class="item-top"><span class="build-number">Bau-Nr. ${extra.site}</span><span>${badge(extraDocument(extra), extra.docStatus === 'COMPLETE' ? 'ok' : 'warn')} ${badge(extraCommercial(extra), decided ? 'ok' : 'problem')}</span></div><h3>${esc(extra.description)}</h3><p>${esc(siteName(extra.site))}</p><div class="extra-meta"><span>Gemeldet von<strong>${esc(employee.name)}</strong></span><span>Zeitpunkt<strong>${esc(extra.reportedAt)}</strong></span><span>Menge<strong>${esc(extra.quantity + ' ' + extra.unit)}</strong></span><span>Zeitaufwand<strong>${esc(extra.minutes ? extra.minutes + ' Min. (roh)' : 'nicht angegeben')}</strong></span></div>${extra.photo ? syntheticPhoto(extra.photo, extra.id) : '<div class="confirmation"><strong>Kein Beispielbild hinterlegt</strong></div>'}<div class="confirmation"><strong>Bestätigung der dokumentierten Zusatzarbeit</strong><small>${esc(extra.confirmation)}</small></div>${extra.decisionReason ? `<div class="decision-box"><strong>${esc(extraCommercial(extra))}</strong><p>${esc(extra.decisionReason)}</p></div>` : ''}<details class="history"><summary>Verlauf anzeigen</summary><ul>${extra.history.map(function (line) { return `<li>${esc(line)}</li>`; }).join('')}</ul></details><div class="form-actions"><button class="secondary" data-action="open-site" data-id="${extra.site}">Baustellenmappe</button>${extra.docStatus !== 'COMPLETE' && isOfficeRole() ? `<button class="secondary" data-action="complete-extra" data-id="${extra.id}">Dokumentation vollständig</button>` : ''}${extra.commercialStatus === 'OPEN' && isOfficeRole() ? `<button class="primary" data-action="decide-extra" data-id="${extra.id}">Kaufmännisch prüfen</button>` : ''}</div></article>`;
 }
 
 function renderWeeks() {
-  return `${pageHead('Wochenzettel', 'Offene Prüfungen zuerst; Excel bleibt in V1 bestehen')}<section class="card card-pad"><h2>KW 37 im Überblick</h2><p>3 Wochenzettel benötigen noch Aufmerksamkeit. 1 Beispiel ist bereits freigegeben.</p><p class="meta">Die App soll die doppelte Übertragung von Papier nach Excel später vermeiden. Diese Demo berechnet keine Löhne oder Überstunden.</p></section><div class="list section">${weeks.map(week => `<article class="card week-card"><div class="item-top"><span><strong>${week.employee}</strong><small>${week.week} · ${week.detail}</small></span>${badge(week.status, week.kind)}</div><div class="progress-line ${week.kind === 'warn' ? 'pending' : ''}" aria-label="Beispiel-Vollständigkeit ${week.progress} Prozent"><span style="width:${week.progress}%"></span></div><div class="form-actions"><button class="${week.kind === 'ok' ? 'secondary' : 'primary'}" data-action="review-week" data-id="${week.id}">${week.kind === 'ok' ? 'Freigabe ansehen' : 'Wochenzettel prüfen'}</button></div></article>`).join('')}</div>`;
+  return `${head('Wochenzettel', 'Aus Ereignissen erstellt · Fahrzeit separat und unbewertet')}<div class="list">${db.weeklySheets.map(weekCard).join('')}</div>`;
+}
+function weekCard(sheet) {
+  const employee = person(sheet.employeeId);
+  const open = ui.selectedWeek === sheet.id;
+  const issueCount = sheet.days.filter(function (day) { return day.issue; }).length;
+  const kind = sheet.status === 'ADMIN_APPROVED' ? 'ok' : ['NEEDS_CORRECTION', 'NEEDS_REVIEW'].includes(sheet.status) ? 'problem' : 'warn';
+  return `<article class="card week-card"><button class="item-button week-button" data-action="open-week" data-id="${sheet.id}"><span><strong>${esc(employee.name)}</strong><small>${sheet.week} · Version ${sheet.version}</small></span><span>${badge(weekText[sheet.status], kind)}<small>${issueCount ? issueCount + ' fehlende Angabe' : '5 Tage sichtbar'}</small></span></button>${open ? weekDetail(sheet) : ''}</article>`;
+}
+function weekDetail(sheet) {
+  const complete = !sheet.days.some(function (day) { return day.issue; });
+  const canConfirm = ui.role === 'employee' && sheet.employeeId === profile().employeeId && complete && ['DRAFT', 'NEEDS_REVIEW'].includes(sheet.status);
+  const canApprove = isOfficeRole() && complete && ['EMPLOYEE_CONFIRMED', 'NEEDS_REVIEW'].includes(sheet.status);
+  return `<div class="inline-detail week-detail"><div class="table-scroll"><table><thead><tr><th>Tag</th><th>Bau-Nr.</th><th>Beginn</th><th>Pause</th><th>Ende</th><th>Fahrt</th><th>Hinweis</th></tr></thead><tbody>${sheet.days.map(function (day) { return `<tr class="${day.issue ? 'row-problem' : ''}"><td><strong>${day.day}</strong><small>${day.date}</small></td><td>${day.site}</td><td>${day.start}</td><td>${day.break}</td><td>${day.end}</td><td>${day.travel}</td><td>${day.issue || 'vollständig'}</td></tr>`; }).join('')}</tbody></table></div><p class="meta">Keine Lohn-, Überstunden- oder Fahrzeitbewertung. Angezeigt werden synthetische Rohangaben.</p><div class="form-actions"><button class="secondary" data-action="download-week-pdf" data-id="${sheet.id}">PDF herunterladen</button>${canConfirm ? `<button class="primary" data-action="confirm-week" data-id="${sheet.id}">Version ${sheet.version} bestätigen</button>` : ''}${canApprove ? '<button class="primary" data-action="approve-week" data-id="' + sheet.id + '">Betrieblich freigeben</button>' : ''}${!complete ? '<button class="secondary" data-action="navigate" data-view="times">Korrektur prüfen</button>' : ''}</div><details class="history"><summary>Versions- und Freigabeverlauf</summary><ul>${sheet.history.map(function (line) { return `<li>${esc(line)}</li>`; }).join('')}</ul></details></div>`;
+}
+
+function renderExports() {
+  return `${head('Exporte', 'Synthetische Beispieldaten für Übergang und Prüfung')}<div class="export-grid"><section class="card export-card"><span class="export-icon">CSV</span><h2>Zeitereignisse</h2><p>Datum, Mitarbeiter, Bau-Nr., Ereignisart, Uhrzeit und Buchender.</p><button class="primary" data-action="download-times">Zeitdaten herunterladen</button></section><section class="card export-card"><span class="export-icon">CSV</span><h2>Nachkalkulation</h2><p>Bau-Nr.-bezogene Rohdaten. Keine direkte Excel-Schreibschnittstelle.</p><button class="primary" data-action="download-calculation">Nachkalkulationsdaten</button></section><section class="card export-card"><span class="export-icon">PDF</span><h2>Wochenzettel</h2><p>Lesbarer Übergangsexport eines synthetischen Wochenzettels.</p><label>Wochenzettel<select id="export-week">${db.weeklySheets.map(function (sheet) { return `<option value="${sheet.id}">${esc(person(sheet.employeeId).name)} · ${sheet.week}</option>`; }).join('')}</select></label><button class="primary" data-action="download-selected-week">PDF herunterladen</button></section></div>${assumption('CSV-Spalten und PDF-Layout sind ein prüfbarer Demo-Vorschlag. Die endgültige Struktur wird später mit der vorhandenen Excel-Datei abgestimmt.')}`;
+}
+
+function renderForeman() {
+  const foreman = person(profile().employeeId);
+  const crew = db.employees.filter(function (item) { return item.site === foreman.site; });
+  return `${head(greeting(profile().name), 'Deine Baustelle und Kolonne · ' + DEMO_DATE)}<section class="card employee-project"><span class="build-number">Bau-Nr. ${foreman.site}</span><h2>${esc(siteName(foreman.site))}</h2><p>${esc(site(foreman.site).address)}</p><div class="employee-status"><small>Dein Status</small><strong>${statusText[foreman.status]}</strong></div></section><section class="section"><div class="section-title"><h2>Deine Demo-Kolonne</h2><button data-action="navigate" data-view="crew">Kolonne buchen</button></div><div class="crew-preview">${crew.slice(0, 6).map(function (member) { return `<div><span class="avatar small">${member.name.charAt(0)}</span><span><strong>${esc(member.name)}</strong><small>${statusText[member.status]}</small></span></div>`; }).join('')}</div></section>${assumption('Die Demo zeigt nur die Personen auf dieser Baustelle. Die endgültige Reichweite der Vorarbeiterrechte ist noch offen.')}`;
+}
+function renderCrew() {
+  const foreman = person(profile().employeeId);
+  const crew = db.employees.filter(function (item) { return item.site === foreman.site && item.id !== foreman.id; });
+  const bookings = db.events.filter(function (item) { return item.createdBy === foreman.id && item.createdFor !== foreman.id; }).slice().reverse();
+  return `${head('Kolonnenbuchung', 'Für jede Person entsteht ein eigener Eintrag')}${assumption('Der Vorarbeiter kann hier nur die Kolonne seiner heutigen Baustelle buchen. Diese Reichweite ist noch nicht endgültig beschlossen.')}<section class="card card-pad"><form data-form="crew-action"><fieldset><legend>Mitarbeiter auswählen</legend><div class="check-list">${crew.map(function (item) { return `<label><input type="checkbox" name="employee" value="${item.id}"><span><strong>${esc(item.name)}</strong><small>${statusText[item.status]}</small></span></label>`; }).join('')}</div></fieldset><label>Aktion<select name="event"><option value="WORK_START">Arbeit starten</option><option value="BREAK_START">Pause starten</option><option value="BREAK_END">Pause beenden</option><option value="WORK_END">Feierabend</option></select></label><button class="primary full-button">Für ausgewählte Mitarbeiter buchen</button></form></section><section class="section"><h2>Letzte Kolonnenbuchungen</h2><div class="list">${bookings.map(function (item) { return `<article class="audit-box"><strong>${esc(employeeName(item.employeeId))}: ${esc(eventText[item.type])}</strong><small>${item.time} · Bau-Nr. ${item.site} · gebucht durch ${esc(foreman.name)}</small></article>`; }).join('') || '<div class="empty-note">Noch keine Kolonnenbuchung in dieser Sitzung.</div>'}</div></section>`;
+}
+
+function employeeActions(employee) {
+  if (employee.status === 'NOT_STARTED' || employee.status === 'FINISHED') return '<button class="primary employee-main-action" data-action="employee-event" data-event="WORK_START">ARBEIT STARTEN</button>';
+  if (employee.status === 'ON_BREAK') return '<button class="primary employee-main-action" data-action="employee-event" data-event="BREAK_END">PAUSE BEENDEN</button>';
+  if (employee.status === 'TRAVELING') return '<button class="primary employee-main-action" data-action="employee-event" data-event="TRAVEL_END">FAHRT BEENDEN / ARBEIT FORTSETZEN</button>';
+  if (employee.status === 'WORKING') return '<button class="primary employee-main-action" data-action="employee-event" data-event="BREAK_START">PAUSE STARTEN</button><div class="employee-secondary-actions"><button class="secondary" data-action="switch-site">Baustelle wechseln</button><button class="secondary" data-action="employee-event" data-event="WORK_END">Feierabend</button></div>';
+  return '<button class="primary employee-main-action" data-action="open-employee-action" data-kind="correction">KORREKTUR MELDEN</button>';
+}
+function renderEmployee() {
+  const employee = person(profile().employeeId);
+  const planned = assignment(employee.id);
+  const currentSite = site(employee.site || (planned && planned.site));
+  const items = eventsFor(employee.id).slice().reverse();
+  const ownWeek = db.weeklySheets.find(function (sheet) { return sheet.employeeId === employee.id; });
+  return `${head(greeting(employee.name.split(' ')[0]), DEMO_DATE)}<section class="card employee-project"><span class="build-number">Bau-Nr. ${currentSite ? currentSite.number : '–'}</span><h2>${esc(currentSite ? currentSite.name : 'Heute nicht eingeplant')}</h2><p>${esc(currentSite ? currentSite.address : 'Bitte im Betrieb nachfragen.')}</p><div class="employee-status"><small>Dein Status</small><strong>${statusText[employee.status]}</strong></div>${employeeActions(employee)}</section><section class="section card card-pad"><div class="section-title"><h2>Heute</h2><span class="meta">${items.length} Ereignisse</span></div><ol class="timeline">${items.length ? items.map(function (event) { return `<li><time>${event.time}</time><span><strong>${esc(eventText[event.type] || event.type)}</strong><small>${event.site ? 'Bau-Nr. ' + event.site : ''}${event.createdBy !== event.createdFor ? ' · gebucht durch ' + esc(employeeName(event.createdBy)) : ''}</small></span></li>`; }).join('') : `<li><time>–</time><span><strong>Noch nicht gestartet</strong><small>${planned ? 'Geplant: Bau-Nr. ' + planned.site : 'Nicht eingeplant'}</small></span></li>`}</ol></section><section class="section"><h2>Weitere Aktionen</h2><div class="employee-actions"><button class="employee-action" data-action="open-employee-action" data-kind="extra">Zusatzarbeit</button><button class="employee-action" data-action="open-employee-action" data-kind="note">Notiz / Foto</button><button class="employee-action" data-action="open-employee-action" data-kind="correction">Korrektur melden</button><button class="employee-action" data-action="open-employee-action" data-kind="feedback">Feedback</button></div></section>${ownWeek ? `<section class="section"><h2>Mein Wochenzettel</h2>${weekCard(ownWeek)}</section>` : ''}`;
 }
 
 function renderMore() {
-  return `${pageHead('Mehr', 'Selten benötigte Bereiche und Demo-Perspektive')}<div class="more-grid"><section class="card more-card"><h2>Demo-Perspektive</h2><p>Wechsle zur einfachen Baustellenansicht für Max.</p><button class="primary" data-action="switch-role" data-role="employee">Als Mitarbeiter ansehen</button></section><section class="card more-card"><h2>Anmeldung</h2><p>So soll die ruhige Maler-Meyer-Anmeldung aussehen.</p><button class="secondary" data-action="show-login">Anmeldeseite ansehen</button></section><section class="card more-card"><h2>Support</h2><p>Rückmeldungen und Hilfefälle – nicht im täglichen Hauptmenü.</p><button class="secondary" data-action="demo-message" data-message="Der Supportbereich ist in dieser Demo nur ein Beispiel.">Support öffnen</button></section><section class="card more-card"><h2>Einstellungen</h2><p>Benutzer, Rechte und betriebliche Einstellungen gehören hierher.</p><button class="secondary" data-action="demo-message" data-message="Einstellungen werden in der öffentlichen Demo nicht gespeichert.">Einstellungen öffnen</button></section></div><details class="developer-area"><summary>Entwickler- und Testinformationen</summary><p>Statische öffentliche Bedienungsdemo ohne Backend, echte Anmeldung oder Produktivdaten. Rollenwechsel und Eingaben sind Simulationen und werden beim Neuladen verworfen.</p><p>Demo-Version 5 · responsive Oberfläche · keine Verbindung zu Maler Meyer.</p></details>`;
-}
-
-const employeeSteps = [
-  { status: 'Noch nicht gestartet', action: 'ARBEIT STARTEN', log: '07:00 · Arbeit auf Bau-Nr. 25148 gestartet' },
-  { status: 'Arbeitet seit 07:00', action: 'PAUSE STARTEN', log: '09:30 · Pause gestartet' },
-  { status: 'Pause seit 09:30', action: 'PAUSE BEENDEN', log: '10:00 · Pause beendet' },
-  { status: 'Arbeitet auf Bau-Nr. 25148', action: 'BAUSTELLE WECHSELN', log: '12:00 · Bau-Nr. 25148 abgeschlossen, Fahrt begonnen' },
-  { status: 'Unterwegs zu Bau-Nr. 25152', action: 'FAHRT BEENDEN · ARBEIT FORTSETZEN', log: '12:20 · Auf Bau-Nr. 25152 angekommen, Arbeit fortgesetzt' },
-  { status: 'Arbeitet auf Bau-Nr. 25152', action: 'FEIERABEND', log: '15:00 · Feierabend' },
-  { status: 'Feierabend seit 15:00', action: 'BEISPIELTAG ZURÜCKSETZEN', log: '' },
-];
-
-function employeeLayout() {
-  return `<div class="test-strip">TESTSYSTEM – KEINE PRODUKTIVDATEN <span>Einfacher Beispielablauf für Mitarbeiter.</span></div><div class="main-column"><header class="topbar"><a class="brand employee-header-brand" href="#" data-action="employee-home" aria-label="Maler Meyer – Heute">${meyerLogo()}<small>Digitale Baustellenorganisation</small></a><button class="profile-button" data-action="employee-more"><span class="avatar">M</span><span class="profile-copy"><strong>Max</strong><small>Mitarbeiter · Demo</small></span></button></header><main id="main-content" class="content" tabindex="-1">${state.view === 'more' ? renderEmployeeMore() : renderEmployeeDay()}</main></div><nav class="mobile-nav" aria-label="Mitarbeiter-Navigation"><button class="nav-button ${state.view !== 'more' ? 'active' : ''}" data-action="employee-home"><span class="nav-icon">H</span><span>Heute</span></button><button class="nav-button" data-action="open-employee-action" data-kind="extra"><span class="nav-icon">+</span><span>Zusatzarbeit</span></button><button class="nav-button" data-action="open-employee-action" data-kind="note"><span class="nav-icon">N</span><span>Notiz</span></button><button class="nav-button ${state.view === 'more' ? 'active' : ''}" data-action="employee-more"><span class="nav-icon">···</span><span>Mehr</span></button></nav>${renderOverlays()}`;
-}
-
-function renderEmployeeDay() {
-  const step = employeeSteps[state.employeeStep];
-  return `<div class="employee-day">${pageHead(greeting('Max'), DEMO_DATE)}<section class="card employee-project"><span class="build-number">Bau-Nr. 25148</span><h2>M&B Schinkel</h2><p>Musterstraße 12 · Beispielstadt</p><div class="employee-status"><small>Dein Status</small><strong>${step.status}</strong></div><button class="primary employee-main-action" data-action="employee-step">${step.action}</button></section>${state.employeeLog.length ? `<section class="section card card-pad"><h2>Heute</h2><ol class="timeline">${state.employeeLog.map(item => `<li><time>${item.slice(0,5)}</time><span><strong>${item.slice(8)}</strong><small>Nur in dieser Demo angezeigt</small></span></li>`).join('')}</ol></section>` : ''}${renderEmployeeSubmissions()}<section class="section"><div class="section-title"><h2>Weitere Aktionen</h2></div><div class="employee-actions"><button class="employee-action" data-action="open-employee-action" data-kind="extra">Zusatzarbeit</button><button class="employee-action" data-action="open-employee-action" data-kind="note">Notiz / Foto</button><button class="employee-action" data-action="open-employee-action" data-kind="correction">Korrektur melden</button><button class="employee-action" data-action="open-employee-action" data-kind="feedback">Feedback</button></div></section><p class="meta section">Große Hauptaktion, wenige Entscheidungen. Alle Zeiten und Baustellen sind erfunden.</p></div>`;
-}
-
-function renderEmployeeSubmissions() {
-  if (!state.employeeSubmissions.length) return '';
-  return `<section class="section card card-pad"><div class="section-title"><h2>Meine Meldungen</h2><span class="meta">nur in dieser Demo</span></div><div class="submission-list">${state.employeeSubmissions.map(item => `<article class="submission"><span class="submission-icon" aria-hidden="true">✓</span><span><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.time)} · ${escapeHtml(item.detail)}</small></span></article>`).join('')}</div></section>`;
-}
-
-function renderEmployeeActionDialog() {
-  const kind = state.employeeAction;
-  if (!kind) return '';
-  const settings = {
-    extra: ['Zusatzarbeit melden', 'Zusatzarbeit speichern'],
-    note: ['Notiz oder Foto hinzufügen', 'Notiz speichern'],
-    correction: ['Korrektur melden', 'Korrektur senden'],
-    feedback: ['Feedback geben', 'Feedback senden'],
-  }[kind];
-  const fields = kind === 'extra' ? `<label>Was wurde zusätzlich gemacht?<textarea name="description" required maxlength="300" placeholder="Zum Beispiel: zusätzliche Türzarge gespachtelt"></textarea></label><label>Menge oder Umfang – optional<input name="quantity" maxlength="80" placeholder="Zum Beispiel: 2 Türzargen"></label><label>Foto – optional<input name="photo" type="file" accept="image/*" capture="environment"><small>Das Foto wird in dieser Demo nicht hochgeladen.</small></label><label>Dokumentierte Bestätigung – optional<select name="confirmation"><option>Noch keine Bestätigung</option><option>Kunde wurde informiert</option><option>Bauleitung wurde informiert</option></select></label>`
-    : kind === 'note' ? `<label>Notiz<textarea name="note" required maxlength="400" placeholder="Was soll zur Baustelle festgehalten werden?"></textarea></label><label>Foto – optional<input name="photo" type="file" accept="image/*" capture="environment"><small>Das Foto wird in dieser Demo nicht hochgeladen.</small></label>`
-    : kind === 'correction' ? `<label>Welche Buchung betrifft es?<select name="event"><option>Arbeitsbeginn</option><option>Pause</option><option>Baustellenwechsel</option><option>Feierabend</option></select></label><label>Richtige Uhrzeit<input name="time" type="time" required value="07:00"></label><label>Was soll korrigiert werden?<textarea name="reason" required maxlength="300" placeholder="Zum Beispiel: Arbeitsbeginn war um 06:55 Uhr"></textarea></label>`
-    : `<label>Worum geht es?<select name="category"><option>Verbesserungsvorschlag</option><option>Problem bei der Bedienung</option><option>Frage an das Büro</option></select></label><label>Deine Nachricht<textarea name="feedback" required maxlength="500" placeholder="Schreibe kurz, was dir aufgefallen ist."></textarea></label>`;
-  return `<div class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="employee-action-title"><form class="login-card employee-action-card" data-form="employee-action" data-kind="${kind}"><div class="action-modal-head"><div><span class="build-number">Bau-Nr. 25148</span><h2 id="employee-action-title">${settings[0]}</h2><p>M&B Schinkel</p></div><button class="modal-close" type="button" data-action="close-employee-action" aria-label="Fenster schließen">×</button></div><div class="action-form-fields">${fields}</div><div class="demo-save-note"><strong>Nur Demo</strong><span>Deine Eingabe wird nur bis zum Neuladen auf diesem Gerät angezeigt.</span></div><div class="login-actions"><button class="primary">${settings[1]}</button><button class="secondary" type="button" data-action="close-employee-action">Abbrechen</button></div></form></div>`;
-}
-
-function renderEmployeeMore() {
-  return `<div class="employee-day">${pageHead('Mehr', 'Zusätzliche Funktionen')}<div class="more-grid"><section class="card more-card"><h2>Wochenzettel</h2><p>Eigene Beispielwoche ansehen.</p><button class="secondary" data-action="employee-message" data-message="Der eigene Wochenzettel ist in dieser Demo vollständig erfunden.">Ansehen</button></section><section class="card more-card"><h2>Demo-Perspektive</h2><p>Zurück zur Tagesübersicht der Geschäftsführung.</p><button class="primary" data-action="switch-role" data-role="management">Als Geschäftsführung ansehen</button></section></div></div>`;
-}
-
-function renderLogin() {
-  if (!state.loginPreview) return '';
-  return `<div class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="login-title"><form class="login-card" data-form="demo-login"><div class="login-brand">${meyerLogo('large')}<h2 id="login-title" class="sr-only">Maler Meyer</h2><p>Digitale Baustellenorganisation</p><span class="powered">powered by ShoreLogic</span></div><div class="test-strip" style="border-radius:9px">TESTSYSTEM – KEINE PRODUKTIVDATEN</div><label>Benutzername<input name="username" value="torben-demo" autocomplete="username"></label><label>Passwort<input name="password" type="password" value="beispiel" autocomplete="current-password"></label><label class="checkbox-line"><input type="checkbox" name="shared"><span>Dieses Gerät wird von mehreren Mitarbeitern genutzt</span></label><details class="info-note"><summary>Was bedeutet das?</summary><p>Auf gemeinsam genutzten Geräten soll die echte App schneller sperren und beim Benutzerwechsel eine neue Anmeldung verlangen.</p></details><div class="login-actions"><button class="primary">Demo als Torben öffnen</button><button class="secondary" type="button" data-action="hide-login">Schließen</button></div><p class="meta">Keine echte Anmeldung. Bitte keine echten Zugangsdaten eingeben.</p></form></div>`;
+  return `${head('Mehr', 'Rollenwechsel, Demo-Steuerung und seltene Bereiche')}<section class="card card-pad"><h2>Demo-Perspektive wechseln</h2><p>Dieselben synthetischen Vorgänge aus vier Rollen prüfen.</p><div class="role-grid">${Object.keys(profiles).map(function (key) { const p = profiles[key]; return `<button class="role-card ${ui.role === key ? 'active' : ''}" data-action="switch-role" data-role="${key}"><span class="avatar">${p.initial}</span><span><strong>${esc(p.name)}</strong><small>${esc(p.label)}</small></span></button>`; }).join('')}</div></section><div class="more-grid section"><section class="card more-card"><h2>Anmeldung</h2><p>Vorschau der späteren Anmeldung.</p><button class="secondary" data-action="show-login">Anmeldeseite ansehen</button></section><section class="card more-card"><h2>Demo zurücksetzen</h2><p>Alle erfundenen Ausgangsdaten wiederherstellen.</p><button class="danger-button" data-action="reset-demo">Demo-Daten zurücksetzen</button></section>${isOfficeRole() ? '<section class="card more-card"><h2>Exporte</h2><p>PDF und Excel-kompatible Beispieldateien.</p><button class="secondary" data-action="navigate" data-view="exports">Exporte öffnen</button></section>' : ''}<section class="card more-card"><h2>Späterer Ausbau</h2><p>Material, Urlaub, Aufmaß, OCR und KI bleiben bewusst für Punkt 7 zurückgestellt.</p><button class="secondary" disabled>Noch nicht Teil dieses Ausbaus</button></section></div><details class="developer-area"><summary>Entwickler- und Testinformationen</summary><p>Statische Demo ohne Backend und echte serverseitige Rechte. Änderungen bleiben lokal in diesem Browser, bis die Demo zurückgesetzt wird.</p><p>Demo-Version 6 · vollständig synthetisch.</p></details>`;
 }
 
 function renderOverlays() {
-  return `${state.toast ? `<div class="toast" role="status">${escapeHtml(state.toast)}</div>` : ''}${renderLogin()}${renderEmployeeActionDialog()}`;
+  return (ui.toast ? `<div class="toast" role="status">${esc(ui.toast)}</div>` : '') + renderActionModal() + renderSwitchModal() + renderDecisionModal() + renderLogin();
+}
+function renderActionModal() {
+  if (!ui.employeeAction) return '';
+  const kind = ui.employeeAction;
+  const employee = person(profile().employeeId || 'M-0001');
+  const currentSite = employee.site || (assignment(employee.id) || {}).site || '26-101';
+  const titles = { extra: 'Zusatzarbeit melden', note: 'Notiz oder synthetisches Foto', correction: 'Korrektur melden', feedback: 'Feedback / Fehler melden' };
+  let fields = '';
+  const siteOptions = db.sites.map(function (item) { return `<option value="${item.number}" ${item.number === currentSite ? 'selected' : ''}>${item.number} · ${esc(item.name)}</option>`; }).join('');
+  if (kind === 'extra') fields = `<label>Bau-Nr.<select name="site">${siteOptions}</select></label><label>Beschreibung<textarea name="description" required placeholder="Was wurde zusätzlich gemacht?"></textarea></label><div class="form-grid"><label>Menge – optional<input name="quantity" placeholder="12"></label><label>Einheit – optional<input name="unit" placeholder="m²"></label></div><label class="checkbox-line"><input type="checkbox" name="photo"><span>Synthetisches Beispielbild hinzufügen</span></label><label>Dokumentierte Bestätigung – optional<select name="confirmation"><option>Noch keine Bestätigung</option><option>Bauleitung wurde informiert</option><option>Dokumentierte Bestätigung vorhanden</option></select></label>`;
+  if (kind === 'note') fields = `<label>Bau-Nr.<select name="site">${siteOptions}</select></label><label>Kategorie<select name="category"><option>Allgemein</option><option>Fortschritt</option><option>Problem / Schaden</option><option>Kunden-/Bauleiterabsprache</option></select></label><label>Notiz<textarea name="text" required placeholder="Was soll festgehalten werden?"></textarea></label><label class="checkbox-line"><input type="checkbox" name="photo"><span>Synthetisches Beispielbild hinzufügen</span></label>`;
+  if (kind === 'correction') fields = `<label>Art<select name="type"><option>Fehlender Arbeitsbeginn</option><option>Fehlendes Arbeitsende</option><option>Falsche Baustelle</option><option>Falsche Pause</option><option>Sonstiges</option></select></label><label>Bau-Nr.<select name="site">${siteOptions}</select></label><label>Gewünschte Angabe<input name="suggestion" required placeholder="z. B. 07:05"></label><label>Beschreibung<textarea name="description" required placeholder="Was ist passiert?"></textarea></label>`;
+  if (kind === 'feedback') fields = '<label>Kategorie<select name="category"><option>Technischer Fehler</option><option>Bedienproblem</option><option>Daten stimmen nicht</option><option>Verbesserungsvorschlag</option><option>Funktion fehlt</option><option>Sonstiges</option></select></label><label>Beschreibung<textarea name="description" required placeholder="Was möchtest du melden?"></textarea></label>';
+  return `<div class="modal-backdrop" role="dialog" aria-modal="true"><form class="login-card employee-action-card" data-form="employee-action" data-kind="${kind}"><div class="action-modal-head"><div><span class="build-number">Bau-Nr. ${currentSite}</span><h2>${titles[kind]}</h2><p>Nur synthetische Demo-Eingaben verwenden.</p></div><button type="button" class="modal-close" data-action="close-action" aria-label="Schließen">×</button></div><div class="action-form-fields">${fields}</div><button class="primary full-button">Speichern</button><p class="demo-save-note"><strong>Bedienbare Demo</strong><span>Der Eintrag wird lokal gespeichert und erscheint in den verbundenen Ansichten.</span></p></form></div>`;
+}
+function renderSwitchModal() {
+  if (!ui.switchSite) return '';
+  const employee = person(profile().employeeId);
+  return `<div class="modal-backdrop" role="dialog" aria-modal="true"><form class="login-card" data-form="site-switch"><div class="action-modal-head"><div><h2>Baustelle wechseln</h2><p>Aktuell: Bau-Nr. ${employee.site}</p></div><button type="button" class="modal-close" data-action="close-switch">×</button></div><label>Nächste Baustelle<select name="site">${db.sites.filter(function (item) { return item.number !== employee.site; }).map(function (item) { return `<option value="${item.number}">${item.number} · ${esc(item.name)}</option>`; }).join('')}</select></label><button class="primary full-button">Baustelle verlassen und Fahrt starten</button><p class="meta">Fahrzeit wird nur als Rohereignis erfasst.</p></form></div>`;
+}
+function renderDecisionModal() {
+  if (!ui.decisionExtra) return '';
+  const extra = db.extras.find(function (item) { return item.id === ui.decisionExtra; });
+  return `<div class="modal-backdrop" role="dialog" aria-modal="true"><form class="login-card" data-form="extra-decision" data-id="${extra.id}"><div class="action-modal-head"><div><span class="build-number">Bau-Nr. ${extra.site}</span><h2>Kaufmännisch prüfen</h2><p>${esc(extra.description)}</p></div><button type="button" class="modal-close" data-action="close-decision">×</button></div><label>Demo-Entscheidung<select name="decision"><option value="BILLING">Zur Abrechnung vorgesehen</option><option value="NOT_BILLABLE">Nicht abrechenbar</option><option value="OPEN">Entscheidung offen lassen</option></select></label><label>Begründung<textarea name="reason" required></textarea></label><button class="primary full-button">Mit Verlauf speichern</button><p class="meta">Keine automatische Rechnung und keine rechtsverbindliche Freigabe.</p></form></div>`;
+}
+function renderLogin() {
+  if (!ui.login) return '';
+  return `<div class="modal-backdrop" role="dialog" aria-modal="true"><form class="login-card" data-form="demo-login"><div class="login-brand">${logo('large')}<p>Digitale Baustellenorganisation</p><span class="powered">powered by ShoreLogic</span></div><div class="test-strip">TESTSYSTEM – KEINE PRODUKTIVDATEN</div><label>Demo-Konto<select name="role">${Object.keys(profiles).map(function (key) { return `<option value="${key}">${esc(profiles[key].name)} · ${esc(profiles[key].label)}</option>`; }).join('')}</select></label><label>Passwort<input type="password" value="beispiel"></label><label class="checkbox-line"><input type="checkbox"><span>Dieses Gerät wird von mehreren Mitarbeitern genutzt</span></label><details class="info-note"><summary>Was bedeutet das?</summary><p>Die echte App soll auf gemeinsam genutzten Geräten schneller sperren.</p></details><div class="login-actions"><button class="primary">Demo öffnen</button><button class="secondary" type="button" data-action="hide-login">Schließen</button></div><p class="meta">Keine echte Anmeldung. Keine echten Zugangsdaten eingeben.</p></form></div>`;
 }
 
-function render() {
-  app.innerHTML = state.role === 'management' ? managerLayout() : employeeLayout();
-  document.title = state.role === 'management' ? 'Maler Meyer · Heute' : 'Maler Meyer · Mein Tag';
+function audit(type, entity, title, before, after, reason) {
+  db.audit.unshift({ id: makeId('A'), type: type, entity: entity, title: title, before: before, after: after, actor: actor(), time: timeNow(), reason: reason });
 }
-
-function navigate(view) {
-  state.view = view;
-  state.query = '';
-  state.toast = '';
+function applyStatus(employee, type, target) {
+  if (['WORK_START', 'BREAK_END', 'TRAVEL_END', 'WORK_RESUME'].includes(type)) { employee.status = 'WORKING'; employee.since = timeNow(); if (target) employee.site = target; }
+  if (type === 'BREAK_START') { employee.status = 'ON_BREAK'; employee.since = timeNow(); }
+  if (type === 'TRAVEL_START') { employee.status = 'TRAVELING'; employee.since = timeNow(); employee.travelTarget = target; }
+  if (type === 'WORK_END') { employee.status = 'FINISHED'; employee.since = timeNow(); }
+}
+function addEvent(employeeId, type, options) {
+  const employee = person(employeeId);
+  const opts = options || {};
+  const target = opts.site || employee.site;
+  db.events.push({ id: makeId('E'), employeeId: employeeId, type: type, time: timeNow(), site: target, fromSite: opts.fromSite || null, createdBy: opts.createdBy || employeeId, createdFor: employeeId, note: opts.note || '' });
+  applyStatus(employee, type, target);
+}
+function toast(message) {
+  if (toastTimer) clearTimeout(toastTimer);
+  ui.toast = message;
   render();
-  document.getElementById('main-content')?.focus({ preventScroll: true });
-  window.scrollTo({ top: 0, behavior: 'auto' });
+  toastTimer = setTimeout(function () {
+    if (ui.toast !== message) return;
+    ui.toast = '';
+    const element = document.querySelector('.toast');
+    if (element) element.remove();
+    toastTimer = null;
+  }, 2400);
+}
+function navigate(view) { ui.view = view; ui.query = ''; window.scrollTo(0, 0); render(); }
+function render() { app.innerHTML = renderShell(); }
+
+function csvCell(value) { return '"' + String(value == null ? '' : value).replace(/"/g, '""') + '"'; }
+function download(filename, blob) {
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url; anchor.download = filename; document.body.appendChild(anchor); anchor.click(); anchor.remove();
+  setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+}
+function downloadCsv(filename, rows) { download(filename, new Blob(['\uFEFF' + rows.map(function (row) { return row.map(csvCell).join(';'); }).join('\r\n')], { type: 'text/csv;charset=utf-8' })); }
+function pdfSafe(value) { return String(value).replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/Ä/g, 'Ae').replace(/Ö/g, 'Oe').replace(/Ü/g, 'Ue').replace(/ß/g, 'ss').replace(/[^\x20-\x7E]/g, '-').replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)'); }
+function pdfBlob(lines) {
+  const commands = ['BT', '/F1 11 Tf', '48 790 Td'];
+  lines.slice(0, 42).forEach(function (line, i) { if (i) commands.push('0 -17 Td'); commands.push('(' + pdfSafe(line) + ') Tj'); });
+  commands.push('ET');
+  const stream = commands.join('\n');
+  const objects = ['<< /Type /Catalog /Pages 2 0 R >>', '<< /Type /Pages /Kids [3 0 R] /Count 1 >>', '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>', '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>', '<< /Length ' + stream.length + ' >>\nstream\n' + stream + '\nendstream'];
+  let pdf = '%PDF-1.4\n'; const offsets = [0];
+  objects.forEach(function (object, i) { offsets.push(new TextEncoder().encode(pdf).length); pdf += (i + 1) + ' 0 obj\n' + object + '\nendobj\n'; });
+  const xref = new TextEncoder().encode(pdf).length;
+  pdf += 'xref\n0 ' + (objects.length + 1) + '\n0000000000 65535 f \n';
+  offsets.slice(1).forEach(function (offset) { pdf += String(offset).padStart(10, '0') + ' 00000 n \n'; });
+  pdf += 'trailer\n<< /Size ' + (objects.length + 1) + ' /Root 1 0 R >>\nstartxref\n' + xref + '\n%%EOF';
+  return new Blob([pdf], { type: 'application/pdf' });
+}
+function downloadWeek(id) {
+  const sheet = db.weeklySheets.find(function (item) { return item.id === id; });
+  const lines = ['Maler Meyer - TESTSYSTEM / KEINE PRODUKTIVDATEN', 'Wochenzettel ' + sheet.week + ' - ' + employeeName(sheet.employeeId), 'Version ' + sheet.version + ' - ' + weekText[sheet.status], ''];
+  sheet.days.forEach(function (day) { lines.push(day.day + ' ' + day.date + ' | Bau-Nr. ' + day.site + ' | Beginn ' + day.start + ' | Pause ' + day.break + ' | Ende ' + day.end + ' | Fahrt ' + day.travel + (day.issue ? ' | PRUEFBEDARF ' + day.issue : '')); });
+  lines.push('', 'Fahrzeiten sind Rohangaben. Keine Lohn- oder Ueberstundenberechnung.', 'Alle Daten sind synthetisch.');
+  download('Demo-Wochenzettel-' + sheet.employeeId + '.pdf', pdfBlob(lines));
+}
+function exportTimes() {
+  const rows = [['Demo-Datum', 'Mitarbeiter-ID', 'Mitarbeiter', 'Bau-Nr.', 'Ereignis', 'Uhrzeit', 'Gebucht durch', 'Hinweis']];
+  db.events.forEach(function (item) { rows.push([DEMO_DATE, item.employeeId, employeeName(item.employeeId), item.site || '', item.type, item.time, employeeName(item.createdBy), item.note || '']); });
+  downloadCsv('maler-meyer-demo-zeitereignisse.csv', rows);
+}
+function exportCalculation() {
+  const rows = [['Bau-Nr.', 'Baustelle', 'Ist-Ereignisse', 'Fahrzeit-Ereignisse', 'Zusatzarbeiten offen', 'Hinweis']];
+  db.sites.forEach(function (item) { const entries = db.events.filter(function (event) { return event.site === item.number; }); rows.push([item.number, item.name, entries.length, entries.filter(function (event) { return ['TRAVEL_START', 'TRAVEL_END'].includes(event.type); }).length, openExtras().filter(function (extra) { return extra.site === item.number; }).length, 'Keine Lohn- oder Kostenbewertung']); });
+  downloadCsv('maler-meyer-demo-nachkalkulation.csv', rows);
+}
+function exportPlanning() {
+  const rows = [['Demo-Datum', 'Mitarbeiter', 'Funktion', 'Bau-Nr.', 'Baustelle', 'Hinweis']];
+  db.employees.forEach(function (employee) { const plan = assignment(employee.id); rows.push([DEMO_DATE, employee.name, employee.job, plan ? plan.site : '', plan ? siteName(plan.site) : 'Nicht eingeplant', plan ? plan.note : '']); });
+  downloadCsv('maler-meyer-demo-tagesplanung.csv', rows);
 }
 
-function showToast(message) {
-  state.toast = message;
-  render();
-  window.setTimeout(() => { if (state.toast === message) { state.toast = ''; render(); } }, 2600);
+function renderMoreV6() {
+  const roleButtons = Object.keys(profiles).map(function (key) {
+    const item = profiles[key];
+    return '<button class="role-card ' + (ui.role === key ? 'active' : '') + '" data-action="switch-role" data-role="' + key + '"><span class="avatar">' + item.initial + '</span><span><strong>' + esc(item.name) + '</strong><small>' + esc(item.label) + '</small></span></button>';
+  }).join('');
+  const operations = isOfficeRole() ? '<section class="card card-pad section"><h2>Weitere Bereiche</h2><div class="quick-grid"><button class="secondary" data-action="navigate" data-view="planning">Tagesplanung</button><button class="secondary" data-action="navigate" data-view="sites">Baustellen</button><button class="secondary" data-action="navigate" data-view="employees">Mitarbeiter</button><button class="secondary" data-action="navigate" data-view="times">Zeiten prüfen</button><button class="secondary" data-action="navigate" data-view="extras">Zusatzarbeiten</button><button class="secondary" data-action="navigate" data-view="weeks">Wochenzettel</button><button class="secondary" data-action="navigate" data-view="exports">Exporte</button></div></section>' : '';
+  return head('Mehr', 'Rollenwechsel, Demo-Steuerung und seltene Bereiche') +
+    '<section class="card card-pad"><h2>Demo-Perspektive wechseln</h2><p>Dieselben synthetischen Vorgänge aus vier Rollen prüfen.</p><div class="role-grid">' + roleButtons + '</div></section>' +
+    operations +
+    '<div class="more-grid section"><section class="card more-card"><h2>Anmeldung</h2><p>Vorschau der späteren Anmeldung.</p><button class="secondary" data-action="show-login">Anmeldeseite ansehen</button></section><section class="card more-card"><h2>Demo zurücksetzen</h2><p>Alle erfundenen Ausgangsdaten wiederherstellen.</p><button class="danger-button" data-action="reset-demo">Demo-Daten zurücksetzen</button></section><section class="card more-card"><h2>Späterer Ausbau</h2><p>Material, Urlaub, Aufmaß, OCR und KI bleiben bewusst für Punkt 7 zurückgestellt.</p><button class="secondary" disabled>Noch nicht Teil dieses Ausbaus</button></section></div>' +
+    '<details class="developer-area"><summary>Entwickler- und Testinformationen</summary><p>Statische Demo ohne Backend und echte serverseitige Rechte. Änderungen bleiben lokal in diesem Browser, bis die Demo zurückgesetzt wird.</p><p>Demo-Version 6 · vollständig synthetisch.</p></details>';
 }
 
-app.addEventListener('input', event => {
+app.addEventListener('input', function (event) {
   if (event.target.id !== 'global-search') return;
-  state.query = event.target.value;
+  ui.query = event.target.value;
   render();
   const input = document.getElementById('global-search');
-  input?.focus();
-  input?.setSelectionRange(state.query.length, state.query.length);
+  if (input) { input.focus(); input.setSelectionRange(ui.query.length, ui.query.length); }
 });
 
-app.addEventListener('submit', event => {
+app.addEventListener('submit', function (event) {
   const form = event.target.closest('form');
   if (!form) return;
   event.preventDefault();
+  const values = new FormData(form);
+
   if (form.dataset.form === 'demo-login') {
-    state.loginPreview = false; state.role = 'management'; state.view = 'today'; render(); showToast('Demo geöffnet – keine echte Anmeldung.'); return;
+    ui.role = values.get('role'); ui.login = false; navigate('today'); toast('Demo als ' + profiles[ui.role].label + ' geöffnet.'); return;
+  }
+  if (form.dataset.form === 'planning-change') {
+    const employee = person(form.dataset.employee);
+    const current = assignment(employee.id);
+    const oldSite = current ? current.site : null;
+    const newSite = values.get('site') || null;
+    if (current) Object.assign(current, { originalSite: oldSite, site: newSite, changedBy: actor(), changedAt: timeNow(), note: values.get('reason') });
+    else db.assignments.push({ employeeId: employee.id, site: newSite, originalSite: oldSite, changedBy: actor(), changedAt: timeNow(), note: values.get('reason') });
+    if (['NOT_STARTED', 'NOT_PLANNED'].includes(employee.status)) { employee.site = newSite; employee.plannedSite = newSite; employee.status = newSite ? 'NOT_STARTED' : 'NOT_PLANNED'; }
+    audit('PLAN_CHANGED', employee.id, 'Tagesplanung geändert', oldSite || 'Nicht eingeplant', newSite || 'Nicht eingeplant', values.get('reason'));
+    saveDb(); toast('Tageszuordnung geändert und protokolliert.'); return;
   }
   if (form.dataset.form === 'time-correction') {
-    const problem = timeProblems.find(item => item.id === form.dataset.id);
-    if (!problem) return;
-    const values = new FormData(form);
-    const time = values.get('time'); const editor = values.get('editor'); const reason = values.get('reason');
-    const before = state.corrected[problem.id] || problem.original;
-    const after = `${time} · ${problem.title.replace('fehlt', 'ergänzt')}`;
-    state.corrected[problem.id] = after;
-    state.corrections.unshift({ problemId: problem.id, before, after, editor, reason, when: new Intl.DateTimeFormat('de-DE', { dateStyle: 'short', timeStyle: 'short' }).format(new Date()) });
-    state.editProblem = null; render(); showToast('Demo-Korrektur mit Verlauf ergänzt.');
+    saveTimeCorrection(form);
     return;
   }
+  if (form.dataset.form === 'crew-action') {
+    const selected = values.getAll('employee');
+    if (!selected.length) { toast('Bitte mindestens einen Mitarbeiter auswählen.'); return; }
+    const foreman = person(profile().employeeId);
+    selected.forEach(function (id) { addEvent(id, values.get('event'), { site: foreman.site, createdBy: foreman.id, note: 'Kolonnenbuchung durch Vorarbeiter' }); });
+    audit('CREW_EVENT', foreman.id, 'Kolonnenbuchung', selected.length + ' Personen', eventText[values.get('event')], 'Je Person ein eigener Ereigniseintrag');
+    saveDb(); toast(selected.length + ' einzelne Buchungen gespeichert.'); return;
+  }
+  if (form.dataset.form === 'site-switch') {
+    const employee = person(profile().employeeId);
+    const from = employee.site;
+    const target = values.get('site');
+    addEvent(employee.id, 'SITE_LEAVE', { site: from });
+    addEvent(employee.id, 'TRAVEL_START', { site: target, fromSite: from, note: 'Fahrt wird nur als Rohereignis erfasst.' });
+    ui.switchSite = false; saveDb(); toast('Fahrt zu Bau-Nr. ' + target + ' gestartet.'); return;
+  }
+  if (form.dataset.form === 'extra-decision') {
+    const extra = db.extras.find(function (item) { return item.id === form.dataset.id; });
+    const before = extraCommercial(extra);
+    extra.commercialStatus = values.get('decision');
+    extra.decisionReason = values.get('reason');
+    extra.history.push(timeNow() + ' · ' + extraCommercial(extra) + ' durch ' + actor() + ' · ' + extra.decisionReason);
+    audit('EXTRA_DECIDED', extra.id, 'Zusatzarbeit kaufmännisch geprüft', before, extraCommercial(extra), extra.decisionReason);
+    ui.decisionExtra = null; saveDb(); toast('Entscheidung gespeichert; Vorgang bleibt erhalten.'); return;
+  }
   if (form.dataset.form === 'employee-action') {
-    const values = new FormData(form);
+    const employee = person(profile().employeeId || 'M-0001');
     const kind = form.dataset.kind;
-    const photoSelected = Boolean(form.querySelector('[name="photo"]')?.files?.length);
-    const time = new Intl.DateTimeFormat('de-DE', { hour: '2-digit', minute: '2-digit' }).format(new Date());
-    let title = 'Meldung gespeichert';
-    let detail = '';
     if (kind === 'extra') {
-      title = 'Zusatzarbeit gemeldet';
-      detail = `${values.get('description')}${values.get('quantity') ? ` · ${values.get('quantity')}` : ''}${photoSelected ? ' · Foto ausgewählt' : ''}`;
-    } else if (kind === 'note') {
-      title = 'Baustellennotiz gespeichert';
-      detail = `${values.get('note')}${photoSelected ? ' · Foto ausgewählt' : ''}`;
-    } else if (kind === 'correction') {
-      title = 'Korrektur gemeldet';
-      detail = `${values.get('event')} auf ${values.get('time')} Uhr · ${values.get('reason')}`;
-    } else if (kind === 'feedback') {
-      title = 'Feedback gesendet';
-      detail = `${values.get('category')} · ${values.get('feedback')}`;
+      const id = makeId('ZA');
+      db.extras.unshift({ id: id, site: values.get('site'), employeeId: employee.id, reportedAt: 'Heute · ' + timeNow(), description: values.get('description'), quantity: values.get('quantity') || '–', unit: values.get('unit') || '', minutes: '', photo: values.get('photo') ? 'Synthetisches Bild zur neuen Zusatzarbeit' : null, confirmation: values.get('confirmation'), docStatus: 'REPORTED', commercialStatus: 'OPEN', decisionReason: '', history: [timeNow() + ' · von ' + employee.name + ' gemeldet'] });
+      audit('EXTRA_REPORTED', id, 'Zusatzarbeit gemeldet', '–', values.get('description'), 'Mitarbeiteransicht');
+      ui.employeeAction = null; saveDb(); toast('Zusatzarbeit in allen Ansichten ergänzt.'); return;
     }
-    state.employeeSubmissions.unshift({ title, detail, time });
-    state.employeeAction = null;
-    render();
-    showToast(`${title}. Nur in dieser Demo gespeichert.`);
+    if (kind === 'note') {
+      db.notes.unshift({ id: makeId('N'), site: values.get('site'), author: employee.name, time: timeNow(), category: values.get('category'), text: values.get('text'), photo: values.get('photo') ? 'Synthetisches Bild zur neuen Notiz' : null });
+      ui.employeeAction = null; saveDb(); toast('Notiz der Baustellenmappe zugeordnet.'); return;
+    }
+    if (kind === 'correction') {
+      db.correctionRequests.unshift({ id: makeId('KR'), employeeId: employee.id, date: '10.09.', site: values.get('site'), type: values.get('type'), description: values.get('description'), original: 'Ursprüngliche Ereignisfolge bleibt unverändert', suggestion: values.get('suggestion'), status: 'OPEN', createdAt: timeNow() });
+      ui.employeeAction = null; saveDb(); toast('Korrekturmeldung an Büro und Geschäftsführung gesendet.'); return;
+    }
+    if (kind === 'feedback') { ui.employeeAction = null; toast('Feedback gespeichert · Fallnummer DEMO-' + String(Date.now()).slice(-5)); return; }
   }
 });
 
-app.addEventListener('click', event => {
+app.addEventListener('click', function (event) {
   const target = event.target.closest('[data-action]');
   if (!target) return;
   event.preventDefault();
   const action = target.dataset.action;
-  if (action === 'navigate') navigate(target.dataset.view);
-  if (action === 'filter-employees') { state.employeeFilter = target.dataset.filter; navigate('employees'); }
-  if (action === 'employee-filter') { state.employeeFilter = target.dataset.filter; render(); }
-  if (action === 'open-site') { state.selectedSite = state.selectedSite === target.dataset.id ? null : target.dataset.id; state.view = 'sites'; state.query = ''; render(); document.querySelector('.folder-detail')?.scrollIntoView({ block: 'start' }); }
-  if (action === 'open-site-number') { const site = siteByNumber(target.dataset.number); if (site) { state.selectedSite = site.id; navigate('sites'); } }
-  if (action === 'close-site') { state.selectedSite = null; render(); }
-  if (action === 'open-employee') { state.selectedEmployee = state.selectedEmployee === target.dataset.id ? null : target.dataset.id; state.view = 'employees'; state.query = ''; render(); document.querySelector('.inline-detail')?.scrollIntoView({ block: 'nearest' }); }
-  if (action === 'edit-time') { state.editProblem = target.dataset.id; render(); document.querySelector('[data-form="time-correction"] textarea')?.focus(); }
-  if (action === 'cancel-time') { state.editProblem = null; render(); }
-  if (action === 'extra-filter') { state.extraFilter = target.dataset.filter; render(); }
-  if (action === 'demo-extra-check') showToast('Nur simuliert: Die kaufmännische Entscheidung bleibt offen.');
-  if (action === 'review-week') showToast('Beispiel-Wochenzettel geöffnet – keine Freigabe gespeichert.');
-  if (action === 'demo-message') showToast(target.dataset.message);
-  if (action === 'show-login') { state.loginPreview = true; render(); document.querySelector('.login-card input')?.focus(); }
-  if (action === 'hide-login') { state.loginPreview = false; render(); }
-  if (action === 'switch-role') { state.role = target.dataset.role; state.view = 'today'; state.toast = ''; render(); window.scrollTo(0,0); }
-  if (action === 'employee-home') navigate('today');
-  if (action === 'employee-more') navigate('more');
-  if (action === 'open-employee-action') { state.employeeAction = target.dataset.kind; render(); document.querySelector('.employee-action-card textarea, .employee-action-card input')?.focus(); }
-  if (action === 'close-employee-action') { state.employeeAction = null; render(); }
-  if (action === 'employee-message') showToast(target.dataset.message);
-  if (action === 'employee-step') {
-    if (state.employeeStep === employeeSteps.length - 1) { state.employeeStep = 0; state.employeeLog = []; }
-    else { const eventText = employeeSteps[state.employeeStep].log; if (eventText) state.employeeLog.push(eventText); state.employeeStep += 1; }
-    render();
+  if (action === 'submit-correction') {
+    saveTimeCorrection(target.closest('form'));
+    return;
   }
+  if (action === 'navigate') return navigate(target.dataset.view);
+  if (action === 'filter-status') { ui.employeeFilter = target.dataset.status; return navigate('employees'); }
+  if (action === 'employee-filter') { ui.employeeFilter = target.dataset.status; return render(); }
+  if (action === 'open-site') { ui.selectedSite = target.dataset.id; ui.view = 'sites'; ui.query = ''; render(); return setTimeout(function () { const detail = document.querySelector('.folder-detail'); if (detail) detail.scrollIntoView({ block: 'start' }); }, 0); }
+  if (action === 'close-site') { ui.selectedSite = null; return render(); }
+  if (action === 'open-employee') { ui.selectedEmployee = ui.selectedEmployee === target.dataset.id ? null : target.dataset.id; ui.view = 'employees'; ui.query = ''; return render(); }
+  if (action === 'open-correction') { ui.editCorrection = target.dataset.id; ui.view = 'times'; return render(); }
+  if (action === 'close-correction') { ui.editCorrection = null; return render(); }
+  if (action === 'open-extra') { ui.view = 'extras'; render(); return setTimeout(function () { const card = document.getElementById('extra-' + target.dataset.id); if (card) card.scrollIntoView({ block: 'center' }); }, 0); }
+  if (action === 'complete-extra') {
+    const extra = db.extras.find(function (item) { return item.id === target.dataset.id; });
+    extra.docStatus = 'COMPLETE'; extra.history.push(timeNow() + ' · Dokumentation vollständig durch ' + actor());
+    audit('EXTRA_DOCUMENTED', extra.id, 'Dokumentation vervollständigt', 'Offen', 'Vollständig', 'Demo-Prüfung');
+    saveDb(); return toast('Dokumentation als vollständig markiert.');
+  }
+  if (action === 'decide-extra') { ui.decisionExtra = target.dataset.id; return render(); }
+  if (action === 'close-decision') { ui.decisionExtra = null; return render(); }
+  if (action === 'open-week') { ui.selectedWeek = ui.selectedWeek === target.dataset.id ? null : target.dataset.id; return render(); }
+  if (action === 'confirm-week') {
+    const sheet = db.weeklySheets.find(function (item) { return item.id === target.dataset.id; });
+    sheet.status = 'EMPLOYEE_CONFIRMED'; sheet.history.push(profile().name + ' hat Version ' + sheet.version + ' um ' + timeNow() + ' bestätigt');
+    audit('WEEK_CONFIRMED', sheet.id, 'Wochenzettel bestätigt', 'Entwurf', 'Mitarbeiter bestätigt', 'Demo-Bestätigung');
+    saveDb(); return toast('Wochenzettel bestätigt.');
+  }
+  if (action === 'approve-week') {
+    const sheet = db.weeklySheets.find(function (item) { return item.id === target.dataset.id; });
+    sheet.status = 'ADMIN_APPROVED'; sheet.history.push(actor() + ' hat Version ' + sheet.version + ' um ' + timeNow() + ' freigegeben');
+    audit('WEEK_APPROVED', sheet.id, 'Wochenzettel freigegeben', 'Prüfung', 'Freigegeben', 'Demo-Freigabe');
+    saveDb(); return toast('Wochenzettel betrieblich freigegeben.');
+  }
+  if (action === 'switch-role') { ui.role = target.dataset.role; ui.view = 'today'; ui.selectedSite = null; ui.selectedWeek = null; window.scrollTo(0, 0); return render(); }
+  if (action === 'show-login') { ui.login = true; return render(); }
+  if (action === 'hide-login') { ui.login = false; return render(); }
+  if (action === 'reset-demo') { resetDb(); render(); return toast('Synthetische Ausgangsdaten wiederhergestellt.'); }
+  if (action === 'open-employee-action') { ui.employeeAction = target.dataset.kind; return render(); }
+  if (action === 'close-action') { ui.employeeAction = null; return render(); }
+  if (action === 'switch-site') { ui.switchSite = true; return render(); }
+  if (action === 'close-switch') { ui.switchSite = false; return render(); }
+  if (action === 'employee-event') {
+    const employee = person(profile().employeeId);
+    const type = target.dataset.event;
+    if (type === 'TRAVEL_END') {
+      const destination = employee.travelTarget || employee.site;
+      addEvent(employee.id, 'TRAVEL_END', { site: destination });
+      addEvent(employee.id, 'WORK_RESUME', { site: destination, note: 'Arbeit auf neuer Baustelle fortgesetzt' });
+      delete employee.travelTarget;
+    } else addEvent(employee.id, type);
+    saveDb(); return toast(eventText[type] + ' · ' + timeNow());
+  }
+  if (action === 'download-times') { exportTimes(); return toast('CSV mit synthetischen Zeitereignissen erstellt.'); }
+  if (action === 'download-calculation') { exportCalculation(); return toast('Excel-kompatible CSV erstellt.'); }
+  if (action === 'download-planning') { exportPlanning(); return toast('Tagesplanung als CSV erstellt.'); }
+  if (action === 'download-week-pdf') { downloadWeek(target.dataset.id); return toast('PDF-Wochenzettel erstellt.'); }
+  if (action === 'download-selected-week') { const select = document.getElementById('export-week'); if (select) downloadWeek(select.value); return toast('PDF-Wochenzettel erstellt.'); }
 });
 
-app.addEventListener('keydown', event => {
-  if (event.key === 'Escape' && state.employeeAction) { state.employeeAction = null; render(); }
+app.addEventListener('keydown', function (event) {
+  if (event.key === 'Escape') { ui.employeeAction = null; ui.switchSite = false; ui.decisionExtra = null; ui.login = false; render(); }
 });
 
 render();
