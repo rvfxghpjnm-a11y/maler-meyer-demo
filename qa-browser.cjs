@@ -123,7 +123,7 @@ async function clickNav(page, view) {
 
       await clickNav(page, 'more');
       await page.locator('[data-action="switch-role"][data-role="office"]').click();
-      await page.getByText('Arbeitsvorrat im Büro', { exact: false }).waitFor();
+      await page.getByText('Arbeitsvorrat und Betriebsverwaltung', { exact: false }).waitFor();
       await clickNav(page, 'times');
       await page.getByRole('heading', { name: 'Monatsverlauf · August / September 2026' }).waitFor();
       assert.equal(await page.locator('.month-overview tbody tr').count(), 29);
@@ -131,7 +131,7 @@ async function clickNav(page, view) {
       await page.locator('form[data-form="time-correction"] textarea[name="reason"]').fill('Synthetische Prüfung im Browsertest');
       await page.locator('form[data-form="time-correction"] button.primary').click();
       await page.waitForFunction(() => {
-        const stored = JSON.parse(localStorage.getItem('maler-meyer-demo-v8') || '{}');
+        const stored = JSON.parse(localStorage.getItem('maler-meyer-demo-v9') || '{}');
         return stored.data?.corrections?.some(item => item.reason === 'Synthetische Prüfung im Browsertest');
       });
 

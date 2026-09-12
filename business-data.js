@@ -76,6 +76,8 @@
 
   window.createDemoSeed = function createExpandedDemoSeed() {
     const db = baseFactory();
+    db.employees.forEach(function (employee) { employee.active = true; });
+    db.sites.forEach(function (project) { project.active = true; });
     db.monthHistory = buildMonthHistory(db.employees);
     db.weekPlans = [weekPlan(db.employees, 34, '2026-08-17'), weekPlan(db.employees, 35, '2026-08-24'), weekPlan(db.employees, 36, '2026-08-31'), weekPlan(db.employees, 37, '2026-09-07')];
     const weekStarts = { 34: '2026-08-17', 35: '2026-08-24', 36: '2026-08-31' };
@@ -225,5 +227,5 @@
     ];
     return db;
   };
-  window.DEMO_DATA_VERSION = 8;
+  window.DEMO_DATA_VERSION = 9;
 }());

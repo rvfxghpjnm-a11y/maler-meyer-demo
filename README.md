@@ -6,6 +6,14 @@ Die Demo hat kein Backend, keine echte Anmeldung und keine Verbindung zu Maler M
 
 Vier Perspektiven sind bedienbar: Geschäftsführung, Büro, Vorarbeiter und Mitarbeiter. Planung, Zeitereignisse, Korrekturen, Zusatzarbeiten, Baustellenmappe und Wochenzettel verwenden einen gemeinsamen synthetischen Demo-Zustand. Der erweiterte Datensatz umfasst vier Planungswochen und einen synthetischen Arbeitszeitverlauf vom 3. August bis 11. September 2026.
 
+## Betriebsverwaltung und Büro-Hilfe
+
+Torben, Steffen und die beiden vollständig synthetischen Büro-Demokonten besitzen in Demo-Version 9 dieselbe umfangreiche Verwaltungsansicht. Dort können sie Projekte anlegen und bearbeiten, Mitarbeiter anlegen und bearbeiten, Planung unterstützen sowie Mitarbeiter oder Projekte deaktivieren und wieder aktivieren. „Entfernen“ ist bewusst als nachvollziehbare Deaktivierung umgesetzt: Zeitdaten, Dokumente und Änderungsverläufe bleiben erhalten.
+
+Wenn ein Mitarbeiter sein Smartphone nicht dabeihat oder Hilfe benötigt, kann das Büro eine aktuelle Zeitaktion stellvertretend auslösen. Die Demo speichert dabei getrennt, welcher Mitarbeiter betroffen ist, welches Verwaltungskonto gehandelt hat, wann die Aktion erfolgte und welcher Grund angegeben wurde. Rückwirkende Änderungen laufen weiterhin über den Korrekturprozess.
+
+Diese Gleichstellung der vier Verwaltungskonten ist eine spätere Projektentscheidung vom 12. September 2026 und kein rückwirkender Meeting-Beschluss. Die Namen der beiden Büro-Demokonten sind erfunden. Die statische Demo simuliert Bedienrechte nur im Browser; die echte Anwendung muss Anmeldung, Rollenrechte und Audit serverseitig erzwingen. Details stehen in [ADMIN_VERWALTUNG.md](./ADMIN_VERWALTUNG.md).
+
 Unter „Dokumente & Exporte“ und in der jeweiligen Baustellenmappe stehen originalnah gestaltete Druckansichten für Arbeitszeitnachweis, Arbeitszettel, Materialanforderung, Materialeinsatz, Tageslohnnachweis, Aufmaß, Baubesprechungsprotokoll, Urlaubsantrag und Angebot bereit. Hinzu kommen XLSX-Exporte für Wochenplanung, Bauliste/Nachkalkulation, Projekt-Unterkonto und „Rechnung schreiben?“ sowie CSV-Ausgaben für Zeitdaten und die Rechnungsliste. Die Demo erzeugt ausschließlich neue Dateien und schreibt nie in eine bestehende Excel-Arbeitsmappe.
 
 Die Referenzstruktur und alle bewusst offenen Details sind in [EXPORT_REFERENZ_MATRIX.md](./EXPORT_REFERENZ_MATRIX.md) dokumentiert. Es gibt keine automatische Lohn-, Überstunden-, Fahrzeit- oder Aufmaßbewertung.
