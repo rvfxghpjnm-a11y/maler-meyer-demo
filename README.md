@@ -10,9 +10,18 @@ Unter „Dokumente & Exporte“ und in der jeweiligen Baustellenmappe stehen ori
 
 Die Referenzstruktur und alle bewusst offenen Details sind in [EXPORT_REFERENZ_MATRIX.md](./EXPORT_REFERENZ_MATRIX.md) dokumentiert. Es gibt keine automatische Lohn-, Überstunden-, Fahrzeit- oder Aufmaßbewertung.
 
+## Mobile Bestätigungen
+
+Mitarbeiter können ihren eigenen Wochenzettel mobil prüfen, eine Korrektur melden und eine vollständige Version optional mit einer Finger-/Pointer-Unterschrift bestätigen. Jede Bestätigung friert den damaligen Inhalt als eigenen synthetischen Snapshot ein. Nach einer Bürokorrektur entsteht eine neue Version; eine alte Unterschrift wird nicht übernommen.
+
+Zusatzarbeiten können vor Ort als dokumentierter Stand bestätigt werden. Ändert sich danach beispielsweise die Menge, bleibt die alte Bestätigung beim alten Inhalt und für den neuen Stand ist eine neue Bestätigung erforderlich. Dokumentationsbestätigung und kaufmännische Prüfung bleiben getrennt.
+
+Das Demo-Benachrichtigungszentrum verlinkt direkt auf den betroffenen Wochenzettel. Die Browser-Notification-API kann eine lokale Testmeldung zeigen. Eine echte Zustellung bei geschlossener App wird ausdrücklich nicht simuliert.
+
+Der technische und fachliche Ablauf ist in [MOBILE_BESTAETIGUNG.md](./MOBILE_BESTAETIGUNG.md) festgehalten.
+
 ## Bewusst offen oder später
 
-OCR und KI, produktiver Rechnungseingang, echte Dateiablage, rechtswirksame Freigaben sowie direkte Excel-Integration bleiben ausdrücklich zurückgestellt. Material, Urlaub und Aufmaß sind ausschließlich als klar erkennbare synthetische Bedien- und Exportbeispiele umgesetzt.
+OCR und KI, produktiver Rechnungseingang, echte Dateiablage, rechtswirksame Freigaben, echter Web Push sowie direkte Excel-Integration bleiben ausdrücklich zurückgestellt. Material, Urlaub und Aufmaß sind ausschließlich als klar erkennbare synthetische Bedien- und Exportbeispiele umgesetzt.
 
 Öffentliche Ansicht: https://rvfxghpjnm-a11y.github.io/maler-meyer-demo/
-

@@ -2,9 +2,9 @@
 
 Stand: 12. September 2026  
 Zweck: Fachliche Soll-Matrix und fortgeschriebene Bestandsprüfung  
-Bewertete Demo-Basis: öffentliche, rein statische Bedienungsdemo (Demo-Version 7)
+Bewertete Demo-Basis: öffentliche, rein statische Bedienungsdemo (Demo-Version 8)
 
-Freigabevermerk vom 12. September 2026: Die Ausbaustufen 1 bis 6 wurden umgesetzt. Die zusätzlich freigegebenen originalnahen Formular- und Exportbeispiele sind in `EXPORT_REFERENZ_MATRIX.md` beschrieben. Produktive OCR-/KI-Verarbeitung bleibt für später zurückgestellt.
+Freigabevermerk vom 12. September 2026: Die Ausbaustufen 1 bis 6, die originalnahen Formular-/Exportbeispiele sowie der mobile Bestätigungs-, Korrektur- und Benachrichtigungsablauf wurden umgesetzt. Details stehen in `EXPORT_REFERENZ_MATRIX.md` und `MOBILE_BESTAETIGUNG.md`. Produktive OCR-/KI-Verarbeitung und echter Web Push bleiben für später zurückgestellt.
 
 ## 1. Abgrenzung
 
@@ -275,3 +275,4 @@ Die vorhandene Demo ist bereits ein guter visueller Einstieg und deckt Torbens M
 
 Der sinnvollste nächste Schritt ist deshalb nicht einfach „mehr Karten und Beispieldaten“, sondern zuerst eine gemeinsame synthetische Demo-Welt für alle 25 Szenarien. Darauf können die vier Rollen, die vollständigen Zeit-/Korrekturabläufe, Zusatzarbeiten, Baustellenmappe, Wochenzettel und Exporte zuverlässig aufbauen. So bleibt die Demo später sauber auf die echte Backend-Anwendung übertragbar, ohne offene Fachregeln einzubauen.
 
+> Historischer Prüfvermerk: Die Abschnitte 4 und 5 dokumentieren den Stand vor den inzwischen freigegebenen Ausbaustufen. Der aktuell bedienbare Stand ist Demo-Version 8; die neue mobile Bestätigung ist in `MOBILE_BESTAETIGUNG.md` verifiziert.

@@ -158,8 +158,72 @@
         { id: 'D-' + project.number + '-BP', site: project.number, type: 'Baubesprechungsprotokoll', title: 'Baubesprechungsprotokoll ' + project.name, status: 'Druckbereit' }
       ];
     });
+
+    function demoHash(value) {
+      const input = JSON.stringify(value);
+      let hash = 0x811c9dc5;
+      for (let i = 0; i < input.length; i += 1) {
+        hash ^= input.charCodeAt(i);
+        hash = Math.imul(hash, 0x01000193);
+      }
+      return 'DEMO-' + (hash >>> 0).toString(16).toUpperCase().padStart(8, '0');
+    }
+    function extraContent(extra) {
+      return { extraId: extra.id, site: extra.site, description: extra.description, quantity: extra.quantity || '', unit: extra.unit || '', minutes: extra.minutes || '', photo: extra.photo || null };
+    }
+
+    const maxWeek = db.weeklySheets.find(function (sheet) { return sheet.id === 'W-001'; });
+    if (maxWeek) {
+      maxWeek.status = 'DRAFT';
+      maxWeek.days = maxWeek.days.map(function (day) { return Object.assign({}, day, day.day === 'Do' ? { start: '07:05', issue: '' } : {}); });
+      maxWeek.history = ['Entwurf aus vollständigen Zeitereignissen erstellt', 'Bereit zur Prüfung durch Max Beispiel'];
+    }
+    if (!db.weeklySheets.some(function (sheet) { return sheet.id === 'W-002'; })) {
+      db.weeklySheets.push({
+        id: 'W-002', employeeId: 'M-0002', week: 'KW 37', status: 'NEEDS_CORRECTION', version: 1,
+        days: maxWeek.days.map(function (day) { return Object.assign({}, day, day.day === 'Mi' ? { site: '26-102', end: '–', issue: 'Arbeitsende fehlt' } : { site: '26-102' }); }),
+        history: ['Entwurf aus Zeitereignissen erstellt', 'Mittwoch: Arbeitsende fehlt']
+      });
+    }
+
+    db.weeklySnapshots = [];
+    db.weeklyApprovals = [];
+    db.weeklySheets.filter(function (sheet) { return sheet.status === 'EMPLOYEE_CONFIRMED' || sheet.status === 'ADMIN_APPROVED'; }).forEach(function (sheet, index) {
+      const worker = db.employees.find(function (employee) { return employee.id === sheet.employeeId; });
+      const content = { employeeId: sheet.employeeId, employeeName: worker ? worker.name : sheet.employeeId, week: sheet.week, version: sheet.version, days: JSON.parse(JSON.stringify(sheet.days)) };
+      const snapshot = {
+        id: 'WS-DEMO-' + String(index + 1).padStart(3, '0'), sheetId: sheet.id, employeeId: sheet.employeeId,
+        week: sheet.week, version: sheet.version, confirmedAt: '11.09.2026 · 16:' + String(8 + index).padStart(2, '0') + ' Uhr',
+        confirmedBy: worker ? worker.name : sheet.employeeId, content: content, contentHash: demoHash(content), signatureDataUrl: null,
+        status: 'EMPLOYEE_CONFIRMED', supersededByVersion: null
+      };
+      db.weeklySnapshots.push(snapshot);
+      sheet.confirmedSnapshotId = snapshot.id;
+      if (sheet.status === 'ADMIN_APPROVED') db.weeklyApprovals.push({ id: 'WA-DEMO-' + (index + 1), snapshotId: snapshot.id, approvedAt: '12.09.2026 · 08:10 Uhr', approvedBy: 'Sabine Beispiel · Büro' });
+    });
+
+    const extraScenario = {
+      id: 'ZA-208', site: '26-104', employeeId: 'M-0017', reportedAt: 'Heute · 13:40',
+      description: 'Nordwand im Besprechungsraum zusätzlich spachteln und streichen.', quantity: '18', unit: 'm²', minutes: '', photo: null,
+      confirmation: 'Noch keine Bestätigung', docStatus: 'REPORTED', commercialStatus: 'OPEN', decisionReason: '',
+      history: ['13:40 · von Emma Test erfasst', 'Bestätigung der dokumentierten Zusatzarbeit noch offen']
+    };
+    if (!db.extras.some(function (extra) { return extra.id === extraScenario.id; })) db.extras.unshift(extraScenario);
+    db.extraConfirmations = [];
+    db.extras.filter(function (extra) { return /Bestätigung vorhanden/.test(extra.confirmation || ''); }).forEach(function (extra, index) {
+      const content = extraContent(extra);
+      db.extraConfirmations.push({
+        id: 'ECS-DEMO-' + String(index + 1).padStart(3, '0'), extraId: extra.id, site: extra.site,
+        project: (db.sites.find(function (site) { return site.number === extra.site; }) || {}).name || '',
+        content: content, contentHash: demoHash(content), confirmerName: 'Robin Muster', confirmerRole: 'Bauleitung (synthetisch)',
+        confirmedAt: '10.09.2026 · 10:04 Uhr', signatureDataUrl: null, status: 'DOCUMENTATION_CONFIRMED'
+      });
+    });
+    db.notifications = [
+      { id: 'NOT-001', employeeId: 'M-0001', type: 'WEEK_REVIEW', title: 'Wochenübersicht KW 37 wartet auf deine Bestätigung.', body: 'Bitte prüfe Baustellen, Zeiten, tatsächliche Pausen und rohe Fahrtangaben.', sheetId: 'W-001', createdAt: 'Beispiel-Erinnerung: Freitag 16:00 Uhr', read: false },
+      { id: 'NOT-002', employeeId: 'M-0001', type: 'INFO', title: 'Demo-Benachrichtigungszentrum aktiv', body: 'Eine echte Zustellung bei geschlossener App benötigt später Push-Service und Backend.', createdAt: 'Heute · 08:00', read: true }
+    ];
     return db;
   };
-  window.DEMO_DATA_VERSION = 7;
+  window.DEMO_DATA_VERSION = 8;
 }());
-

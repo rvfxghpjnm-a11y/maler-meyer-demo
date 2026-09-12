@@ -408,4 +408,38 @@ legend { margin-bottom: .65rem; color: var(--navy); font-weight: 900; }
   .inline-demo-form { grid-template-columns: 1fr; }
   .mm-export-card .form-actions { display: grid; grid-template-columns: 1fr; }
 }
+.signature-overlay{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:18px;background:rgba(10,24,38,.72);overscroll-behavior:contain}
+.signature-dialog{width:min(760px,100%);max-height:calc(100dvh - 28px);overflow:auto;background:#fff;border-radius:18px;padding:22px;box-shadow:0 28px 70px #0006}
+.signature-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
+.signature-head h2{margin:4px 0 8px;font-size:clamp(1.25rem,3vw,1.8rem)}
+.icon-button{border:0;background:#edf1f4;border-radius:999px;width:40px;height:40px;font-size:26px;line-height:1;flex:none}
+.signature-canvas-wrap{position:relative;margin:16px 0 8px;border:2px solid #67809a;border-radius:12px;background:linear-gradient(#fff,#fbfcfd);overflow:hidden}
+.signature-canvas{display:block;width:100%;height:220px;touch-action:pan-y;cursor:default;opacity:.62}
+.signature-canvas.active{touch-action:none;cursor:crosshair;opacity:1}
+.signature-enable{border:1px solid #2473a6;border-radius:10px;background:#eff8fd;color:#174f73;padding:10px 14px;font-weight:800}.signature-enable.active{background:#e7f5eb;border-color:#2f8a43;color:#246b34}
+.signature-line-label{position:absolute;left:8%;right:8%;bottom:22px;border-bottom:1px solid #637080;color:#637080;font-size:12px;padding-bottom:4px;pointer-events:none}
+.signature-hint,.legal-note{font-size:.86rem;color:#596778}
+.legal-note{border-left:4px solid #c58d2b;background:#fff8e8;padding:10px 12px}
+.signature-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:10px;margin-top:18px}
+.form-error{color:#a52620;font-weight:700}
+.week-state-legend{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px}
+.snapshot-list{margin-top:18px;padding-top:16px;border-top:1px solid var(--border,#d7dee5)}
+.snapshot-list h3{margin:0 0 10px}
+.snapshot-row{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:12px;border:1px solid #d6dee6;border-radius:10px;background:#f7fafc;margin:8px 0}
+.snapshot-row>div{display:grid;gap:4px}.snapshot-row small{color:#596778}.snapshot-old{border-color:#d99b92;background:#fff5f3}
+.confirmation-history{margin:14px 0}.notification-explainer{padding:18px;border-radius:14px;background:#edf5f9;border:1px solid #c8d9e4}.notification-explainer p{margin:6px 0 14px}
+.notification-card{width:100%;display:flex;justify-content:space-between;align-items:center;text-align:left;gap:14px;padding:18px}.notification-card>span:first-child{display:grid;gap:5px}.notification-card.unread{border-left:5px solid #2473a6;background:#f1f8fc}.notification-card small{color:#596778}
+.frozen-preview{padding:14px;border:1px solid #ccd7df;border-radius:10px;background:#f6f9fb;margin:12px 0}.scenario-button{width:100%;border:1px dashed #2473a6;border-radius:10px;background:#eff8fd;color:#174f73;padding:11px;font-weight:700}
 
+@media (max-width:720px){
+  .signature-overlay{padding:8px;place-items:end center}
+  .signature-dialog{border-radius:18px 18px 8px 8px;padding:16px;max-height:calc(100dvh - 8px)}
+  .signature-canvas{height:190px}
+  .signature-actions{display:grid;grid-template-columns:1fr}
+  .signature-actions button{width:100%}
+  .snapshot-row{align-items:flex-start;flex-direction:column}
+  .snapshot-row button{width:100%}
+  .week-detail .table-scroll{margin-inline:-14px;padding-inline:14px}
+  .week-state-legend{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px}
+  .week-state-legend .badge{white-space:nowrap}
+}

@@ -131,7 +131,7 @@ async function clickNav(page, view) {
       await page.locator('form[data-form="time-correction"] textarea[name="reason"]').fill('Synthetische Prüfung im Browsertest');
       await page.locator('form[data-form="time-correction"] button.primary').click();
       await page.waitForFunction(() => {
-        const stored = JSON.parse(localStorage.getItem('maler-meyer-demo-v7') || '{}');
+        const stored = JSON.parse(localStorage.getItem('maler-meyer-demo-v8') || '{}');
         return stored.data?.corrections?.some(item => item.reason === 'Synthetische Prüfung im Browsertest');
       });
 
@@ -177,4 +177,3 @@ async function clickNav(page, view) {
   console.error(error);
   process.exitCode = 1;
 });
-

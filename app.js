@@ -1,7 +1,7 @@
 'use strict';
 
 const DEMO_DATE = 'Donnerstag, 10. September';
-const STORAGE_KEY = 'maler-meyer-demo-v7';
+const STORAGE_KEY = 'maler-meyer-demo-v8';
 const app = document.getElementById('app');
 
 const profiles = {
@@ -13,10 +13,10 @@ const profiles = {
 const statusText = { WORKING: 'Arbeitet', ON_BREAK: 'Pause', TRAVELING: 'Unterwegs', NOT_STARTED: 'Noch nicht gestartet', NOT_PLANNED: 'Nicht eingeplant', FINISHED: 'Beendet', REVIEW: 'Prüfbedarf' };
 const statusKind = { WORKING: 'ok', ON_BREAK: 'warn', TRAVELING: 'travel', NOT_STARTED: 'problem', NOT_PLANNED: '', FINISHED: 'ok', REVIEW: 'problem' };
 const eventText = { WORK_START: 'Arbeit gestartet', BREAK_START: 'Pause gestartet', BREAK_END: 'Pause beendet', SITE_LEAVE: 'Baustelle verlassen', TRAVEL_START: 'Fahrt begonnen', TRAVEL_END: 'Fahrt beendet', WORK_RESUME: 'Arbeit fortgesetzt', WORK_END: 'Feierabend', CORRECTION: 'Korrektur ergänzt' };
-const weekText = { DRAFT: 'Entwurf', EMPLOYEE_CONFIRMED: 'Vom Mitarbeiter bestätigt', ADMIN_APPROVED: 'Freigegeben', NEEDS_CORRECTION: 'Unvollständig', NEEDS_REVIEW: 'Erneute Prüfung nötig' };
+const weekText = { DRAFT: 'Entwurf · Mitarbeiterbestätigung fehlt', EMPLOYEE_CONFIRMED: 'Vom Mitarbeiter bestätigt', ADMIN_APPROVED: 'Büro/Admin freigegeben', CORRECTION_REQUESTED: 'Korrektur angefordert', NEEDS_RECONFIRM: 'Erneute Bestätigung erforderlich', NEEDS_CORRECTION: 'Unvollständig', NEEDS_REVIEW: 'Erneute Bestätigung erforderlich' };
 
 let db = loadDb();
-const ui = { role: 'management', view: 'today', query: '', employeeFilter: 'all', planningWeek: 37, selectedSite: null, selectedEmployee: null, selectedWeek: null, editCorrection: null, decisionExtra: null, employeeAction: null, switchSite: false, login: false, toast: '' };
+const ui = { role: 'management', view: 'today', query: '', employeeFilter: 'all', planningWeek: 37, selectedSite: null, selectedEmployee: null, selectedWeek: null, editCorrection: null, decisionExtra: null, confirmExtra: null, editExtra: null, weekCorrection: null, employeeAction: null, switchSite: false, login: false, toast: '' };
 let toastTimer = null;
 
 function loadDb() {
@@ -29,9 +29,10 @@ function loadDb() {
 function saveDb() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: window.DEMO_DATA_VERSION, data: db })); } catch (_) {}
 }
-function resetDb() { db = window.createDemoSeed(); saveDb(); Object.assign(ui, { view: 'today', query: '', employeeFilter: 'all', planningWeek: 37, selectedSite: null, selectedEmployee: null, selectedWeek: null, editCorrection: null, decisionExtra: null, employeeAction: null, switchSite: false }); }
+function resetDb() { db = window.createDemoSeed(); saveDb(); Object.assign(ui, { view: 'today', query: '', employeeFilter: 'all', planningWeek: 37, selectedSite: null, selectedEmployee: null, selectedWeek: null, editCorrection: null, decisionExtra: null, confirmExtra: null, editExtra: null, weekCorrection: null, employeeAction: null, switchSite: false }); }
 function esc(value) { return String(value == null ? '' : value).replace(/[&<>'"]/g, function (char) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]; }); }
 function timeNow() { return new Intl.DateTimeFormat('de-DE', { hour: '2-digit', minute: '2-digit' }).format(new Date()); }
+function dateTimeNow() { return new Intl.DateTimeFormat('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date()).replace(',', ' ·') + ' Uhr'; }
 function makeId(prefix) { return prefix + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 6); }
 function person(id) { return db.employees.find(function (item) { return item.id === id; }); }
 function site(number) { return db.sites.find(function (item) { return item.number === number; }); }
@@ -45,6 +46,13 @@ function eventsFor(id) { return db.events.filter(function (item) { return item.e
 function openCorrections() { return db.correctionRequests.filter(function (item) { return item.status === 'OPEN'; }); }
 function openExtras() { return db.extras.filter(function (item) { return item.commercialStatus === 'OPEN'; }); }
 function pendingWeeks() { return db.weeklySheets.filter(function (item) { return item.status !== 'ADMIN_APPROVED'; }); }
+function clone(value) { return window.MMWorkflow.clone(value); }
+function demoHash(value) { return window.MMWorkflow.hashContent(value); }
+function weekSnapshot(sheet) { return db.weeklySnapshots.find(function (item) { return item.id === sheet.confirmedSnapshotId; }); }
+function snapshotsFor(sheet) { return db.weeklySnapshots.filter(function (item) { return item.sheetId === sheet.id; }).sort(function (a, b) { return b.version - a.version; }); }
+function extraContent(extra) { return { extraId: extra.id, site: extra.site, description: extra.description, quantity: extra.quantity || '', unit: extra.unit || '', minutes: extra.minutes || '', photo: extra.photo || null }; }
+function extraConfirmations(extra) { return db.extraConfirmations.filter(function (item) { return item.extraId === extra.id; }).sort(function (a, b) { return String(b.confirmedAt).localeCompare(String(a.confirmedAt)); }); }
+function currentExtraConfirmation(extra) { const hash = demoHash(extraContent(extra)); return extraConfirmations(extra).find(function (item) { return item.contentHash === hash; }); }
 function greeting(name) { const hour = new Date().getHours(); return (hour < 11 ? 'Guten Morgen' : hour < 18 ? 'Guten Tag' : 'Guten Abend') + ', ' + name; }
 function badge(text, kind) { return `<span class="badge ${kind || ''}">${esc(text)}</span>`; }
 function logo(size) { return `<span class="meyer-wordmark ${size || ''}" aria-hidden="true"><span>maler</span><span>meyer</span></span>`; }
@@ -52,12 +60,13 @@ function assumption(text) { return `<p class="assumption"><strong>Demo-Annahme</
 function head(title, subtitle) { return `<div class="page-head"><div><h1>${esc(title)}</h1><p>${esc(subtitle)}</p></div><span class="demo-context">Erfundener Beispieltag</span></div>`; }
 
 function navItems() {
-  if (ui.role === 'employee') return [['today', 'H', 'Heute'], ['employee-extra', '+', 'Zusatzarbeit'], ['employee-note', 'N', 'Notiz'], ['more', '···', 'Mehr']];
+  if (ui.role === 'employee') return [['today', 'H', 'Heute'], ['weeks', 'W', 'Wochenzettel'], ['notifications', 'N', 'Hinweise'], ['employee-extra', '+', 'Zusatzarbeit'], ['more', '···', 'Mehr']];
   if (ui.role === 'foreman') return [['today', 'H', 'Heute'], ['crew', 'K', 'Kolonne'], ['sites', 'B', 'Baustelle'], ['more', '···', 'Mehr']];
-  return [['today', 'H', 'Heute'], ['planning', 'P', 'Planung'], ['sites', 'B', 'Baustellen'], ['employees', 'M', 'Mitarbeiter'], ['times', 'Z', 'Zeiten prüfen'], ['extras', '+', 'Zusatzarbeiten'], ['weeks', 'W', 'Wochenzettel'], ['exports', '⇩', 'Dokumente & Exporte'], ['more', '···', 'Mehr']];
+  return [['today', 'H', 'Heute'], ['planning', 'P', 'Planung'], ['sites', 'B', 'Baustellen'], ['employees', 'M', 'Mitarbeiter'], ['times', 'Z', 'Zeiten prüfen'], ['extras', '+', 'Zusatzarbeiten'], ['weeks', 'W', 'Wochenzettel'], ['notifications', 'N', 'Hinweise'], ['exports', '⇩', 'Dokumente & Exporte'], ['more', '···', 'Mehr']];
 }
 function mobileItems() {
-  if (ui.role === 'employee' || ui.role === 'foreman') return navItems();
+  if (ui.role === 'employee') return [['today', 'H', 'Heute'], ['weeks', 'W', 'Woche'], ['notifications', 'N', 'Hinweise'], ['more', '···', 'Mehr']];
+  if (ui.role === 'foreman') return navItems();
   return ui.role === 'office' ? [['today', 'H', 'Heute'], ['times', 'Z', 'Zeiten'], ['extras', '+', 'Zusätze'], ['more', '···', 'Mehr']] : [['today', 'H', 'Heute'], ['sites', 'B', 'Baustellen'], ['times', 'Z', 'Zeiten'], ['more', '···', 'Mehr']];
 }
 function navButton(item) {
@@ -80,7 +89,12 @@ function renderShell() {
 function renderView() {
   if (ui.view === 'employee-extra') { ui.employeeAction = 'extra'; ui.view = 'today'; }
   if (ui.view === 'employee-note') { ui.employeeAction = 'note'; ui.view = 'today'; }
-  if (ui.role === 'employee') return ui.view === 'more' ? renderMoreV6() : renderEmployee();
+  if (ui.role === 'employee') {
+    if (ui.view === 'more') return renderMoreV6();
+    if (ui.view === 'weeks') return renderWeeks(true);
+    if (ui.view === 'notifications') return renderNotifications();
+    return renderEmployee();
+  }
   if (ui.role === 'foreman') {
     if (ui.view === 'crew') return renderCrew();
     if (ui.view === 'sites') { ui.selectedSite = person(profile().employeeId).site; return renderSites(true); }
@@ -93,6 +107,7 @@ function renderView() {
   if (ui.view === 'times') return renderTimes();
   if (ui.view === 'extras') return renderExtras();
   if (ui.view === 'weeks') return renderWeeks();
+  if (ui.view === 'notifications') return renderNotifications();
   if (ui.view === 'exports') return renderExports();
   if (ui.view === 'more') return renderMoreV6();
   return ui.role === 'office' ? renderOffice() : renderManagement();
@@ -210,13 +225,46 @@ function saveTimeCorrection(form) {
   db.events.push({ id: makeId('E'), employeeId: request.employeeId, type: 'CORRECTION', time: timeNow(), site: request.site, createdBy: profile().employeeId || ui.role, createdFor: request.employeeId, note: request.original + ' → ' + after });
   const employee = person(request.employeeId);
   if (['REVIEW', 'NOT_STARTED'].includes(employee.status)) { employee.status = 'WORKING'; employee.since = (String(after).match(/\d\d:\d\d/) || [timeNow()])[0]; }
-  db.weeklySheets.filter(function (sheet) { return sheet.employeeId === request.employeeId; }).forEach(function (sheet) {
-    if (['EMPLOYEE_CONFIRMED', 'ADMIN_APPROVED'].includes(sheet.status)) { sheet.version += 1; sheet.status = 'NEEDS_REVIEW'; sheet.history.push('Korrektur durch ' + actor() + '; Version ' + sheet.version + ' benötigt erneute Prüfung'); }
-  });
+  if (request.sheetId) {
+    const sheet = db.weeklySheets.find(function (item) { return item.id === request.sheetId; });
+    const oldVersion = sheet.version;
+    const oldSnapshot = snapshotsFor(sheet).find(function (item) { return item.version === oldVersion; });
+    if (oldSnapshot) oldSnapshot.supersededByVersion = oldVersion + 1;
+    const day = sheet.days.find(function (item) { return item.day === request.weekDay; });
+    if (day && request.bookingField) {
+      day[request.bookingField] = after;
+      day.issue = '';
+    }
+    sheet.version = oldVersion + 1;
+    sheet.status = 'NEEDS_RECONFIRM';
+    sheet.confirmedSnapshotId = null;
+    sheet.history.push('Korrektur durch ' + actor() + '; Version ' + sheet.version + ' erzeugt');
+    sheet.history.push('Alte Bestätigung nicht übernommen · erneute Bestätigung erforderlich');
+    db.notifications.unshift({ id: makeId('NOT'), employeeId: sheet.employeeId, type: 'WEEK_REVIEW', title: 'Wochenübersicht ' + sheet.week + ' · Version ' + sheet.version + ' wartet auf deine erneute Bestätigung.', body: 'Eine Korrektur wurde bearbeitet. Die alte Version bleibt im Verlauf.', sheetId: sheet.id, createdAt: 'Heute · ' + timeNow(), read: false });
+  }
   audit('TIME_CORRECTED', request.id, 'Zeitkorrektur protokolliert', request.original, after, values.get('reason'));
   ui.editCorrection = null;
   saveDb();
   toast('Korrektur gespeichert; Original und Verlauf bleiben sichtbar.');
+}
+
+function createWeekSnapshot(sheet, signatureDataUrl) {
+  const content = { employeeId: sheet.employeeId, employeeName: employeeName(sheet.employeeId), week: sheet.week, version: sheet.version, days: clone(sheet.days) };
+  const snapshot = {
+    id: 'WS-' + demoHash(content).replace('DEMO-', '') + '-V' + sheet.version,
+    sheetId: sheet.id, employeeId: sheet.employeeId, week: sheet.week, version: sheet.version,
+    confirmedAt: dateTimeNow(), confirmedBy: profile().name, content: content, contentHash: demoHash(content),
+    signatureDataUrl: signatureDataUrl || null, status: 'EMPLOYEE_CONFIRMED', supersededByVersion: null
+  };
+  db.weeklySnapshots = db.weeklySnapshots.filter(function (item) { return !(item.sheetId === sheet.id && item.version === sheet.version); });
+  db.weeklySnapshots.push(snapshot);
+  sheet.confirmedSnapshotId = snapshot.id;
+  sheet.status = 'EMPLOYEE_CONFIRMED';
+  sheet.history.push(profile().name + ' hat Version ' + sheet.version + ' am ' + snapshot.confirmedAt + (signatureDataUrl ? ' mit gezeichneter Demo-Unterschrift bestätigt' : ' ohne gezeichnete Unterschrift bestätigt'));
+  db.notifications.filter(function (item) { return item.sheetId === sheet.id; }).forEach(function (item) { item.read = true; });
+  audit('WEEK_CONFIRMED', sheet.id, 'Wochenzettel bestätigt', 'Bestätigung offen', 'Vom Mitarbeiter bestätigt', 'Eingefrorener Snapshot ' + snapshot.contentHash);
+  saveDb();
+  toast('Version ' + sheet.version + ' wurde als unveränderbarer Stand bestätigt.');
 }
 
 function extraCommercial(extra) {
@@ -232,24 +280,36 @@ function renderExtras() {
 function extraCard(extra) {
   const employee = person(extra.employeeId);
   const decided = extra.commercialStatus !== 'OPEN';
-  return `<article class="card extra-card ${decided ? 'resolved-card' : ''}" id="extra-${extra.id}"><div class="item-top"><span class="build-number">Bau-Nr. ${extra.site}</span><span>${badge(extraDocument(extra), extra.docStatus === 'COMPLETE' ? 'ok' : 'warn')} ${badge(extraCommercial(extra), decided ? 'ok' : 'problem')}</span></div><h3>${esc(extra.description)}</h3><p>${esc(siteName(extra.site))}</p><div class="extra-meta"><span>Gemeldet von<strong>${esc(employee.name)}</strong></span><span>Zeitpunkt<strong>${esc(extra.reportedAt)}</strong></span><span>Menge<strong>${esc(extra.quantity + ' ' + extra.unit)}</strong></span><span>Zeitaufwand<strong>${esc(extra.minutes ? extra.minutes + ' Min. (roh)' : 'nicht angegeben')}</strong></span></div>${extra.photo ? syntheticPhoto(extra.photo, extra.id) : '<div class="confirmation"><strong>Kein Beispielbild hinterlegt</strong></div>'}<div class="confirmation"><strong>Bestätigung der dokumentierten Zusatzarbeit</strong><small>${esc(extra.confirmation)}</small></div>${extra.decisionReason ? `<div class="decision-box"><strong>${esc(extraCommercial(extra))}</strong><p>${esc(extra.decisionReason)}</p></div>` : ''}<details class="history"><summary>Verlauf anzeigen</summary><ul>${extra.history.map(function (line) { return `<li>${esc(line)}</li>`; }).join('')}</ul></details><div class="form-actions"><button class="secondary" data-action="open-site" data-id="${extra.site}">Baustellenmappe</button>${extra.docStatus !== 'COMPLETE' && isOfficeRole() ? `<button class="secondary" data-action="complete-extra" data-id="${extra.id}">Dokumentation vollständig</button>` : ''}${extra.commercialStatus === 'OPEN' && isOfficeRole() ? `<button class="primary" data-action="decide-extra" data-id="${extra.id}">Kaufmännisch prüfen</button>` : ''}</div></article>`;
+  const confirmations = extraConfirmations(extra);
+  const currentConfirmation = currentExtraConfirmation(extra);
+  const confirmationLabel = currentConfirmation ? 'Bestätigung vorhanden' : confirmations.length ? 'Inhalt geändert · neue Bestätigung erforderlich' : 'Bestätigung nicht vorhanden';
+  return `<article class="card extra-card ${decided ? 'resolved-card' : ''}" id="extra-${extra.id}"><div class="item-top"><span class="build-number">Bau-Nr. ${extra.site}</span><span>${badge(extraDocument(extra), extra.docStatus === 'COMPLETE' ? 'ok' : 'warn')} ${badge(confirmationLabel, currentConfirmation ? 'ok' : 'problem')} ${badge(extraCommercial(extra), decided ? 'ok' : 'problem')}</span></div><h3>${esc(extra.description)}</h3><p>${esc(siteName(extra.site))}</p><div class="extra-meta"><span>Gemeldet von<strong>${esc(employee.name)}</strong></span><span>Zeitpunkt<strong>${esc(extra.reportedAt)}</strong></span><span>Menge<strong>${esc(extra.quantity + ' ' + extra.unit)}</strong></span><span>Zeitaufwand<strong>${esc(extra.minutes ? extra.minutes + ' Min. (roh)' : 'nicht angegeben')}</strong></span></div>${extra.photo ? syntheticPhoto(extra.photo, extra.id) : '<div class="confirmation"><strong>Kein Beispielbild hinterlegt</strong></div>'}<div class="confirmation"><strong>Bestätigung der dokumentierten Zusatzarbeit</strong><small>${esc(confirmationLabel)}. Dies ist keine automatische Rechnungsfreigabe.</small></div>${confirmations.length ? `<details class="history confirmation-history"><summary>${confirmations.length} eingefrorene Bestätigung${confirmations.length === 1 ? '' : 'en'} anzeigen</summary>${confirmations.map(function (item) { return `<article class="snapshot-row"><div><strong>${esc(item.confirmedAt)} · ${esc(item.confirmerName)}</strong><small>${esc(item.content.quantity + ' ' + item.content.unit)} · ${esc(item.contentHash)}${item.contentHash === demoHash(extraContent(extra)) ? ' · aktueller Inhalt' : ' · früherer Inhalt'}</small></div><button class="secondary" data-action="print-extra-confirmation" data-id="${item.id}">Druckansicht</button></article>`; }).join('')}</details>` : ''}${extra.decisionReason ? `<div class="decision-box"><strong>${esc(extraCommercial(extra))}</strong><p>${esc(extra.decisionReason)}</p></div>` : ''}<details class="history"><summary>Verlauf anzeigen</summary><ul>${extra.history.map(function (line) { return `<li>${esc(line)}</li>`; }).join('')}</ul></details><div class="form-actions"><button class="secondary" data-action="open-site" data-id="${extra.site}">Baustellenmappe</button><button class="secondary" data-action="edit-extra" data-id="${extra.id}">Inhalt ändern</button>${!currentConfirmation ? `<button class="primary" data-action="confirm-extra" data-id="${extra.id}">Vor-Ort-Bestätigung aufnehmen</button>` : ''}${extra.docStatus !== 'COMPLETE' && isOfficeRole() ? `<button class="secondary" data-action="complete-extra" data-id="${extra.id}">Dokumentation vollständig</button>` : ''}${extra.commercialStatus === 'OPEN' && isOfficeRole() ? `<button class="primary" data-action="decide-extra" data-id="${extra.id}">Kaufmännisch prüfen</button>` : ''}</div></article>`;
 }
 
-function renderWeeks() {
-  return `${head('Wochenzettel', 'Aus Ereignissen erstellt · Fahrzeit separat und unbewertet')}<div class="list">${db.weeklySheets.map(weekCard).join('')}</div>`;
+function renderWeeks(ownOnly) {
+  const sheets = ownOnly ? db.weeklySheets.filter(function (item) { return item.employeeId === profile().employeeId; }) : db.weeklySheets;
+  return `${head(ownOnly ? 'Meine Wochenübersichten' : 'Wochenzettel', 'Aus Ereignissen erstellt · Fahrzeit separat und unbewertet')}<div class="week-state-legend">${['DRAFT','EMPLOYEE_CONFIRMED','CORRECTION_REQUESTED','NEEDS_RECONFIRM','ADMIN_APPROVED'].map(function (state) { return badge(weekText[state], state === 'ADMIN_APPROVED' ? 'ok' : state === 'EMPLOYEE_CONFIRMED' ? 'warn' : 'problem'); }).join('')}</div><div class="list">${sheets.map(weekCard).join('')}</div>`;
 }
 function weekCard(sheet) {
   const employee = person(sheet.employeeId);
   const open = ui.selectedWeek === sheet.id;
   const issueCount = sheet.days.filter(function (day) { return day.issue; }).length;
-  const kind = sheet.status === 'ADMIN_APPROVED' ? 'ok' : ['NEEDS_CORRECTION', 'NEEDS_REVIEW'].includes(sheet.status) ? 'problem' : 'warn';
+  const kind = sheet.status === 'ADMIN_APPROVED' ? 'ok' : ['NEEDS_CORRECTION', 'NEEDS_REVIEW', 'NEEDS_RECONFIRM', 'CORRECTION_REQUESTED'].includes(sheet.status) ? 'problem' : 'warn';
   return `<article class="card week-card"><button class="item-button week-button" data-action="open-week" data-id="${sheet.id}"><span><strong>${esc(employee.name)}</strong><small>${sheet.week} · Version ${sheet.version}</small></span><span>${badge(weekText[sheet.status], kind)}<small>${issueCount ? issueCount + ' fehlende Angabe' : '5 Tage sichtbar'}</small></span></button>${open ? weekDetail(sheet) : ''}</article>`;
 }
 function weekDetail(sheet) {
   const complete = !sheet.days.some(function (day) { return day.issue; });
-  const canConfirm = ui.role === 'employee' && sheet.employeeId === profile().employeeId && complete && ['DRAFT', 'NEEDS_REVIEW'].includes(sheet.status);
-  const canApprove = isOfficeRole() && complete && ['EMPLOYEE_CONFIRMED', 'NEEDS_REVIEW'].includes(sheet.status);
-  return `<div class="inline-detail week-detail"><div class="table-scroll"><table><thead><tr><th>Tag</th><th>Bau-Nr.</th><th>Beginn</th><th>Pause</th><th>Ende</th><th>Fahrt</th><th>Hinweis</th></tr></thead><tbody>${sheet.days.map(function (day) { return `<tr class="${day.issue ? 'row-problem' : ''}"><td><strong>${day.day}</strong><small>${day.date}</small></td><td>${day.site}</td><td>${day.start}</td><td>${day.break}</td><td>${day.end}</td><td>${day.travel}</td><td>${day.issue || 'vollständig'}</td></tr>`; }).join('')}</tbody></table></div><p class="meta">Keine Lohn-, Überstunden- oder Fahrzeitbewertung. Angezeigt werden synthetische Rohangaben.</p><div class="form-actions"><button class="secondary" data-action="download-week-pdf" data-id="${sheet.id}">PDF herunterladen</button>${canConfirm ? `<button class="primary" data-action="confirm-week" data-id="${sheet.id}">Version ${sheet.version} bestätigen</button>` : ''}${canApprove ? '<button class="primary" data-action="approve-week" data-id="' + sheet.id + '">Betrieblich freigeben</button>' : ''}${!complete ? '<button class="secondary" data-action="navigate" data-view="times">Korrektur prüfen</button>' : ''}</div><details class="history"><summary>Versions- und Freigabeverlauf</summary><ul>${sheet.history.map(function (line) { return `<li>${esc(line)}</li>`; }).join('')}</ul></details></div>`;
+  const canConfirm = ui.role === 'employee' && sheet.employeeId === profile().employeeId && complete && ['DRAFT', 'NEEDS_REVIEW', 'NEEDS_RECONFIRM'].includes(sheet.status);
+  const canCorrect = ui.role === 'employee' && sheet.employeeId === profile().employeeId;
+  const canApprove = isOfficeRole() && complete && sheet.status === 'EMPLOYEE_CONFIRMED';
+  const snapshots = snapshotsFor(sheet);
+  return `<div class="inline-detail week-detail"><div class="table-scroll"><table><thead><tr><th>Tag</th><th>Bau-Nr.</th><th>Beginn</th><th>Pause</th><th>Ende</th><th>Fahrt roh</th><th>Vollständigkeit</th></tr></thead><tbody>${sheet.days.map(function (day) { return `<tr class="${day.issue ? 'row-problem' : ''}"><td><strong>${day.day}</strong><small>${day.date}</small></td><td>${day.site}</td><td>${day.start}</td><td>${day.break}</td><td>${day.end}</td><td>${day.travel}</td><td>${day.issue || 'vollständig'}</td></tr>`; }).join('')}</tbody></table></div><p class="meta">Keine Lohn-, Überstunden- oder Fahrzeitbewertung. Angezeigt werden synthetische Rohangaben.</p><div class="form-actions"><button class="secondary" data-action="download-week-pdf" data-id="${sheet.id}">Aktuelle Druckansicht</button>${canCorrect ? `<button class="secondary" data-action="week-correction" data-id="${sheet.id}">Korrektur melden</button>` : ''}${canConfirm ? `<button class="primary" data-action="confirm-week" data-id="${sheet.id}">Bestätigen</button>` : ''}${canApprove ? '<button class="primary" data-action="approve-week" data-id="' + sheet.id + '">Büro/Admin freigeben</button>' : ''}${!complete && isOfficeRole() ? '<button class="secondary" data-action="navigate" data-view="times">Korrektur prüfen</button>' : ''}</div>${snapshots.length ? `<section class="snapshot-list"><h3>Eingefrorene bestätigte Versionen</h3>${snapshots.map(function (snapshot) { const approval = db.weeklyApprovals.find(function (item) { return item.snapshotId === snapshot.id; }); return `<article class="snapshot-row ${snapshot.supersededByVersion ? 'snapshot-old' : ''}"><div><strong>Version ${snapshot.version} · ${esc(snapshot.confirmedAt)}</strong><small>${snapshot.supersededByVersion ? 'Nicht mehr aktueller Stand – durch Version ' + snapshot.supersededByVersion + ' ersetzt' : approval ? 'Büro/Admin freigegeben' : 'Vom Mitarbeiter bestätigt'} · ${esc(snapshot.contentHash)} · ${snapshot.signatureDataUrl ? 'mit gezeichneter Unterschrift' : 'ohne gezeichnete Unterschrift'}</small></div><button class="secondary" data-action="print-week-snapshot" data-id="${snapshot.id}">PDF-/Druckvorschau</button></article>`; }).join('')}</section>` : ''}<details class="history"><summary>Versions- und Freigabeverlauf</summary><ul>${sheet.history.map(function (line) { return `<li>${esc(line)}</li>`; }).join('')}</ul></details></div>`;
+}
+
+function renderNotifications() {
+  const employeeId = profile().employeeId;
+  const items = employeeId ? db.notifications.filter(function (item) { return item.employeeId === employeeId; }) : db.notifications;
+  return `${head('Benachrichtigungen', 'Demo-Zentrum für Hinweise und direkte Sprünge')}<section class="notification-explainer"><strong>Beispiel-Erinnerung: Freitag 16:00 Uhr</strong><p>Der Zeitpunkt ist eine konfigurierbare Demo-Annahme und keine fest beschlossene Betriebsregel.</p><button class="secondary" data-action="test-notification">Test-Benachrichtigung anzeigen</button></section><div class="list section">${items.map(function (item) { return `<button class="card notification-card ${item.read ? '' : 'unread'}" data-action="open-notification" data-id="${item.id}"><span><strong>${esc(item.title)}</strong><small>${esc(item.body)}</small><small>${esc(item.createdAt)}</small></span><span class="action-word">Öffnen</span></button>`; }).join('') || '<div class="empty-note">Keine Hinweise vorhanden.</div>'}</div><p class="legal-note">Echte Push-Zustellung bei geschlossener App ist hier nicht aktiv. Dafür werden später Push-Service, Service Worker, Backend-Zeitplanung, Geräteberechtigung und sichere Benutzerzuordnung benötigt.</p>`;
 }
 
 function renderExports() { return window.MMExports.render(db); }
@@ -279,7 +339,8 @@ function renderEmployee() {
   const currentSite = site(employee.site || (planned && planned.site));
   const items = eventsFor(employee.id).slice().reverse();
   const ownWeek = db.weeklySheets.find(function (sheet) { return sheet.employeeId === employee.id; });
-  return `${head(greeting(employee.name.split(' ')[0]), DEMO_DATE)}<section class="card employee-project"><span class="build-number">Bau-Nr. ${currentSite ? currentSite.number : '–'}</span><h2>${esc(currentSite ? currentSite.name : 'Heute nicht eingeplant')}</h2><p>${esc(currentSite ? currentSite.address : 'Bitte im Betrieb nachfragen.')}</p><div class="employee-status"><small>Dein Status</small><strong>${statusText[employee.status]}</strong></div>${employeeActions(employee)}</section><section class="section card card-pad"><div class="section-title"><h2>Heute</h2><span class="meta">${items.length} Ereignisse</span></div><ol class="timeline">${items.length ? items.map(function (event) { return `<li><time>${event.time}</time><span><strong>${esc(eventText[event.type] || event.type)}</strong><small>${event.site ? 'Bau-Nr. ' + event.site : ''}${event.createdBy !== event.createdFor ? ' · gebucht durch ' + esc(employeeName(event.createdBy)) : ''}</small></span></li>`; }).join('') : `<li><time>–</time><span><strong>Noch nicht gestartet</strong><small>${planned ? 'Geplant: Bau-Nr. ' + planned.site : 'Nicht eingeplant'}</small></span></li>`}</ol></section><section class="section"><h2>Weitere Aktionen</h2><div class="employee-actions"><button class="employee-action" data-action="open-employee-action" data-kind="extra">Zusatzarbeit</button><button class="employee-action" data-action="open-employee-action" data-kind="note">Notiz / Foto</button><button class="employee-action" data-action="open-employee-action" data-kind="correction">Korrektur melden</button><button class="employee-action" data-action="open-employee-action" data-kind="feedback">Feedback</button></div></section>${ownWeek ? `<section class="section"><h2>Mein Wochenzettel</h2>${weekCard(ownWeek)}</section>` : ''}`;
+  const ownExtras = db.extras.filter(function (extra) { return extra.employeeId === employee.id; }).slice(0, 3);
+  return `${head(greeting(employee.name.split(' ')[0]), DEMO_DATE)}<section class="card employee-project"><span class="build-number">Bau-Nr. ${currentSite ? currentSite.number : '–'}</span><h2>${esc(currentSite ? currentSite.name : 'Heute nicht eingeplant')}</h2><p>${esc(currentSite ? currentSite.address : 'Bitte im Betrieb nachfragen.')}</p><div class="employee-status"><small>Dein Status</small><strong>${statusText[employee.status]}</strong></div>${employeeActions(employee)}</section><section class="section card card-pad"><div class="section-title"><h2>Heute</h2><span class="meta">${items.length} Ereignisse</span></div><ol class="timeline">${items.length ? items.map(function (event) { return `<li><time>${event.time}</time><span><strong>${esc(eventText[event.type] || event.type)}</strong><small>${event.site ? 'Bau-Nr. ' + event.site : ''}${event.createdBy !== event.createdFor ? ' · gebucht durch ' + esc(employeeName(event.createdBy)) : ''}</small></span></li>`; }).join('') : `<li><time>–</time><span><strong>Noch nicht gestartet</strong><small>${planned ? 'Geplant: Bau-Nr. ' + planned.site : 'Nicht eingeplant'}</small></span></li>`}</ol></section><section class="section"><h2>Weitere Aktionen</h2><div class="employee-actions"><button class="employee-action" data-action="open-employee-action" data-kind="extra">Zusatzarbeit</button><button class="employee-action" data-action="open-employee-action" data-kind="note">Notiz / Foto</button><button class="employee-action" data-action="open-employee-action" data-kind="correction">Korrektur melden</button><button class="employee-action" data-action="open-employee-action" data-kind="feedback">Feedback</button></div></section>${ownWeek ? `<section class="section"><h2>Mein Wochenzettel</h2>${weekCard(ownWeek)}</section>` : ''}${ownExtras.length ? `<section class="section"><h2>Meine Zusatzarbeiten</h2><div class="list">${ownExtras.map(extraCard).join('')}</div></section>` : ''}`;
 }
 
 function renderMore() {
@@ -287,7 +348,7 @@ function renderMore() {
 }
 
 function renderOverlays() {
-  return (ui.toast ? `<div class="toast" role="status">${esc(ui.toast)}</div>` : '') + renderActionModal() + renderSwitchModal() + renderDecisionModal() + renderLogin();
+  return (ui.toast ? `<div class="toast" role="status">${esc(ui.toast)}</div>` : '') + renderActionModal() + renderSwitchModal() + renderDecisionModal() + renderWeekCorrectionModal() + renderExtraConfirmModal() + renderExtraEditModal() + renderLogin();
 }
 function renderActionModal() {
   if (!ui.employeeAction) return '';
@@ -297,7 +358,7 @@ function renderActionModal() {
   const titles = { extra: 'Zusatzarbeit melden', note: 'Notiz oder synthetisches Foto', correction: 'Korrektur melden', feedback: 'Feedback / Fehler melden' };
   let fields = '';
   const siteOptions = db.sites.map(function (item) { return `<option value="${item.number}" ${item.number === currentSite ? 'selected' : ''}>${item.number} · ${esc(item.name)}</option>`; }).join('');
-  if (kind === 'extra') fields = `<label>Bau-Nr.<select name="site">${siteOptions}</select></label><label>Beschreibung<textarea name="description" required placeholder="Was wurde zusätzlich gemacht?"></textarea></label><div class="form-grid"><label>Menge – optional<input name="quantity" placeholder="12"></label><label>Einheit – optional<input name="unit" placeholder="m²"></label></div><label class="checkbox-line"><input type="checkbox" name="photo"><span>Synthetisches Beispielbild hinzufügen</span></label><label>Dokumentierte Bestätigung – optional<select name="confirmation"><option>Noch keine Bestätigung</option><option>Bauleitung wurde informiert</option><option>Dokumentierte Bestätigung vorhanden</option></select></label>`;
+  if (kind === 'extra') fields = `<button class="scenario-button" type="button" data-action="load-extra-scenario">Beispielszenario 26-104 laden</button><label>Bau-Nr.<select name="site">${siteOptions}</select></label><label>Beschreibung<textarea name="description" required placeholder="Was wurde zusätzlich gemacht?"></textarea></label><div class="form-grid"><label>Menge – optional<input name="quantity" placeholder="18"></label><label>Einheit – optional<input name="unit" placeholder="m²"></label><label>Zeitaufwand – optional<input name="minutes" inputmode="numeric" placeholder="Minuten als Rohangabe"></label><label>Name des Bestätigenden – optional<input name="confirmerName" placeholder="z. B. Robin Muster"></label><label>Funktion – optional<input name="confirmerRole" placeholder="Bauleitung / Auftraggeber"></label></div><label class="checkbox-line"><input type="checkbox" name="photo"><span>Synthetisches Beispielbild hinzufügen</span></label><label class="checkbox-line"><input type="checkbox" name="confirmAfter"><span>Bestätigung der dokumentierten Zusatzarbeit anschließend aufnehmen</span></label>`;
   if (kind === 'note') fields = `<label>Bau-Nr.<select name="site">${siteOptions}</select></label><label>Kategorie<select name="category"><option>Allgemein</option><option>Fortschritt</option><option>Problem / Schaden</option><option>Kunden-/Bauleiterabsprache</option></select></label><label>Notiz<textarea name="text" required placeholder="Was soll festgehalten werden?"></textarea></label><label class="checkbox-line"><input type="checkbox" name="photo"><span>Synthetisches Beispielbild hinzufügen</span></label>`;
   if (kind === 'correction') fields = `<label>Art<select name="type"><option>Fehlender Arbeitsbeginn</option><option>Fehlendes Arbeitsende</option><option>Falsche Baustelle</option><option>Falsche Pause</option><option>Sonstiges</option></select></label><label>Bau-Nr.<select name="site">${siteOptions}</select></label><label>Gewünschte Angabe<input name="suggestion" required placeholder="z. B. 07:05"></label><label>Beschreibung<textarea name="description" required placeholder="Was ist passiert?"></textarea></label>`;
   if (kind === 'feedback') fields = '<label>Kategorie<select name="category"><option>Technischer Fehler</option><option>Bedienproblem</option><option>Daten stimmen nicht</option><option>Verbesserungsvorschlag</option><option>Funktion fehlt</option><option>Sonstiges</option></select></label><label>Beschreibung<textarea name="description" required placeholder="Was möchtest du melden?"></textarea></label>';
@@ -312,6 +373,21 @@ function renderDecisionModal() {
   if (!ui.decisionExtra) return '';
   const extra = db.extras.find(function (item) { return item.id === ui.decisionExtra; });
   return `<div class="modal-backdrop" role="dialog" aria-modal="true"><form class="login-card" data-form="extra-decision" data-id="${extra.id}"><div class="action-modal-head"><div><span class="build-number">Bau-Nr. ${extra.site}</span><h2>Kaufmännisch prüfen</h2><p>${esc(extra.description)}</p></div><button type="button" class="modal-close" data-action="close-decision">×</button></div><label>Demo-Entscheidung<select name="decision"><option value="BILLING">Zur Abrechnung vorgesehen</option><option value="NOT_BILLABLE">Nicht abrechenbar</option><option value="OPEN">Entscheidung offen lassen</option></select></label><label>Begründung<textarea name="reason" required></textarea></label><button class="primary full-button">Mit Verlauf speichern</button><p class="meta">Keine automatische Rechnung und keine rechtsverbindliche Freigabe.</p></form></div>`;
+}
+function renderWeekCorrectionModal() {
+  if (!ui.weekCorrection) return '';
+  const sheet = db.weeklySheets.find(function (item) { return item.id === ui.weekCorrection; });
+  return `<div class="modal-backdrop" role="dialog" aria-modal="true"><form class="login-card" data-form="week-correction" data-id="${sheet.id}"><div class="action-modal-head"><div><span class="build-number">${sheet.week} · Version ${sheet.version}</span><h2>Korrektur melden</h2><p>Der bestätigte Stand bleibt unverändert sichtbar.</p></div><button type="button" class="modal-close" data-action="close-week-correction">×</button></div><div class="form-grid"><label>Tag<select name="weekDay">${sheet.days.map(function (day) { return `<option value="${day.day}">${day.day} · ${day.date}</option>`; }).join('')}</select></label><label>Betroffene Buchung<select name="bookingField"><option value="start">Arbeitsbeginn</option><option value="break">Pause</option><option value="end">Arbeitsende</option><option value="site">Baustelle / Bau-Nr.</option><option value="travel">Fahrt als Rohangabe</option></select></label><label class="full">Beschreibung des Fehlers<textarea name="description" required placeholder="Was stimmt nicht?"></textarea></label><label class="full">Gewünschte Korrektur<input name="suggestion" required placeholder="z. B. 07:05"></label></div><button class="primary full-button">Korrekturmeldung senden</button><p class="meta">Die Buchung wird nicht still überschrieben. Büro/Geschäftsführung prüft den Vorgang.</p></form></div>`;
+}
+function renderExtraConfirmModal() {
+  if (!ui.confirmExtra) return '';
+  const extra = db.extras.find(function (item) { return item.id === ui.confirmExtra; });
+  return `<div class="modal-backdrop" role="dialog" aria-modal="true"><form class="login-card" data-form="extra-confirm-details" data-id="${extra.id}"><div class="action-modal-head"><div><span class="build-number">Bau-Nr. ${extra.site}</span><h2>Bestätigung der dokumentierten Zusatzarbeit</h2><p>Bitte Inhalt vor dem Zeichnen gemeinsam prüfen.</p></div><button type="button" class="modal-close" data-action="close-extra-confirm">×</button></div><div class="frozen-preview"><dl class="facts"><dt>Baustelle</dt><dd>${esc(siteName(extra.site))}</dd><dt>Beschreibung</dt><dd>${esc(extra.description)}</dd><dt>Menge</dt><dd>${esc(extra.quantity + ' ' + extra.unit)}</dd><dt>Zeitaufwand</dt><dd>${esc(extra.minutes ? extra.minutes + ' Min. (roh)' : 'nicht angegeben')}</dd></dl></div><div class="form-grid"><label>Name des Bestätigenden<input name="confirmerName" required value="${esc(extra.pendingConfirmerName || '')}" placeholder="synthetischer Name"></label><label>Funktion<input name="confirmerRole" required value="${esc(extra.pendingConfirmerRole || '')}" placeholder="Bauleitung / Auftraggeber"></label></div><button class="primary full-button">Zum Unterschriftsfeld</button><p class="legal-note">Dokumentation bestätigt bedeutet weder rechtsverbindliche Beauftragung noch Abnahme oder Rechnungsfreigabe.</p></form></div>`;
+}
+function renderExtraEditModal() {
+  if (!ui.editExtra) return '';
+  const extra = db.extras.find(function (item) { return item.id === ui.editExtra; });
+  return `<div class="modal-backdrop" role="dialog" aria-modal="true"><form class="login-card" data-form="extra-edit" data-id="${extra.id}"><div class="action-modal-head"><div><span class="build-number">Bau-Nr. ${extra.site}</span><h2>Zusatzarbeit ändern</h2><p>Bestehende Bestätigungen bleiben an ihrem eingefrorenen Inhalt.</p></div><button type="button" class="modal-close" data-action="close-extra-edit">×</button></div><label>Beschreibung<textarea name="description" required>${esc(extra.description)}</textarea></label><div class="form-grid"><label>Menge<input name="quantity" value="${esc(extra.quantity)}"></label><label>Einheit<input name="unit" value="${esc(extra.unit)}"></label></div><button class="primary full-button">Als neuen Dokumentstand speichern</button><p class="meta">Eine alte Bestätigung wird nicht auf den geänderten Inhalt übertragen.</p></form></div>`;
 }
 function renderLogin() {
   if (!ui.login) return '';
@@ -400,12 +476,12 @@ function renderMoreV6() {
     const item = profiles[key];
     return '<button class="role-card ' + (ui.role === key ? 'active' : '') + '" data-action="switch-role" data-role="' + key + '"><span class="avatar">' + item.initial + '</span><span><strong>' + esc(item.name) + '</strong><small>' + esc(item.label) + '</small></span></button>';
   }).join('');
-  const operations = isOfficeRole() ? '<section class="card card-pad section"><h2>Weitere Bereiche</h2><div class="quick-grid"><button class="secondary" data-action="navigate" data-view="planning">Tagesplanung</button><button class="secondary" data-action="navigate" data-view="sites">Baustellen</button><button class="secondary" data-action="navigate" data-view="employees">Mitarbeiter</button><button class="secondary" data-action="navigate" data-view="times">Zeiten prüfen</button><button class="secondary" data-action="navigate" data-view="extras">Zusatzarbeiten</button><button class="secondary" data-action="navigate" data-view="weeks">Wochenzettel</button><button class="secondary" data-action="navigate" data-view="exports">Exporte</button></div></section>' : '';
+  const operations = isOfficeRole() ? '<section class="card card-pad section"><h2>Weitere Bereiche</h2><div class="quick-grid"><button class="secondary" data-action="navigate" data-view="planning">Tagesplanung</button><button class="secondary" data-action="navigate" data-view="sites">Baustellen</button><button class="secondary" data-action="navigate" data-view="employees">Mitarbeiter</button><button class="secondary" data-action="navigate" data-view="times">Zeiten prüfen</button><button class="secondary" data-action="navigate" data-view="extras">Zusatzarbeiten</button><button class="secondary" data-action="navigate" data-view="weeks">Wochenzettel</button><button class="secondary" data-action="navigate" data-view="notifications">Benachrichtigungen</button><button class="secondary" data-action="navigate" data-view="exports">Exporte</button></div></section>' : '';
   return head('Mehr', 'Rollenwechsel, Demo-Steuerung und seltene Bereiche') +
     '<section class="card card-pad"><h2>Demo-Perspektive wechseln</h2><p>Dieselben synthetischen Vorgänge aus vier Rollen prüfen.</p><div class="role-grid">' + roleButtons + '</div></section>' +
     operations +
-    '<div class="more-grid section"><section class="card more-card"><h2>Anmeldung</h2><p>Vorschau der späteren Anmeldung.</p><button class="secondary" data-action="show-login">Anmeldeseite ansehen</button></section><section class="card more-card"><h2>Demo zurücksetzen</h2><p>Alle erfundenen Ausgangsdaten wiederherstellen.</p><button class="danger-button" data-action="reset-demo">Demo-Daten zurücksetzen</button></section><section class="card more-card"><h2>Dokumente & Exporte</h2><p>Originalnahe Formulare, Wochenplanung und Nachkalkulationsdateien.</p><button class="primary" data-action="navigate" data-view="exports">Bereich öffnen</button></section></div>' +
-    '<details class="developer-area"><summary>Entwickler- und Testinformationen</summary><p>Statische Demo ohne Backend und echte serverseitige Rechte. Änderungen bleiben lokal in diesem Browser, bis die Demo zurückgesetzt wird.</p><p>Demo-Version 6 · vollständig synthetisch.</p></details>';
+    '<div class="more-grid section"><section class="card more-card"><h2>Anmeldung</h2><p>Vorschau der späteren Anmeldung.</p><button class="secondary" data-action="show-login">Anmeldeseite ansehen</button></section><section class="card more-card"><h2>Demo zurücksetzen</h2><p>Alle erfundenen Ausgangsdaten wiederherstellen.</p><button class="danger-button" data-action="reset-demo">Demo-Daten zurücksetzen</button></section><section class="card more-card"><h2>Benachrichtigungen</h2><p>Hinweise öffnen direkt die passende Wochenübersicht.</p><button class="secondary" data-action="navigate" data-view="notifications">Hinweise öffnen</button></section><section class="card more-card"><h2>Dokumente & Exporte</h2><p>Originalnahe Formulare, Wochenplanung und Nachkalkulationsdateien.</p><button class="primary" data-action="navigate" data-view="exports">Bereich öffnen</button></section></div>' +
+    '<details class="developer-area"><summary>Entwickler- und Testinformationen</summary><p>Statische Demo ohne Backend und echte serverseitige Rechte. Änderungen, Snapshots und gezeichnete Demo-Unterschriften bleiben nur lokal in diesem Browser.</p><p>Browser-Benachrichtigungen funktionieren nur nach Erlaubnis und nur solange die statische Seite aktiv ist. Geschlossene-App-Push benötigt später Backend, Push-Service, Service Worker und Benutzer-/Gerätezuordnung.</p><p>Demo-Version 8 · vollständig synthetisch.</p></details>';
 }
 
 app.addEventListener('input', function (event) {
@@ -416,7 +492,7 @@ app.addEventListener('input', function (event) {
   if (input) { input.focus(); input.setSelectionRange(ui.query.length, ui.query.length); }
 });
 
-app.addEventListener('submit', function (event) {
+app.addEventListener('submit', async function (event) {
   const form = event.target.closest('form');
   if (!form) return;
   event.preventDefault();
@@ -440,6 +516,63 @@ app.addEventListener('submit', function (event) {
   }
   if (form.dataset.form === 'time-correction') {
     saveTimeCorrection(form);
+    return;
+  }
+  if (form.dataset.form === 'week-correction') {
+    const sheet = db.weeklySheets.find(function (item) { return item.id === form.dataset.id; });
+    const day = sheet.days.find(function (item) { return item.day === values.get('weekDay'); });
+    const field = values.get('bookingField');
+    const request = {
+      id: makeId('KR'), employeeId: sheet.employeeId, date: day.date, site: day.site, type: 'Wochenzettel-Korrektur',
+      description: values.get('description'), original: day[field] || 'keine Angabe', suggestion: values.get('suggestion'),
+      status: 'OPEN', createdAt: timeNow(), sheetId: sheet.id, sheetVersion: sheet.version, weekDay: day.day,
+      bookingField: field, sourceSnapshotId: sheet.confirmedSnapshotId || null
+    };
+    db.correctionRequests.unshift(request);
+    if (['EMPLOYEE_CONFIRMED', 'ADMIN_APPROVED'].includes(sheet.status)) sheet.status = 'CORRECTION_REQUESTED';
+    else sheet.status = 'NEEDS_CORRECTION';
+    sheet.history.push(profile().name + ' hat für Version ' + sheet.version + ' eine Korrektur angefordert');
+    audit('WEEK_CORRECTION_REQUESTED', sheet.id, 'Korrektur zum Wochenzettel angefordert', request.original, request.suggestion, request.description);
+    ui.weekCorrection = null;
+    saveDb();
+    toast('Korrekturmeldung gesendet; bestätigter Stand bleibt unverändert.');
+    return;
+  }
+  if (form.dataset.form === 'extra-confirm-details') {
+    const extra = db.extras.find(function (item) { return item.id === form.dataset.id; });
+    const result = await window.MobileSignature.open({ title: 'Bestätigung der dokumentierten Zusatzarbeit', description: 'Der bestätigte Inhalt wird anschließend als eigener Demo-Snapshot eingefroren.' });
+    if (!result) return;
+    const content = extraContent(extra);
+    const confirmation = {
+      id: 'ECS-' + demoHash(content).replace('DEMO-', '') + '-' + Date.now().toString(36), extraId: extra.id,
+      site: extra.site, project: siteName(extra.site), content: clone(content), contentHash: demoHash(content),
+      confirmerName: values.get('confirmerName'), confirmerRole: values.get('confirmerRole'), confirmedAt: dateTimeNow(),
+      signatureDataUrl: result.signatureDataUrl || null, status: 'DOCUMENTATION_CONFIRMED'
+    };
+    db.extraConfirmations.push(confirmation);
+    extra.confirmation = 'Dokumentierte Bestätigung vorhanden · ' + confirmation.confirmerName + ', ' + confirmation.confirmerRole;
+    extra.docStatus = 'COMPLETE';
+    extra.history.push(confirmation.confirmedAt + ' · Dokumentation bestätigt · ' + confirmation.contentHash);
+    delete extra.pendingConfirmerName;
+    delete extra.pendingConfirmerRole;
+    audit('EXTRA_CONFIRMATION_SAVED', extra.id, 'Zusatzarbeit dokumentiert bestätigt', 'Bestätigung offen', confirmation.contentHash, 'Getrennter unveränderbarer Bestätigungsdatensatz');
+    ui.confirmExtra = null;
+    saveDb();
+    toast('Bestätigung als eingefrorener Dokumentstand gespeichert.');
+    return;
+  }
+  if (form.dataset.form === 'extra-edit') {
+    const extra = db.extras.find(function (item) { return item.id === form.dataset.id; });
+    const before = extraContent(extra);
+    extra.description = values.get('description');
+    extra.quantity = values.get('quantity') || '–';
+    extra.unit = values.get('unit') || '';
+    extra.confirmation = extraConfirmations(extra).length ? 'Inhalt geändert · neue Bestätigung erforderlich' : 'Noch keine Bestätigung';
+    extra.history.push(timeNow() + ' · Inhalt geändert; vorhandene Bestätigung bleibt am früheren Snapshot');
+    audit('EXTRA_CONTENT_CHANGED', extra.id, 'Bestätigte Zusatzarbeit geändert', demoHash(before), demoHash(extraContent(extra)), 'Neue Bestätigung erforderlich');
+    ui.editExtra = null;
+    saveDb();
+    toast('Neuer Dokumentstand gespeichert; alte Bestätigung nicht übertragen.');
     return;
   }
   if (form.dataset.form === 'crew-action') {
@@ -472,9 +605,14 @@ app.addEventListener('submit', function (event) {
     const kind = form.dataset.kind;
     if (kind === 'extra') {
       const id = makeId('ZA');
-      db.extras.unshift({ id: id, site: values.get('site'), employeeId: employee.id, reportedAt: 'Heute · ' + timeNow(), description: values.get('description'), quantity: values.get('quantity') || '–', unit: values.get('unit') || '', minutes: '', photo: values.get('photo') ? 'Synthetisches Bild zur neuen Zusatzarbeit' : null, confirmation: values.get('confirmation'), docStatus: 'REPORTED', commercialStatus: 'OPEN', decisionReason: '', history: [timeNow() + ' · von ' + employee.name + ' gemeldet'] });
+      const extra = { id: id, site: values.get('site'), employeeId: employee.id, reportedAt: 'Heute · ' + timeNow(), description: values.get('description'), quantity: values.get('quantity') || '–', unit: values.get('unit') || '', minutes: values.get('minutes') || '', photo: values.get('photo') ? 'Synthetisches Bild zur neuen Zusatzarbeit' : null, confirmation: 'Noch keine Bestätigung', docStatus: 'REPORTED', commercialStatus: 'OPEN', decisionReason: '', pendingConfirmerName: values.get('confirmerName') || '', pendingConfirmerRole: values.get('confirmerRole') || '', history: [timeNow() + ' · von ' + employee.name + ' gemeldet'] };
+      db.extras.unshift(extra);
       audit('EXTRA_REPORTED', id, 'Zusatzarbeit gemeldet', '–', values.get('description'), 'Mitarbeiteransicht');
-      ui.employeeAction = null; saveDb(); toast('Zusatzarbeit in allen Ansichten ergänzt.'); return;
+      ui.employeeAction = null;
+      if (values.get('confirmAfter')) ui.confirmExtra = id;
+      saveDb();
+      if (ui.confirmExtra) { render(); return; }
+      toast('Zusatzarbeit in allen Ansichten ergänzt.'); return;
     }
     if (kind === 'note') {
       db.notes.unshift({ id: makeId('N'), site: values.get('site'), author: employee.name, time: timeNow(), category: values.get('category'), text: values.get('text'), photo: values.get('photo') ? 'Synthetisches Bild zur neuen Notiz' : null });
@@ -488,7 +626,7 @@ app.addEventListener('submit', function (event) {
   }
 });
 
-app.addEventListener('click', function (event) {
+app.addEventListener('click', async function (event) {
   const target = event.target.closest('[data-action],[data-mm-action]');
   if (!target) return;
   event.preventDefault();
@@ -516,18 +654,55 @@ app.addEventListener('click', function (event) {
   }
   if (action === 'decide-extra') { ui.decisionExtra = target.dataset.id; return render(); }
   if (action === 'close-decision') { ui.decisionExtra = null; return render(); }
+  if (action === 'confirm-extra') { ui.confirmExtra = target.dataset.id; return render(); }
+  if (action === 'close-extra-confirm') { ui.confirmExtra = null; return render(); }
+  if (action === 'edit-extra') { ui.editExtra = target.dataset.id; return render(); }
+  if (action === 'close-extra-edit') { ui.editExtra = null; return render(); }
+  if (action === 'print-extra-confirmation') { window.MMExports.openPrint(db, 'extra-confirmation', { confirmationId: target.dataset.id }); return toast('Bestätigungsdatensatz in der Druckansicht geöffnet.'); }
+  if (action === 'load-extra-scenario') {
+    const form = target.closest('form');
+    form.querySelector('[name="site"]').value = '26-104';
+    form.querySelector('[name="description"]').value = 'Nordwand im Besprechungsraum zusätzlich spachteln und streichen.';
+    form.querySelector('[name="quantity"]').value = '18';
+    form.querySelector('[name="unit"]').value = 'm²';
+    form.querySelector('[name="confirmerName"]').value = 'Robin Muster';
+    form.querySelector('[name="confirmerRole"]').value = 'Bauleitung (synthetisch)';
+    return;
+  }
   if (action === 'open-week') { ui.selectedWeek = ui.selectedWeek === target.dataset.id ? null : target.dataset.id; return render(); }
+  if (action === 'week-correction') { ui.weekCorrection = target.dataset.id; return render(); }
+  if (action === 'close-week-correction') { ui.weekCorrection = null; return render(); }
   if (action === 'confirm-week') {
     const sheet = db.weeklySheets.find(function (item) { return item.id === target.dataset.id; });
-    sheet.status = 'EMPLOYEE_CONFIRMED'; sheet.history.push(profile().name + ' hat Version ' + sheet.version + ' um ' + timeNow() + ' bestätigt');
-    audit('WEEK_CONFIRMED', sheet.id, 'Wochenzettel bestätigt', 'Entwurf', 'Mitarbeiter bestätigt', 'Demo-Bestätigung');
-    saveDb(); return toast('Wochenzettel bestätigt.');
+    const result = await window.MobileSignature.open({ title: 'Wochenübersicht ' + sheet.week + ' bestätigen', description: 'Version ' + sheet.version + ' wird mit dem jetzt sichtbaren Inhalt eingefroren.' });
+    if (!result) return;
+    createWeekSnapshot(sheet, result.signatureDataUrl);
+    return;
   }
   if (action === 'approve-week') {
     const sheet = db.weeklySheets.find(function (item) { return item.id === target.dataset.id; });
+    const snapshot = weekSnapshot(sheet);
+    if (!snapshot) return toast('Zuerst muss eine Mitarbeiterbestätigung vorliegen.');
     sheet.status = 'ADMIN_APPROVED'; sheet.history.push(actor() + ' hat Version ' + sheet.version + ' um ' + timeNow() + ' freigegeben');
+    db.weeklyApprovals.push({ id: makeId('WA'), snapshotId: snapshot.id, approvedAt: dateTimeNow(), approvedBy: actor() });
     audit('WEEK_APPROVED', sheet.id, 'Wochenzettel freigegeben', 'Prüfung', 'Freigegeben', 'Demo-Freigabe');
     saveDb(); return toast('Wochenzettel betrieblich freigegeben.');
+  }
+  if (action === 'print-week-snapshot') { window.MMExports.openPrint(db, 'timesheet-confirmed', { snapshotId: target.dataset.id }); return toast('Eingefrorene Version in der Druckansicht geöffnet.'); }
+  if (action === 'open-notification') {
+    const item = db.notifications.find(function (notification) { return notification.id === target.dataset.id; });
+    item.read = true;
+    saveDb();
+    if (item.sheetId) { ui.selectedWeek = item.sheetId; return navigate('weeks'); }
+    return render();
+  }
+  if (action === 'test-notification') {
+    if (!('Notification' in window)) return toast('Dieser Browser unterstützt die Notification API nicht.');
+    let permission = Notification.permission;
+    if (permission === 'default') permission = await Notification.requestPermission();
+    if (permission !== 'granted') return toast('Browser-Benachrichtigung wurde nicht erlaubt.');
+    new Notification('Maler Meyer · Demo', { body: 'Wochenübersicht KW 37 wartet auf deine Bestätigung.', icon: './icon.svg' });
+    return toast('Lokale Test-Benachrichtigung angezeigt.');
   }
   if (action === 'switch-role') { ui.role = target.dataset.role; ui.view = 'today'; ui.selectedSite = null; ui.selectedWeek = null; window.scrollTo(0, 0); return render(); }
   if (action === 'show-login') { ui.login = true; return render(); }
@@ -551,13 +726,12 @@ app.addEventListener('click', function (event) {
   if (action === 'download-times') { exportTimes(); return toast('CSV mit synthetischen Zeitereignissen erstellt.'); }
   if (action === 'download-calculation') { exportCalculation(); return toast('Excel-kompatible CSV erstellt.'); }
   if (action === 'download-planning') { exportPlanning(); return toast('Tagesplanung als CSV erstellt.'); }
-  if (action === 'download-week-pdf') { const sheet = db.weeklySheets.find(function (item) { return item.id === target.dataset.id; }); window.MMExports.openPrint(db, 'timesheet', { site: (sheet.days[0] || {}).site, employeeId: sheet.employeeId, week: Number(String(sheet.week).replace(/\D/g, '')) }); return toast('Originalnahe Druckansicht geöffnet.'); }
+  if (action === 'download-week-pdf') { const sheet = db.weeklySheets.find(function (item) { return item.id === target.dataset.id; }); const snapshot = weekSnapshot(sheet); window.MMExports.openPrint(db, snapshot ? 'timesheet-confirmed' : 'timesheet', snapshot ? { snapshotId: snapshot.id } : { site: (sheet.days[0] || {}).site, employeeId: sheet.employeeId, week: Number(String(sheet.week).replace(/\D/g, '')) }); return toast('Originalnahe Druckansicht geöffnet.'); }
   if (action === 'download-selected-week') { const select = document.getElementById('export-week'); if (select) { const sheet = db.weeklySheets.find(function (item) { return item.id === select.value; }); window.MMExports.openPrint(db, 'timesheet', { site: (sheet.days[0] || {}).site, employeeId: sheet.employeeId, week: Number(String(sheet.week).replace(/\D/g, '')) }); } return toast('Originalnahe Druckansicht geöffnet.'); }
 });
 
 app.addEventListener('keydown', function (event) {
-  if (event.key === 'Escape') { ui.employeeAction = null; ui.switchSite = false; ui.decisionExtra = null; ui.login = false; render(); }
+  if (event.key === 'Escape') { ui.employeeAction = null; ui.switchSite = false; ui.decisionExtra = null; ui.confirmExtra = null; ui.editExtra = null; ui.weekCorrection = null; ui.login = false; render(); }
 });
 
 render();
-
