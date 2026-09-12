@@ -4,6 +4,7 @@ const os = require('node:os');
 const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
 
 const url = process.env.DEMO_URL || 'http://127.0.0.1:4175/';
+const allowedHost = new URL(url).hostname;
 const sizes = [
   { name: 'smartphone', width: 390, height: 844 },
   { name: 'tablet', width: 820, height: 1180 },
@@ -29,7 +30,7 @@ async function clickNav(page, view) {
       page.on('pageerror', error => { errors.push(error.message); console.error('PAGEERROR ' + size.name + ': ' + error.message); });
       page.on('request', request => {
         const requestUrl = new URL(request.url());
-        if (!['127.0.0.1', 'localhost'].includes(requestUrl.hostname)) external.push(request.url());
+        if (!['127.0.0.1', 'localhost', allowedHost].includes(requestUrl.hostname)) external.push(request.url());
       });
       await page.goto(url, { waitUntil: 'networkidle' });
       await page.evaluate(() => localStorage.clear());
