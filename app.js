@@ -1,7 +1,7 @@
 'use strict';
 
 const DEMO_DATE = 'Donnerstag, 10. September';
-const STORAGE_KEY = 'maler-meyer-demo-v6';
+const STORAGE_KEY = 'maler-meyer-demo-v7';
 const app = document.getElementById('app');
 
 const profiles = {
@@ -16,7 +16,7 @@ const eventText = { WORK_START: 'Arbeit gestartet', BREAK_START: 'Pause gestarte
 const weekText = { DRAFT: 'Entwurf', EMPLOYEE_CONFIRMED: 'Vom Mitarbeiter bestätigt', ADMIN_APPROVED: 'Freigegeben', NEEDS_CORRECTION: 'Unvollständig', NEEDS_REVIEW: 'Erneute Prüfung nötig' };
 
 let db = loadDb();
-const ui = { role: 'management', view: 'today', query: '', employeeFilter: 'all', selectedSite: null, selectedEmployee: null, selectedWeek: null, editCorrection: null, decisionExtra: null, employeeAction: null, switchSite: false, login: false, toast: '' };
+const ui = { role: 'management', view: 'today', query: '', employeeFilter: 'all', planningWeek: 37, selectedSite: null, selectedEmployee: null, selectedWeek: null, editCorrection: null, decisionExtra: null, employeeAction: null, switchSite: false, login: false, toast: '' };
 let toastTimer = null;
 
 function loadDb() {
@@ -29,7 +29,7 @@ function loadDb() {
 function saveDb() {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: window.DEMO_DATA_VERSION, data: db })); } catch (_) {}
 }
-function resetDb() { db = window.createDemoSeed(); saveDb(); Object.assign(ui, { view: 'today', query: '', employeeFilter: 'all', selectedSite: null, selectedEmployee: null, selectedWeek: null, editCorrection: null, decisionExtra: null, employeeAction: null, switchSite: false }); }
+function resetDb() { db = window.createDemoSeed(); saveDb(); Object.assign(ui, { view: 'today', query: '', employeeFilter: 'all', planningWeek: 37, selectedSite: null, selectedEmployee: null, selectedWeek: null, editCorrection: null, decisionExtra: null, employeeAction: null, switchSite: false }); }
 function esc(value) { return String(value == null ? '' : value).replace(/[&<>'"]/g, function (char) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]; }); }
 function timeNow() { return new Intl.DateTimeFormat('de-DE', { hour: '2-digit', minute: '2-digit' }).format(new Date()); }
 function makeId(prefix) { return prefix + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 6); }
@@ -54,7 +54,7 @@ function head(title, subtitle) { return `<div class="page-head"><div><h1>${esc(t
 function navItems() {
   if (ui.role === 'employee') return [['today', 'H', 'Heute'], ['employee-extra', '+', 'Zusatzarbeit'], ['employee-note', 'N', 'Notiz'], ['more', '···', 'Mehr']];
   if (ui.role === 'foreman') return [['today', 'H', 'Heute'], ['crew', 'K', 'Kolonne'], ['sites', 'B', 'Baustelle'], ['more', '···', 'Mehr']];
-  return [['today', 'H', 'Heute'], ['planning', 'P', 'Planung'], ['sites', 'B', 'Baustellen'], ['employees', 'M', 'Mitarbeiter'], ['times', 'Z', 'Zeiten prüfen'], ['extras', '+', 'Zusatzarbeiten'], ['weeks', 'W', 'Wochenzettel'], ['exports', '⇩', 'Exporte'], ['more', '···', 'Mehr']];
+  return [['today', 'H', 'Heute'], ['planning', 'P', 'Planung'], ['sites', 'B', 'Baustellen'], ['employees', 'M', 'Mitarbeiter'], ['times', 'Z', 'Zeiten prüfen'], ['extras', '+', 'Zusatzarbeiten'], ['weeks', 'W', 'Wochenzettel'], ['exports', '⇩', 'Dokumente & Exporte'], ['more', '···', 'Mehr']];
 }
 function mobileItems() {
   if (ui.role === 'employee' || ui.role === 'foreman') return navItems();
@@ -115,10 +115,21 @@ function siteMini(item) {
 }
 
 function renderPlanning() {
-  return `${head('Tagesplanung', 'Aktuelle Zuordnung für ' + DEMO_DATE)}${assumption('Geschäftsführung und Büro dürfen in dieser Demo die Tagesplanung ändern. Die endgültigen Planungsrechte und die vollständige Wochenplanung sind noch offen.')}<div class="toolbar"><span><strong>${db.assignments.length}</strong> geplante Einsätze</span><button class="secondary" data-action="download-planning">Planung als CSV</button></div><div class="list">${db.employees.map(function (employee) {
+  const plan = db.weekPlans.find(function (item) { return item.week === ui.planningWeek; }) || db.weekPlans[db.weekPlans.length - 1];
+  return `${head('Tages- und Wochenplanung', 'Aktuelle Zuordnung für ' + DEMO_DATE)}${assumption('Geschäftsführung und Büro dürfen in dieser Demo die Planung ändern. Die endgültigen Planungsrechte bleiben offen.')}<div class="toolbar"><span><strong>${db.assignments.length}</strong> geplante Einsätze</span><div class="form-actions"><button class="secondary" data-action="download-planning">Tagesplanung als CSV</button><button class="primary" data-mm-action="xlsx-planning">Wochenplanung als XLSX</button><button class="secondary" data-mm-action="print" data-template="planning" data-week="${plan.week}">Wochenplanung drucken</button></div></div>${renderWeekMatrix(plan)}<div class="section-title section"><h2>Heutige Zuordnung ändern</h2><span class="meta">Änderungen wirken sofort in der Demo</span></div><div class="list">${db.employees.map(function (employee) {
     const current = assignment(employee.id);
     return `<article class="card planning-card"><div><strong>${esc(employee.name)}</strong><small>${esc(employee.job)} · ${statusText[employee.status]}</small></div><form data-form="planning-change" data-employee="${employee.id}"><select name="site" aria-label="Baustelle für ${esc(employee.name)}"><option value="">Nicht eingeplant</option>${db.sites.map(function (item) { return `<option value="${item.number}" ${current && current.site === item.number ? 'selected' : ''}>Bau-Nr. ${item.number} · ${esc(item.name)}</option>`; }).join('')}</select><input name="reason" aria-label="Grund der Umplanung" placeholder="Grund der Änderung" required><button class="secondary">Zuordnung speichern</button></form>${current && current.originalSite ? `<div class="change-note"><strong>Geändert:</strong> ${esc(current.originalSite || 'nicht eingeplant')} → ${esc(current.site || 'nicht eingeplant')}<small>${esc(current.changedBy)} · ${esc(current.changedAt)} · ${esc(current.note)}</small></div>` : ''}</article>`;
   }).join('')}</div>`;
+}
+
+function renderWeekMatrix(plan) {
+  const monday = new Date(plan.monday + 'T12:00:00');
+  const dates = new Array(6).fill(0).map(function (_, index) { const date = new Date(monday); date.setDate(date.getDate() + index); return String(date.getDate()).padStart(2, '0') + '.' + String(date.getMonth() + 1).padStart(2, '0') + '.'; });
+  const groupRows = function (group) {
+    const rows = plan.rows.filter(function (row) { return row.group === group; });
+    return `<tr class="week-group"><th colspan="8">${esc(group)}</th></tr>${rows.map(function (row, index) { const label = row.displayName || employeeName(row.employeeId); return `<tr><td>${index + 1}</td><th>${esc(label)}</th>${row.values.map(function (value) { const kind = value === 'Krank' ? 'week-sick' : value === 'Urlaub' ? 'week-leave' : ''; return `<td class="${kind}">${esc(value)}</td>`; }).join('')}</tr>`; }).join('')}`;
+  };
+  return `<section class="card card-pad week-matrix"><div class="section-title"><h2>Wochenplanung 2026 · KW ${plan.week}</h2><div class="filter-row">${db.weekPlans.map(function (item) { return `<button class="filter-button ${item.week === plan.week ? 'active' : ''}" data-action="planning-week" data-week="${item.week}">KW ${item.week}</button>`; }).join('')}</div></div><div class="table-scroll"><table><thead><tr><th>Nr.</th><th>Mitarbeiter</th>${['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'].map(function (day, index) { return `<th>${day}<small>${dates[index]}</small></th>`; }).join('')}</tr></thead><tbody>${groupRows('Mitarbeiter')}${groupRows('Auszubildende / Praktikum')}${groupRows('Subunternehmer')}</tbody></table></div></section>`;
 }
 
 function renderSites(single) {
@@ -135,15 +146,16 @@ function siteFolder(item) {
   const notes = db.notes.filter(function (note) { return note.site === item.number; });
   const extras = db.extras.filter(function (extra) { return extra.site === item.number; });
   const documents = db.documents.filter(function (doc) { return doc.site === item.number; });
+  const restTasks = db.restTasks.filter(function (task) { return task.site === item.number; });
   return `<div class="folder-detail"><div class="folder-head"><div><span class="eyebrow">Digitale Baustellenmappe</span><h2>Bau-Nr. ${item.number} · ${esc(item.name)}</h2><p>${esc(item.customer)}</p></div><button class="secondary" data-action="close-site">Schließen</button></div><div class="detail-grid">
     <section class="detail-block"><h3>Stammdaten</h3><dl class="facts"><dt>Adresse</dt><dd>${esc(item.address)}</dd><dt>Ansprechpartner</dt><dd>${esc(item.contact)}</dd><dt>Zugang</dt><dd>${esc(item.access)}</dd><dt>Zeitraum</dt><dd>${esc(item.dates)}</dd><dt>Abrechnungshinweis</dt><dd>${esc(item.invoice)}</dd></dl></section>
     <section class="detail-block"><h3>Aufgaben & Materialhinweise</h3><strong>Aufgaben</strong><ul>${item.tasks.map(function (text) { return `<li>${esc(text)}</li>`; }).join('')}</ul>${item.extraTasks.length ? `<strong>Zusätzliche Aufgaben</strong><ul>${item.extraTasks.map(function (text) { return `<li>${esc(text)}</li>`; }).join('')}</ul>` : ''}<strong>Mitzubringen</strong><p>${esc(item.materials.join(', '))}</p></section>
     <section class="detail-block full-span"><h3>Heute auf der Baustelle</h3><div class="people-table">${members.map(function (employee) { return `<button data-action="open-employee" data-id="${employee.id}"><span><strong>${esc(employee.name)}</strong><small>${esc(employee.job)}</small></span>${badge(statusText[employee.status], statusKind[employee.status])}</button>`; }).join('')}</div></section>
-    <section class="detail-block"><h3>Offene Punkte</h3>${item.open.length ? `<ul>${item.open.map(function (text) { return `<li>${esc(text)}</li>`; }).join('')}</ul>` : '<p>Keine offenen Punkte im Beispiel.</p>'}</section>
+    <section class="detail-block"><h3>Offene Punkte</h3>${item.open.length || restTasks.length ? `<ul>${item.open.map(function (text) { return `<li>${esc(text)}</li>`; }).join('')}${restTasks.map(function (task) { return `<li><strong>${esc(task.area)}:</strong> ${esc(task.description)} · ${esc(task.status.toLowerCase())}</li>`; }).join('')}</ul>` : '<p>Keine offenen Punkte im Beispiel.</p>'}</section>
     <section class="detail-block"><h3>Zusatzarbeiten</h3>${extras.length ? extras.map(function (extra) { return `<button class="compact-link" data-action="open-extra" data-id="${extra.id}"><strong>${esc(extra.description)}</strong><small>${extraCommercial(extra)}</small></button>`; }).join('') : '<p>Keine Zusatzarbeit im Beispiel.</p>'}</section>
     <section class="detail-block full-span"><h3>Notizen und synthetische Bilder</h3><div class="documentation-grid">${notes.map(renderNote).join('') || '<p>Keine Notizen.</p>'}</div></section>
     <section class="detail-block full-span"><h3>Zeit- und Baustellenverlauf</h3><ol class="timeline compact">${eventList.slice(0, 14).map(function (event) { return `<li><time>${event.time}</time><span><strong>${esc(eventText[event.type] || event.type)} · ${esc(employeeName(event.employeeId))}</strong><small>${event.createdBy !== event.createdFor ? 'Gebucht durch ' + esc(employeeName(event.createdBy)) : 'Selbst gebucht'}${event.note ? ' · ' + esc(event.note) : ''}</small></span></li>`; }).join('')}</ol></section>
-    <section class="detail-block full-span"><h3>Dokumente</h3>${documents.length ? documents.map(function (doc) { return `<div class="document-row"><span><strong>${esc(doc.title)}</strong><small>${esc(doc.type)}</small></span>${badge(doc.status, 'warn')}</div>`; }).join('') : '<p>Noch keine Beispieldokumente.</p>'}<p class="meta">Baubesprechungsprotokoll und Aufmaß bleiben als spätere Ausbaustufe klar gekennzeichnet.</p></section>
+    <section class="detail-block full-span"><h3>Dokumente & Exporte</h3>${documents.length ? documents.map(function (doc) { return `<div class="document-row"><span><strong>${esc(doc.title)}</strong><small>${esc(doc.type)}</small></span>${badge(doc.status, 'ok')}</div>`; }).join('') : '<p>Noch keine Beispieldokumente.</p>'}<div class="site-export-actions"><button class="secondary" data-mm-action="print" data-template="work-order" data-site="${item.number}">Arbeitszettel</button><button class="secondary" data-mm-action="print" data-template="material-request" data-site="${item.number}">Materialanforderung</button><button class="secondary" data-mm-action="print" data-template="material-usage" data-site="${item.number}">Materialeinsatz</button><button class="secondary" data-mm-action="print" data-template="measurement" data-site="${item.number}">Aufmaß</button><button class="secondary" data-mm-action="print" data-template="protocol" data-site="${item.number}">Baubesprechung</button><button class="primary" data-mm-action="xlsx-project" data-site="${item.number}">Projekt-Unterkonto XLSX</button></div><p class="meta">Alle Druckansichten verwenden ausschließlich synthetische Daten. Offene Fachregeln werden nicht berechnet.</p></section>
   </div></div>`;
 }
 function renderNote(note) {
@@ -167,7 +179,20 @@ function employeeCard(employee) {
 }
 
 function renderTimes() {
-  return `${head('Zeiten prüfen', 'Fehlende oder auffällige Buchungen zuerst')}<section><div class="section-title"><h2>${openCorrections().length} offene Korrekturmeldungen</h2><span class="meta">Keine stille Überschreibung</span></div><div class="list">${openCorrections().map(correctionCard).join('') || '<div class="empty-note">Keine offene Korrekturmeldung.</div>'}</div></section><section class="section"><div class="section-title"><h2>Bereits bearbeitet</h2><span class="meta">Vorher, nachher, Bearbeiter und Grund</span></div><div class="list">${db.corrections.map(function (item) { return `<article class="audit-box"><strong>${esc(employeeName(item.employeeId))}</strong><p><strong>Vorher:</strong> ${esc(item.before)}<br><strong>Nachher:</strong> ${esc(item.after)}</p><p><strong>Grund:</strong> ${esc(item.reason)}</p><small>${esc(item.editor)} · ${esc(item.when)} · Original bleibt erhalten</small></article>`; }).join('')}</div></section><section class="section"><button class="secondary" data-action="download-times">Zeitereignisse als CSV herunterladen</button></section>`;
+  return `${head('Zeiten prüfen', 'Fehlende oder auffällige Buchungen zuerst')}<section><div class="section-title"><h2>${openCorrections().length} offene Korrekturmeldungen</h2><span class="meta">Keine stille Überschreibung</span></div><div class="list">${openCorrections().map(correctionCard).join('') || '<div class="empty-note">Keine offene Korrekturmeldung.</div>'}</div></section><section class="section"><div class="section-title"><h2>Bereits bearbeitet</h2><span class="meta">Vorher, nachher, Bearbeiter und Grund</span></div><div class="list">${db.corrections.map(function (item) { return `<article class="audit-box"><strong>${esc(employeeName(item.employeeId))}</strong><p><strong>Vorher:</strong> ${esc(item.before)}<br><strong>Nachher:</strong> ${esc(item.after)}</p><p><strong>Grund:</strong> ${esc(item.reason)}</p><small>${esc(item.editor)} · ${esc(item.when)} · Original bleibt erhalten</small></article>`; }).join('')}</div></section>${renderMonthOverview()}<section class="section"><button class="secondary" data-action="download-times">Zeitereignisse als CSV herunterladen</button></section>`;
+}
+
+function renderMonthOverview() {
+  const rows = db.employees.map(function (employee) {
+    const records = db.monthHistory.filter(function (item) { return item.employeeId === employee.id; });
+    const workDays = records.filter(function (item) { return item.acceptedMinutes != null; });
+    const minutes = workDays.reduce(function (sum, item) { return sum + item.acceptedMinutes; }, 0);
+    const travel = records.reduce(function (sum, item) { return sum + (item.travelMinutes || 0); }, 0);
+    const issues = records.filter(function (item) { return item.issue; }).length;
+    const markers = records.filter(function (item) { return item.marker; }).map(function (item) { return item.marker; });
+    return `<tr><th>${esc(employee.name)}<small>${esc(employee.job)}</small></th><td>${workDays.length}</td><td>${(minutes / 60).toFixed(2).replace('.', ',')} Std.</td><td>${travel} Min.</td><td>${markers.length ? esc(markers.join(', ')) : '–'}</td><td>${issues ? badge(issues + ' Prüfhinweis', 'problem') : badge('vollständig', 'ok')}</td></tr>`;
+  }).join('');
+  return `<section class="section card card-pad month-overview"><div class="section-title"><h2>Monatsverlauf · August / September 2026</h2><span class="meta">03.08.–11.09. · 29 synthetische Mitarbeiter</span></div><div class="table-scroll"><table><thead><tr><th>Mitarbeiter</th><th>Tage mit Zeit</th><th>akzeptierte Rohzeit</th><th>Fahrt roh</th><th>Abwesenheit</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div><p class="meta">Die Zeitwerte sind synthetische, bereits akzeptierte Demo-Rohwerte. Keine Lohn-, Überstunden- oder Fahrtvergütungsregel wird berechnet.</p></section>`;
 }
 function correctionCard(request) {
   const employee = person(request.employeeId);
@@ -227,9 +252,7 @@ function weekDetail(sheet) {
   return `<div class="inline-detail week-detail"><div class="table-scroll"><table><thead><tr><th>Tag</th><th>Bau-Nr.</th><th>Beginn</th><th>Pause</th><th>Ende</th><th>Fahrt</th><th>Hinweis</th></tr></thead><tbody>${sheet.days.map(function (day) { return `<tr class="${day.issue ? 'row-problem' : ''}"><td><strong>${day.day}</strong><small>${day.date}</small></td><td>${day.site}</td><td>${day.start}</td><td>${day.break}</td><td>${day.end}</td><td>${day.travel}</td><td>${day.issue || 'vollständig'}</td></tr>`; }).join('')}</tbody></table></div><p class="meta">Keine Lohn-, Überstunden- oder Fahrzeitbewertung. Angezeigt werden synthetische Rohangaben.</p><div class="form-actions"><button class="secondary" data-action="download-week-pdf" data-id="${sheet.id}">PDF herunterladen</button>${canConfirm ? `<button class="primary" data-action="confirm-week" data-id="${sheet.id}">Version ${sheet.version} bestätigen</button>` : ''}${canApprove ? '<button class="primary" data-action="approve-week" data-id="' + sheet.id + '">Betrieblich freigeben</button>' : ''}${!complete ? '<button class="secondary" data-action="navigate" data-view="times">Korrektur prüfen</button>' : ''}</div><details class="history"><summary>Versions- und Freigabeverlauf</summary><ul>${sheet.history.map(function (line) { return `<li>${esc(line)}</li>`; }).join('')}</ul></details></div>`;
 }
 
-function renderExports() {
-  return `${head('Exporte', 'Synthetische Beispieldaten für Übergang und Prüfung')}<div class="export-grid"><section class="card export-card"><span class="export-icon">CSV</span><h2>Zeitereignisse</h2><p>Datum, Mitarbeiter, Bau-Nr., Ereignisart, Uhrzeit und Buchender.</p><button class="primary" data-action="download-times">Zeitdaten herunterladen</button></section><section class="card export-card"><span class="export-icon">CSV</span><h2>Nachkalkulation</h2><p>Bau-Nr.-bezogene Rohdaten. Keine direkte Excel-Schreibschnittstelle.</p><button class="primary" data-action="download-calculation">Nachkalkulationsdaten</button></section><section class="card export-card"><span class="export-icon">PDF</span><h2>Wochenzettel</h2><p>Lesbarer Übergangsexport eines synthetischen Wochenzettels.</p><label>Wochenzettel<select id="export-week">${db.weeklySheets.map(function (sheet) { return `<option value="${sheet.id}">${esc(person(sheet.employeeId).name)} · ${sheet.week}</option>`; }).join('')}</select></label><button class="primary" data-action="download-selected-week">PDF herunterladen</button></section></div>${assumption('CSV-Spalten und PDF-Layout sind ein prüfbarer Demo-Vorschlag. Die endgültige Struktur wird später mit der vorhandenen Excel-Datei abgestimmt.')}`;
-}
+function renderExports() { return window.MMExports.render(db); }
 
 function renderForeman() {
   const foreman = person(profile().employeeId);
@@ -381,7 +404,7 @@ function renderMoreV6() {
   return head('Mehr', 'Rollenwechsel, Demo-Steuerung und seltene Bereiche') +
     '<section class="card card-pad"><h2>Demo-Perspektive wechseln</h2><p>Dieselben synthetischen Vorgänge aus vier Rollen prüfen.</p><div class="role-grid">' + roleButtons + '</div></section>' +
     operations +
-    '<div class="more-grid section"><section class="card more-card"><h2>Anmeldung</h2><p>Vorschau der späteren Anmeldung.</p><button class="secondary" data-action="show-login">Anmeldeseite ansehen</button></section><section class="card more-card"><h2>Demo zurücksetzen</h2><p>Alle erfundenen Ausgangsdaten wiederherstellen.</p><button class="danger-button" data-action="reset-demo">Demo-Daten zurücksetzen</button></section><section class="card more-card"><h2>Späterer Ausbau</h2><p>Material, Urlaub, Aufmaß, OCR und KI bleiben bewusst für Punkt 7 zurückgestellt.</p><button class="secondary" disabled>Noch nicht Teil dieses Ausbaus</button></section></div>' +
+    '<div class="more-grid section"><section class="card more-card"><h2>Anmeldung</h2><p>Vorschau der späteren Anmeldung.</p><button class="secondary" data-action="show-login">Anmeldeseite ansehen</button></section><section class="card more-card"><h2>Demo zurücksetzen</h2><p>Alle erfundenen Ausgangsdaten wiederherstellen.</p><button class="danger-button" data-action="reset-demo">Demo-Daten zurücksetzen</button></section><section class="card more-card"><h2>Dokumente & Exporte</h2><p>Originalnahe Formulare, Wochenplanung und Nachkalkulationsdateien.</p><button class="primary" data-action="navigate" data-view="exports">Bereich öffnen</button></section></div>' +
     '<details class="developer-area"><summary>Entwickler- und Testinformationen</summary><p>Statische Demo ohne Backend und echte serverseitige Rechte. Änderungen bleiben lokal in diesem Browser, bis die Demo zurückgesetzt wird.</p><p>Demo-Version 6 · vollständig synthetisch.</p></details>';
 }
 
@@ -398,6 +421,8 @@ app.addEventListener('submit', function (event) {
   if (!form) return;
   event.preventDefault();
   const values = new FormData(form);
+
+  if (window.MMExports.handleSubmit(form, values, db, { save: saveDb, toast: toast })) return;
 
   if (form.dataset.form === 'demo-login') {
     ui.role = values.get('role'); ui.login = false; navigate('today'); toast('Demo als ' + profiles[ui.role].label + ' geöffnet.'); return;
@@ -464,15 +489,17 @@ app.addEventListener('submit', function (event) {
 });
 
 app.addEventListener('click', function (event) {
-  const target = event.target.closest('[data-action]');
+  const target = event.target.closest('[data-action],[data-mm-action]');
   if (!target) return;
   event.preventDefault();
   const action = target.dataset.action;
+  if (target.dataset.mmAction && window.MMExports.handleAction(target, db, { save: saveDb, toast: toast })) return;
   if (action === 'submit-correction') {
     saveTimeCorrection(target.closest('form'));
     return;
   }
   if (action === 'navigate') return navigate(target.dataset.view);
+  if (action === 'planning-week') { ui.planningWeek = Number(target.dataset.week); return render(); }
   if (action === 'filter-status') { ui.employeeFilter = target.dataset.status; return navigate('employees'); }
   if (action === 'employee-filter') { ui.employeeFilter = target.dataset.status; return render(); }
   if (action === 'open-site') { ui.selectedSite = target.dataset.id; ui.view = 'sites'; ui.query = ''; render(); return setTimeout(function () { const detail = document.querySelector('.folder-detail'); if (detail) detail.scrollIntoView({ block: 'start' }); }, 0); }
@@ -524,8 +551,8 @@ app.addEventListener('click', function (event) {
   if (action === 'download-times') { exportTimes(); return toast('CSV mit synthetischen Zeitereignissen erstellt.'); }
   if (action === 'download-calculation') { exportCalculation(); return toast('Excel-kompatible CSV erstellt.'); }
   if (action === 'download-planning') { exportPlanning(); return toast('Tagesplanung als CSV erstellt.'); }
-  if (action === 'download-week-pdf') { downloadWeek(target.dataset.id); return toast('PDF-Wochenzettel erstellt.'); }
-  if (action === 'download-selected-week') { const select = document.getElementById('export-week'); if (select) downloadWeek(select.value); return toast('PDF-Wochenzettel erstellt.'); }
+  if (action === 'download-week-pdf') { const sheet = db.weeklySheets.find(function (item) { return item.id === target.dataset.id; }); window.MMExports.openPrint(db, 'timesheet', { site: (sheet.days[0] || {}).site, employeeId: sheet.employeeId, week: Number(String(sheet.week).replace(/\D/g, '')) }); return toast('Originalnahe Druckansicht geöffnet.'); }
+  if (action === 'download-selected-week') { const select = document.getElementById('export-week'); if (select) { const sheet = db.weeklySheets.find(function (item) { return item.id === select.value; }); window.MMExports.openPrint(db, 'timesheet', { site: (sheet.days[0] || {}).site, employeeId: sheet.employeeId, week: Number(String(sheet.week).replace(/\D/g, '')) }); } return toast('Originalnahe Druckansicht geöffnet.'); }
 });
 
 app.addEventListener('keydown', function (event) {
@@ -533,3 +560,4 @@ app.addEventListener('keydown', function (event) {
 });
 
 render();
+

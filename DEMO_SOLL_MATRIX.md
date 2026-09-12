@@ -1,14 +1,14 @@
 # Maler Meyer – fachliche Soll-Matrix der Bedienungsdemo
 
 Stand: 12. September 2026  
-Zweck: Fachliche Vorbereitung und Bestandsprüfung vor weiterer Programmierung  
-Bewertete Demo-Basis: öffentliche, rein statische Bedienungsdemo (Demo-Version 5)
+Zweck: Fachliche Soll-Matrix und fortgeschriebene Bestandsprüfung  
+Bewertete Demo-Basis: öffentliche, rein statische Bedienungsdemo (Demo-Version 7)
 
-Freigabevermerk vom 12. September 2026: Die Ausbaustufen 1 bis 6 sind zur Umsetzung freigegeben. Ausbaustufe 7 bleibt ausdrücklich für später zurückgestellt und benötigt eine neue Freigabe.
+Freigabevermerk vom 12. September 2026: Die Ausbaustufen 1 bis 6 wurden umgesetzt. Die zusätzlich freigegebenen originalnahen Formular- und Exportbeispiele sind in `EXPORT_REFERENZ_MATRIX.md` beschrieben. Produktive OCR-/KI-Verarbeitung bleibt für später zurückgestellt.
 
 ## 1. Abgrenzung
 
-Dieses Dokument ist keine Implementierungsfreigabe und enthält keine Änderung am Anwendungscode.
+Dieses Dokument bleibt die fachliche Soll-Matrix. Der zugehörige Umsetzungsstand ist in der öffentlichen Demo bedienbar; offene Regeln bleiben weiterhin ausdrücklich unentschieden.
 
 - Es dürfen ausschließlich vollständig erfundene Personen, Baustellen, Adressen, Fotos und Geschäftsvorgänge verwendet werden.
 - Die Bedienungsdemo simuliert Abläufe. Sie ist kein Produktivsystem, besitzt derzeit kein Backend, keine echte Anmeldung und keine dauerhafte Speicherung.
@@ -274,3 +274,4 @@ Eine Demo-Annahme darf ausprobiert werden, muss aber in der Ansicht und im Ände
 Die vorhandene Demo ist bereits ein guter visueller Einstieg und deckt Torbens Morgenblick sowie erste Mitarbeiteraktionen ab. Sie ist aber noch keine vollständige Bedienungsdemo, weil die Rollen, Daten und Vorgänge nicht durchgängig miteinander verbunden sind.
 
 Der sinnvollste nächste Schritt ist deshalb nicht einfach „mehr Karten und Beispieldaten“, sondern zuerst eine gemeinsame synthetische Demo-Welt für alle 25 Szenarien. Darauf können die vier Rollen, die vollständigen Zeit-/Korrekturabläufe, Zusatzarbeiten, Baustellenmappe, Wochenzettel und Exporte zuverlässig aufbauen. So bleibt die Demo später sauber auf die echte Backend-Anwendung übertragbar, ohne offene Fachregeln einzubauen.
+

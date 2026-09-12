@@ -96,6 +96,9 @@ async function clickNav(page, view) {
         await page.locator('.search-result[data-id="M-0002"]').click();
         await page.getByText('Lena Muster', { exact: true }).first().waitFor();
         await clickNav(page, 'planning');
+        await page.getByRole('heading', { name: /Wochenplanung 2026 · KW 37/ }).waitFor();
+        await page.locator('[data-action="planning-week"][data-week="34"]').click();
+        await page.getByRole('heading', { name: /Wochenplanung 2026 · KW 34/ }).waitFor();
         const planningForm = page.locator('form[data-form="planning-change"][data-employee="M-0002"]');
         await planningForm.locator('select[name="site"]').selectOption('26-105');
         await planningForm.locator('input[name="reason"]').fill('Kurzfristige synthetische Umplanung');
@@ -122,11 +125,13 @@ async function clickNav(page, view) {
       await page.locator('[data-action="switch-role"][data-role="office"]').click();
       await page.getByText('Arbeitsvorrat im Büro', { exact: false }).waitFor();
       await clickNav(page, 'times');
+      await page.getByRole('heading', { name: 'Monatsverlauf · August / September 2026' }).waitFor();
+      assert.equal(await page.locator('.month-overview tbody tr').count(), 29);
       await page.locator('[data-action="open-correction"][data-id="KR-002"]').click();
       await page.locator('form[data-form="time-correction"] textarea[name="reason"]').fill('Synthetische Prüfung im Browsertest');
       await page.locator('form[data-form="time-correction"] button.primary').click();
       await page.waitForFunction(() => {
-        const stored = JSON.parse(localStorage.getItem('maler-meyer-demo-v6') || '{}');
+        const stored = JSON.parse(localStorage.getItem('maler-meyer-demo-v7') || '{}');
         return stored.data?.corrections?.some(item => item.reason === 'Synthetische Prüfung im Browsertest');
       });
 
@@ -149,16 +154,17 @@ async function clickNav(page, view) {
 
       if (size.name === 'desktop') {
         await clickNav(page, 'exports');
-        for (const action of ['download-times', 'download-calculation', 'download-selected-week']) {
+        await page.getByRole('heading', { name: 'Dokumente & Exporte', exact: true }).waitFor();
+        for (const action of ['csv-times', 'xlsx-planning', 'xlsx-calculation', 'xlsx-project', 'xlsx-invoices', 'csv-invoices']) {
           const downloadPromise = page.waitForEvent('download');
-          await page.locator('[data-action="' + action + '"]').click();
+          await page.locator('[data-mm-action="' + action + '"]').first().click();
           const artifact = await downloadPromise;
-          assert.match(artifact.suggestedFilename(), action === 'download-selected-week' ? /\.pdf$/ : /\.csv$/);
+          assert.match(artifact.suggestedFilename(), action.startsWith('xlsx-') ? /\.xlsx$/ : /\.csv$/);
           assert.equal((await artifact.createReadStream()) !== null, true, action + ': Download nicht lesbar');
         }
       }
 
-      await page.screenshot({ path: path.join(os.tmpdir(), 'maler-meyer-v6-' + size.name + '.png'), fullPage: true });
+      await page.screenshot({ path: path.join(os.tmpdir(), 'maler-meyer-v7-' + size.name + '.png'), fullPage: true });
       assert.deepEqual(errors, [], size.name + ': JavaScript-Fehler');
       assert.deepEqual(external, [], size.name + ': unerwartete externe Requests');
       await page.close();
@@ -171,3 +177,4 @@ async function clickNav(page, view) {
   console.error(error);
   process.exitCode = 1;
 });
+
