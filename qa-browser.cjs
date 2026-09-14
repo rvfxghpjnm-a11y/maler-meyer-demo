@@ -69,20 +69,20 @@ async function clickNav(page, view) {
       await page.locator('form[data-form="employee-action"] textarea[name="description"]').fill('Synthetische Zusatzarbeit für den Browsertest');
       await page.locator('form[data-form="employee-action"] input[name="quantity"]').fill('7');
       await page.locator('form[data-form="employee-action"] input[name="unit"]').fill('m²');
-      await page.locator('form[data-form="employee-action"] input[name="photo"]').check();
-      await page.locator('form[data-form="employee-action"] button.primary').click();
+      await page.locator('form[data-form="employee-action"] input[name="syntheticPhoto"]').check();
+      await page.getByRole('button', { name: 'Speichern', exact: true }).click();
       await page.getByText('Zusatzarbeit in allen Ansichten ergänzt.', { exact: true }).waitFor();
 
       if (size.name === 'smartphone') {
         await page.getByRole('button', { name: 'Notiz / Foto', exact: true }).last().click();
         await page.locator('form[data-form="employee-action"] textarea[name="text"]').fill('Synthetische Fortschrittsnotiz aus dem Browsertest');
-        await page.locator('form[data-form="employee-action"] input[name="photo"]').check();
-        await page.locator('form[data-form="employee-action"] button.primary').click();
+        await page.locator('form[data-form="employee-action"] input[name="syntheticPhoto"]').check();
+        await page.getByRole('button', { name: 'Speichern', exact: true }).click();
         await page.getByText('Notiz der Baustellenmappe zugeordnet.', { exact: true }).waitFor();
         await page.getByRole('button', { name: 'Korrektur melden', exact: true }).last().click();
         await page.locator('form[data-form="employee-action"] input[name="suggestion"]').fill('07:05');
         await page.locator('form[data-form="employee-action"] textarea[name="description"]').fill('Arbeitsbeginn wurde in der Demo vergessen');
-        await page.locator('form[data-form="employee-action"] button.primary').click();
+        await page.getByRole('button', { name: 'Speichern', exact: true }).click();
         await page.getByText('Korrekturmeldung an Büro und Geschäftsführung gesendet.', { exact: true }).waitFor();
       }
 
@@ -131,7 +131,7 @@ async function clickNav(page, view) {
       await page.locator('form[data-form="time-correction"] textarea[name="reason"]').fill('Synthetische Prüfung im Browsertest');
       await page.locator('form[data-form="time-correction"] button.primary').click();
       await page.waitForFunction(() => {
-        const stored = JSON.parse(localStorage.getItem('maler-meyer-demo-v9') || '{}');
+        const stored = JSON.parse(localStorage.getItem('maler-meyer-demo-v10') || '{}');
         return stored.data?.corrections?.some(item => item.reason === 'Synthetische Prüfung im Browsertest');
       });
 
@@ -177,3 +177,4 @@ async function clickNav(page, view) {
   console.error(error);
   process.exitCode = 1;
 });
+

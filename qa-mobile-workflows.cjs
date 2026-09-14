@@ -4,7 +4,7 @@ const path = require('node:path');
 const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
 
 const url = process.env.DEMO_URL || 'http://127.0.0.1:4173/';
-const storageKey = 'maler-meyer-demo-v9';
+const storageKey = 'maler-meyer-demo-v10';
 const outputDir = path.join(__dirname, 'output', 'pdf');
 fs.mkdirSync(outputDir, { recursive: true });
 
@@ -137,7 +137,7 @@ async function drawMouse(page) {
     await page.locator('[data-action="open-employee-action"][data-kind="extra"]').first().click();
     await page.locator('[data-action="load-extra-scenario"]').click();
     await page.locator('form[data-form="employee-action"] input[name="confirmAfter"]').check();
-    await page.locator('form[data-form="employee-action"] button.primary').click();
+    await page.getByRole('button', { name: 'Speichern', exact: true }).click();
     await page.locator('form[data-form="extra-confirm-details"]').waitFor();
     await page.locator('form[data-form="extra-confirm-details"] button.primary').click();
     await drawTouch(page);
@@ -212,3 +212,4 @@ async function drawMouse(page) {
     await browser.close();
   }
 })().catch(error => { console.error(error); process.exit(1); });
+

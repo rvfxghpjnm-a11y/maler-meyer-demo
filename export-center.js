@@ -235,11 +235,15 @@
     rows.push(['Summe', '', cell(0, 4, bills.length ? 'SUM(C' + firstBillRow + ':C' + lastBillRow + ')' : '0')], []);
     rows.push(['Materialverbrauch:'], ['Menge', 'Einheit', 'Artikel', 'EP', 'GP']);
     const firstMaterialRow = rows.length + 1;
-    [[4, 'Rolle', 'Abdeckvlies', 18.5], [12, 'Liter', 'Tiefengrund', 7.8], [2, 'Sack / 25 kg', 'Fuellspachtel', 42]].forEach(function (item) {
+    const projectMaterials = (db.projectMaterialItems || []).filter(function (item) { return item.site === site; });
+    const materialRows = projectMaterials.length ? projectMaterials : [{ quantity: 4, unit: 'Rolle', article: 'Abdeckvlies', unitPrice: 18.5 }, { quantity: 12, unit: 'Liter', article: 'Tiefengrund', unitPrice: 7.8 }, { quantity: 2, unit: 'Sack / 25 kg', article: 'Fuellspachtel', unitPrice: 42 }];
+    materialRows.forEach(function (item) {
       const rowNumber = rows.length + 1;
-      rows.push([item[0], item[1], item[2], cell(item[3], 4), cell(0, 4, 'A' + rowNumber + '*D' + rowNumber)]);
+      const priceKnown = typeof item.unitPrice === 'number';
+      rows.push([item.quantity, item.unit, item.article, priceKnown ? cell(item.unitPrice, 4) : 'OFFEN', priceKnown ? cell(0, 4, 'A' + rowNumber + '*D' + rowNumber) : 'OFFEN']);
     });
-    rows.push(['Gesamtsumme Material', '', '', '', cell(0, 4, 'SUM(E' + firstMaterialRow + ':E' + rows.length + ')')], []);
+    const lastMaterialRow = rows.length;
+    rows.push(['Gesamtsumme bewertete Materialpositionen', '', '', '', cell(0, 4, 'SUM(E' + firstMaterialRow + ':E' + lastMaterialRow + ')')], ['Hinweis', 'Neu digital erfasste Verbräuche werden ohne erfundene Bewertung als OFFEN exportiert.'], []);
     rows.push(['Weitere Kostenblöcke', 'Betrag']);
     const firstCostRow = rows.length + 1;
     rows.push(['Lift', cell(x.lift, 4)], ['Subunternehmer', cell(x.subcontractor, 4)], ['Zeitarbeitsfirmen', cell(x.tempStaff, 4)], ['Gerüste + Müllentsorgung', cell(x.scaffoldWaste, 4)], ['Sonstiges', cell(x.other, 4)]);
@@ -262,3 +266,4 @@
 
   window.MMExports = { render: render, handleAction: handleAction, handleSubmit: handleSubmit, openPrint: openPrint, buildXlsx: buildXlsx };
 }());
+

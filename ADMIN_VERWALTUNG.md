@@ -1,6 +1,6 @@
 # Betriebsverwaltung und direkte Büro-Hilfe
 
-Stand: Demo-Version 9 vom 12. September 2026
+Verwaltungsmeilenstein: Demo-Version 9 vom 12. September 2026; in Demo-Version 10 unverändert enthalten.
 
 Alle Daten und Namen in diesem Dokument und in der öffentlichen Demo sind synthetisch. Die beiden Büro-Demokonten „Sabine Beispiel“ und „Tina Demo“ stehen ausschließlich für die zwei noch nicht namentlich festgelegten Bürokräfte.
 
@@ -87,3 +87,4 @@ Für den Echtbetrieb erforderlich bleiben insbesondere:
 - Projektbearbeitung, Archivierung und Reaktivierung,
 - Zugang aller vier Konten zur Verwaltung,
 - Smartphone- und Tabletdarstellung ohne horizontalen Seitenüberlauf.
+
