@@ -4,7 +4,7 @@ const path = require('node:path');
 const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
 
 const url = process.env.DEMO_URL || 'http://127.0.0.1:4173/';
-const storageKey = 'maler-meyer-demo-v10';
+const storageKey = 'maler-meyer-demo-v11';
 const outputDir = path.join(__dirname, 'output', 'ui');
 fs.mkdirSync(outputDir, { recursive: true });
 
@@ -122,4 +122,3 @@ async function openAdmin(page) {
     await browser.close();
   }
 })().catch(error => { console.error(error); process.exitCode = 1; });
-

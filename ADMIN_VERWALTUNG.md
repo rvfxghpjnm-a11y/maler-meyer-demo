@@ -87,4 +87,3 @@ Für den Echtbetrieb erforderlich bleiben insbesondere:
 - Projektbearbeitung, Archivierung und Reaktivierung,
 - Zugang aller vier Konten zur Verwaltung,
 - Smartphone- und Tabletdarstellung ohne horizontalen Seitenüberlauf.
-

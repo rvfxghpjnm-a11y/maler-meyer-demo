@@ -97,13 +97,12 @@ async function clickNav(page, view) {
         await page.getByText('Lena Muster', { exact: true }).first().waitFor();
         await clickNav(page, 'planning');
         await page.getByRole('heading', { name: /Wochenplanung 2026 · KW 37/ }).waitFor();
-        await page.locator('[data-action="planning-week"][data-week="34"]').click();
-        await page.getByRole('heading', { name: /Wochenplanung 2026 · KW 34/ }).waitFor();
-        const planningForm = page.locator('form[data-form="planning-change"][data-employee="M-0002"]');
-        await planningForm.locator('select[name="site"]').selectOption('26-105');
+        await page.locator('.planning-cell[data-employee="M-0002"][data-day="3"]').click();
+        const planningForm = page.locator('form[data-form="plan-cell"]');
+        await planningForm.locator('select[name="value"]').selectOption('26-105');
         await planningForm.locator('input[name="reason"]').fill('Kurzfristige synthetische Umplanung');
-        await planningForm.locator('button').click();
-        await page.getByText('Tageszuordnung geändert und protokolliert.', { exact: true }).waitFor();
+        await planningForm.locator('button.primary').click();
+        await page.getByText(/Wochenplanung geändert/, { exact: false }).waitFor();
       }
       await clickNav(page, 'employees');
       if (size.name === 'desktop') {
@@ -131,7 +130,7 @@ async function clickNav(page, view) {
       await page.locator('form[data-form="time-correction"] textarea[name="reason"]').fill('Synthetische Prüfung im Browsertest');
       await page.locator('form[data-form="time-correction"] button.primary').click();
       await page.waitForFunction(() => {
-        const stored = JSON.parse(localStorage.getItem('maler-meyer-demo-v10') || '{}');
+        const stored = JSON.parse(localStorage.getItem('maler-meyer-demo-v11') || '{}');
         return stored.data?.corrections?.some(item => item.reason === 'Synthetische Prüfung im Browsertest');
       });
 
@@ -177,4 +176,3 @@ async function clickNav(page, view) {
   console.error(error);
   process.exitCode = 1;
 });
-

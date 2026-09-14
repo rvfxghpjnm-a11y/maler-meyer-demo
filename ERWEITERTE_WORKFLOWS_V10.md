@@ -28,4 +28,3 @@ Spracheingabe nimmt kein Audio auf. Offline besitzt keine echte Synchronisations
 
 Materialstatus, Urlaubsentscheidung durch Verwaltungskonten, fünf PIN-Fehlversuche, kurzer Cooldown und zehn Minuten Auto-Sperre sind Demo-Vorschläge beziehungsweise konfigurierbare Demo-Annahmen. Die offenen Regeln stehen in [OFFENE_FACHLICHE_PUNKTE.md](OFFENE_FACHLICHE_PUNKTE.md).
 
-

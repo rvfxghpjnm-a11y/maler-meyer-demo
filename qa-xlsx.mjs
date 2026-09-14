@@ -19,4 +19,3 @@ for (const name of names) {
   if (/#DIV\/0!|#REF!|#VALUE!|#NAME\?|#N\/A/.test(formulaText)) throw new Error(name + ': sichtbarer Formelfehler');
   console.log('OK ' + name + ' ' + JSON.stringify(sheets));
 }
-

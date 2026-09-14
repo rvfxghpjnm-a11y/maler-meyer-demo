@@ -4,7 +4,7 @@ const path = require('node:path');
 const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
 
 const url = process.env.DEMO_URL || 'http://127.0.0.1:4175/';
-const storageKey = 'maler-meyer-demo-v10';
+const storageKey = 'maler-meyer-demo-v11';
 const outputDir = path.join(__dirname, 'output', 'completion');
 fs.mkdirSync(outputDir, { recursive: true });
 
@@ -166,7 +166,7 @@ async function assertClean(page, errors, external, label) {
       await navigate(page, 'more');
       await page.locator('[data-action="reset-demo"]').click();
       const resetState = await page.evaluate(key => JSON.parse(localStorage.getItem(key)), storageKey);
-      assert.equal(resetState.version, 10, 'Demo-Version nach Reset');
+      assert.equal(resetState.version, 11, 'Demo-Version nach Reset');
       assert.equal(resetState.data.materialRecords.length, 3, 'synthetischer Material-Ausgangsstand nach Reset');
       await assertClean(page, errors, external, 'Desktop');
       await context.close();
@@ -176,4 +176,3 @@ async function assertClean(page, errors, external, label) {
     await browser.close();
   }
 })().catch(error => { console.error(error); process.exitCode = 1; });
-

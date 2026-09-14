@@ -218,9 +218,10 @@
   function saveBlob(name,blob){const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},1500);}
 
   function cell(v,s,f){return{v:v,s:s||0,f:f||''};}
-  function calculationWorkbook(db){const rows=[['Bauliste 2026'],['Bau-Nr.','Bauvorhaben','Bearbeiter','Angebotssumme / Auftragswert netto','Soll-Stunden','Gesellen Ist-Stunden','Fahrzeit roh','Azubi-Stunden','Stundenumsatz','Kosten Zeitpersonal','Kosten Material','Kosten Lift','Kosten Subunternehmer','Kosten Gerüste / Müll','Kosten Sonstiges','Übertrag','Gesamtkosten','geschriebene Rechnungen','Ergebnis','aktueller Stundenwert']];db.projectAccounts.forEach(function(x,i){const r=i+3;rows.push([x.site,x.project,x.manager,cell(x.offerNet,4),cell(x.plannedHours,5),cell(x.acceptedHours,5),cell(x.travelHoursRaw,5),cell(x.traineeHours,5),'OFFEN',cell(x.tempStaff,4),cell(x.materials,4),cell(x.lift,4),cell(x.subcontractor,4),cell(x.scaffoldWaste,4),cell(x.other,4),cell(x.carryover,4),cell(0,4,'SUM(J'+r+':P'+r+')'),cell(db.billingRecords.filter(function(b){return b.site===x.site;}).reduce(function(s,b){return s+b.net;},0),4),'OFFEN','OFFEN']);});return[{name:'Bau-Nr.-Liste',rows:rows,widths:[12,34,18,18,13,14,12,12,15,15,15,12,16,17,14,12,15,18,14,18],freeze:{rows:2,cols:2},landscape:true}];}
+  function calculationWorkbook(db){const rows=[['Bauliste 2026'],['Bau-Nr.','Bauvorhaben','Bearbeiter','Angebotssumme / Auftragswert netto','Soll-Stunden','Gesellen Ist-Stunden','Fahrzeit roh','Azubi-Stunden','Stundenumsatz','Kosten Zeitpersonal','Kosten Material','Kosten Lift','Kosten Subunternehmer','Kosten Gerüste / Müll','Kosten Sonstiges','Übertrag','Gesamtkosten','geschriebene Rechnungen','Ergebnis','aktueller Stundenwert']];db.projectAccounts.forEach(function(original,i){const x=window.MMFinal?window.MMFinal.dynamicAccount(db,original):original;const r=i+3;rows.push([x.site,x.project,x.manager,cell(x.offerNet,4),cell(x.plannedHours,5),cell(x.acceptedHours,5),cell(x.travelHoursRaw,5),cell(x.traineeHours,5),'OFFEN',cell(x.tempStaff,4),cell(x.materials,4),cell(x.lift,4),cell(x.subcontractor,4),cell(x.scaffoldWaste,4),cell(x.other,4),cell(x.carryover,4),cell(0,4,'SUM(J'+r+':P'+r+')'),cell(db.billingRecords.filter(function(b){return b.site===x.site;}).reduce(function(s,b){return s+b.net;},0),4),'OFFEN','OFFEN']);});return[{name:'Bau-Nr.-Liste',rows:rows,widths:[12,34,18,18,13,14,12,12,15,15,15,12,16,17,14,12,15,18,14,18],freeze:{rows:2,cols:2},landscape:true}];}
   function projectWorkbook(db, site) {
-    const x = db.projectAccounts.find(function (account) { return account.site === site; }) || db.projectAccounts[0];
+    const original = db.projectAccounts.find(function (account) { return account.site === site; }) || db.projectAccounts[0];
+    const x = window.MMFinal ? window.MMFinal.dynamicAccount(db, original) : original;
     const rows = [
       ['Projekt-Unterkonto · ' + x.site + ' · ' + x.project], [],
       ['Kalenderwoche', 'Gesellen-Stunden', 'Fahrzeit roh', 'Azubi-Stunden'],
@@ -247,7 +248,10 @@
     rows.push(['Weitere Kostenblöcke', 'Betrag']);
     const firstCostRow = rows.length + 1;
     rows.push(['Lift', cell(x.lift, 4)], ['Subunternehmer', cell(x.subcontractor, 4)], ['Zeitarbeitsfirmen', cell(x.tempStaff, 4)], ['Gerüste + Müllentsorgung', cell(x.scaffoldWaste, 4)], ['Sonstiges', cell(x.other, 4)]);
-    rows.push(['Gesamtsumme weitere Kosten', cell(0, 4, 'SUM(B' + firstCostRow + ':B' + rows.length + ')')], [], ['Hinweis', 'Fahrzeitwerte sind Rohdaten. Lohn-, Überstunden- und Ergebnislogik bleiben OFFEN.']);
+    rows.push(['Gesamtsumme weitere Kosten', cell(0, 4, 'SUM(B' + firstCostRow + ':B' + rows.length + ')')], []);
+    rows.push(['Kostenpositionen im Detail'], ['Datum','Kostenart','Beschreibung','Firma / Lieferant','Netto','Referenz']);
+    (db.projectCostEntries || []).filter(function(item){return item.site===site;}).forEach(function(item){rows.push([item.date,(window.MMFinal&&window.MMFinal.costTypes[item.type])||item.type,item.description,item.supplier||'',cell(Number(item.net||0),4),item.reference||'']);});
+    rows.push([], ['Hinweis', 'Fahrzeitwerte sind Rohdaten. Lohn-, Überstunden- und Ergebnislogik bleiben OFFEN.']);
     return [{ name: x.site, rows: rows, widths: [22, 20, 32, 14, 14], freeze: { rows: 1, cols: 0 }, landscape: true }];
   }
   function planningWorkbook(db){return db.weekPlans.map(function(plan){const rows=[['Wochenplanung 2026'],['KW '+plan.week,'Mitarbeiter','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag']];['Mitarbeiter','Auszubildende / Praktikum','Subunternehmer'].forEach(function(group){rows.push([cell(group,3)]);plan.rows.filter(function(r){return r.group===group;}).forEach(function(r,i){rows.push([i+1,r.displayName||employee(db,r.employeeId).name].concat(r.values));});});return{name:'KW '+plan.week,rows:rows,widths:[8,24,22,22,22,22,22,22],freeze:{rows:2,cols:2},landscape:true};});}
@@ -266,4 +270,3 @@
 
   window.MMExports = { render: render, handleAction: handleAction, handleSubmit: handleSubmit, openPrint: openPrint, buildXlsx: buildXlsx };
 }());
-

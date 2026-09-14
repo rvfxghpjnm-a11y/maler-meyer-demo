@@ -2,7 +2,7 @@
 
 Stand: 12. September 2026  
 Zweck: Fachliche Soll-Matrix und fortgeschriebene Bestandsprüfung  
-Bewertete Demo-Basis: öffentliche, rein statische Bedienungsdemo (Demo-Version 10)
+Bewertete Demo-Basis: öffentliche, rein statische Bedienungsdemo (Demo-Version 11)
 
 Freigabevermerk vom 12. September 2026: Die Ausbaustufen 1 bis 6, die originalnahen Formular-/Exportbeispiele sowie der mobile Bestätigungs-, Korrektur- und Benachrichtigungsablauf wurden umgesetzt. Details stehen in `EXPORT_REFERENZ_MATRIX.md` und `MOBILE_BESTAETIGUNG.md`. Produktive OCR-/KI-Verarbeitung und echter Web Push bleiben für später zurückgestellt.
 
@@ -278,7 +278,7 @@ Die vorhandene Demo ist bereits ein guter visueller Einstieg und deckt Torbens M
 
 Der sinnvollste nächste Schritt ist deshalb nicht einfach „mehr Karten und Beispieldaten“, sondern zuerst eine gemeinsame synthetische Demo-Welt für alle 25 Szenarien. Darauf können die vier Rollen, die vollständigen Zeit-/Korrekturabläufe, Zusatzarbeiten, Baustellenmappe, Wochenzettel und Exporte zuverlässig aufbauen. So bleibt die Demo später sauber auf die echte Backend-Anwendung übertragbar, ohne offene Fachregeln einzubauen.
 
-> Historischer Prüfvermerk: Die Abschnitte 4 und 5 dokumentieren den Stand vor den inzwischen freigegebenen Ausbaustufen. Der aktuell bedienbare Stand ist Demo-Version 10; die mobile Bestätigung ist in `MOBILE_BESTAETIGUNG.md`, die spätere Verwaltungsentscheidung in `ADMIN_VERWALTUNG.md` und die neuen Zielentscheidungen in `ERWEITERTE_WORKFLOWS_V10.md` verifiziert.
+> Historischer Prüfvermerk: Die Abschnitte 4 und 5 dokumentieren den Stand vor den inzwischen freigegebenen Ausbaustufen. Der aktuell bedienbare Stand ist Demo-Version 11; die mobile Bestätigung ist in `MOBILE_BESTAETIGUNG.md`, die spätere Verwaltungsentscheidung in `ADMIN_VERWALTUNG.md`, die erweiterten Abläufe in `ERWEITERTE_WORKFLOWS_V10.md` und der vollständige Praxistest in `VIDEO_CALL_QA.md` verifiziert.
 
 ## 8. Nachgetragene Soll-Matrix – freigegebene Zielrichtung vom 14.09.2026
 
@@ -291,4 +291,3 @@ Der sinnvollste nächste Schritt ist deshalb nicht einfach „mehr Karten und Be
 | Mitarbeiter | Fahrzeuggerät | 6-stelliger PIN-Benutzerwechsel | [1] Zielrichtung | Max Beispiel mit 123456 | synthetischer PIN, Mitarbeiterwahl | Mehr → Fahrzeuggerät | wählen, PIN, sperren/wechseln | eigene Mitarbeiteransicht, Demo-Audit | Offline-PIN und Sperrzeit |
 | Alle geeigneten Rollen | Statusleiste | Offline-Bedienung simulieren | [2] Demo | Zeit, Notiz, Material und Zusatzarbeit vormerken | lokale Warteschlange | Offline simulieren | Vorgang speichern, online schalten | Zähler steigt und wird sichtbar geleert | echte Konfliktstrategie |
 | Alle | Feedback | Fehlermeldung lokal erfassen | [1] Soll-Matrix | Bedienproblem melden | Kategorie, Text, Fallnummer | Feedback | absenden | synthetischer Demo-Fall entsteht | Produktive Übermittlung/Triage |
-

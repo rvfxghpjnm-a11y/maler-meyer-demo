@@ -143,4 +143,14 @@ Mitarbeiterstammdaten, aktive Baustellen, Bau-Nrn., gegebenenfalls Artikelstamm 
 - Serverseitige Rollenprüfung, Datei-Upload-Schutz und Audit
 - TOTP/2FA für privilegierte Konten vorsehen beziehungsweise final entscheiden
 
+## 24. Produktive Wochenplanung
 
+Die zellenweise Planung, Mehrfachzuweisung, Kopie der Vorwoche und Veröffentlichung sind in Demo-Version 11 nur lokal bedienbar. Produktiv erforderlich sind ein serverseitiges Planungsdatenmodell, atomare Änderungen, Rollenprüfung, konkurrierende Bearbeitung, Audit mit vorher/nachher, ein eindeutiger Veröffentlichungsstand und zuverlässige Mitarbeiterbenachrichtigungen. Genehmigter Urlaub muss fachlich konsistent eingeblendet werden. Eine localStorage-Matrix ist weder Datenmodell noch Konfliktlösung.
+
+## 25. Projektkosten und Rechnungen
+
+Die Demo erfasst sichere Rohpositionen und bildet ausschließlich Kategoriesummen. Produktiv erforderlich sind validierte Geld- und Datumswerte, Belegidentität, Zugriffskontrolle, unveränderbare Zuordnungshistorie, Storno- und Korrekturabläufe sowie eine belastbare Verknüpfung mit Projekt, Rechnungseingang, Dokumentablage und Export. Lieferantendateien benötigen Object Storage und Upload-Schutz. OCR, Kontierung, Freigaberechte, Umsatzsteuerbehandlung und unbekannte Wirtschaftlichkeitsformeln bleiben außerhalb dieser Demo.
+
+## 26. Planungs- und Unterkontoexporte
+
+Demo-Exporte verwenden den aktuellen lokalen Zustand. Produktiv müssen Exporte serverseitig reproduzierbar, versioniert und eindeutig einem Datenstand zugeordnet sein. Gleichzeitige Änderungen während eines Exports, Berechtigungen, Vorlagenversionen und die spätere Analyse der Original-XLSX sind gesondert zu lösen.

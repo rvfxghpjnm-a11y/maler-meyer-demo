@@ -4,11 +4,11 @@
 
 Die Demo hat kein Backend, keine echte Anmeldung und keine Verbindung zu Maler Meyer. Eingaben und Statusänderungen werden ausschließlich lokal im jeweiligen Browser gespeichert und können über „Demo zurücksetzen“ vollständig verworfen werden.
 
-Vier Perspektiven sind bedienbar: Geschäftsführung, Büro, Vorarbeiter und Mitarbeiter. Planung, Zeitereignisse, Korrekturen, Zusatzarbeiten, Baustellenmappe und Wochenzettel verwenden einen gemeinsamen synthetischen Demo-Zustand. Der erweiterte Datensatz umfasst vier Planungswochen und einen synthetischen Arbeitszeitverlauf vom 3. August bis 11. September 2026.
+Vier Perspektiven sind bedienbar: Geschäftsführung, Büro, Vorarbeiter und Mitarbeiter. Planung, Zeitereignisse, Korrekturen, Zusatzarbeiten, Baustellenmappe und Wochenzettel verwenden einen gemeinsamen synthetischen Demo-Zustand. Der erweiterte Datensatz umfasst mehrere editierbare Planungswochen und einen synthetischen Arbeitszeitverlauf vom 3. August bis 11. September 2026. Aktueller Stand ist Demo-Version 11.
 
 ## Betriebsverwaltung und Büro-Hilfe
 
-Torben, Steffen und die beiden vollständig synthetischen Büro-Demokonten besitzen in Demo-Version 10 dieselbe umfangreiche Verwaltungsansicht. Dort können sie Projekte anlegen und bearbeiten, Mitarbeiter anlegen und bearbeiten, Planung unterstützen sowie Mitarbeiter oder Projekte deaktivieren und wieder aktivieren. „Entfernen“ ist bewusst als nachvollziehbare Deaktivierung umgesetzt: Zeitdaten, Dokumente und Änderungsverläufe bleiben erhalten.
+Torben, Steffen und die beiden vollständig synthetischen Büro-Demokonten besitzen in Demo-Version 11 dieselbe umfangreiche Verwaltungsansicht. Dort können sie Projekte anlegen und bearbeiten, Mitarbeiter anlegen und bearbeiten, Planung unterstützen sowie Mitarbeiter oder Projekte deaktivieren und wieder aktivieren. „Entfernen“ ist bewusst als nachvollziehbare Deaktivierung umgesetzt: Zeitdaten, Dokumente und Änderungsverläufe bleiben erhalten.
 
 Wenn ein Mitarbeiter sein Smartphone nicht dabeihat oder Hilfe benötigt, kann das Büro eine aktuelle Zeitaktion stellvertretend auslösen. Die Demo speichert dabei getrennt, welcher Mitarbeiter betroffen ist, welches Verwaltungskonto gehandelt hat, wann die Aktion erfolgte und welcher Grund angegeben wurde. Rückwirkende Änderungen laufen weiterhin über den Korrekturprozess.
 
@@ -31,7 +31,8 @@ Der technische und fachliche Ablauf ist in [MOBILE_BESTAETIGUNG.md](./MOBILE_BES
 ## Bedienungsdemo kann jetzt zeigen
 
 - Zeit und stellvertretende Büro-Hilfe
-- Tages- und Wochenplanung
+- echte zellenweise Wochenplanung, Mehrtages-/Kolonnenzuweisung, neue Woche, Vorwoche kopieren und Demo-Veröffentlichung
+- Mitarbeiteransicht „Meine Woche“ und lokale Hinweise nach einer veröffentlichten Planänderung
 - Projekte und Mitarbeiterverwaltung
 - Korrekturen, Wochenzettel, Versionen und mobile Bestätigung
 - Zusatzarbeiten, getrennte Dokumentationsbestätigung und kaufmännische Prüfung
@@ -43,8 +44,12 @@ Der technische und fachliche Ablauf ist in [MOBILE_BESTAETIGUNG.md](./MOBILE_BES
 - Benachrichtigungseinstellungen und lokale Test-Benachrichtigung
 - Feedback mit synthetischer Fallnummer
 - Originalnahe Dokumente sowie PDF-/Druck-, XLSX- und CSV-Exporte
+- kaufmännische Projekt-Rohwerte, manuelle Kosten, Eingangsrechnungszuordnung und geschriebene Rechnungen
+- dynamische Wochenplanungs- und Projekt-Unterkonto-Exporte aus dem aktuellen Demo-Zustand
 
 Die neuen Abläufe und ihre Grenzen stehen in [ERWEITERTE_WORKFLOWS_V10.md](./ERWEITERTE_WORKFLOWS_V10.md).
+
+Der vollständige interne Praxistest mit 34 Bedienfällen ist in [VIDEO_CALL_QA.md](./VIDEO_CALL_QA.md) dokumentiert.
 
 ## Echtbetrieb erfordert noch
 
@@ -55,4 +60,3 @@ Noch nicht entschiedene Geschäftsregeln – darunter Fahrzeit, Überstunden, Ma
 OCR und KI, produktiver Rechnungseingang, echte Dateiablage, rechtswirksame Freigaben, echter Web Push sowie direkte Excel-Integration bleiben ausdrücklich zurückgestellt. Aufmaßformeln werden nicht erfunden.
 
 Öffentliche Ansicht: https://rvfxghpjnm-a11y.github.io/maler-meyer-demo/
-

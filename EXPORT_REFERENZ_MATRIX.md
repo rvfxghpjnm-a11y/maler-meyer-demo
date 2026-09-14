@@ -56,4 +56,3 @@ Die QR-/Fragemarker IMG_9297, IMG_9313 und IMG_9316 sind bewusst keine Exportvor
 ## Verbindliche Grenzen
 
 Die Demo schreibt niemals in eine bestehende Excel-Arbeitsmappe. Sie erzeugt ausschließlich neue Exportdateien. Fahrzeitvergütung, 40/45/60-Minuten-Regeln, Überstunden, Rüstzeit, Lohn, Nachtarbeit, rechtliche Unterschriftswirkung, automatische Rechnungsfreigabe und malerfachliche Aufmaßformeln werden nicht erfunden.
-

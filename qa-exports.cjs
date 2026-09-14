@@ -16,7 +16,8 @@ fs.mkdirSync(outputDir, { recursive: true });
   await page.goto(url, { waitUntil: 'networkidle' });
   await page.evaluate(() => localStorage.clear());
   await page.reload({ waitUntil: 'networkidle' });
-  await page.locator('button[data-action="navigate"][data-view="exports"]:visible').click();
+  await page.locator('.profile-button:visible').click();
+  await page.locator('button[data-action="navigate"][data-view="exports"]:visible').first().click();
   await page.getByRole('heading', { name: 'Dokumente & Exporte', exact: true }).waitFor();
 
   for (const action of ['xlsx-planning', 'xlsx-calculation', 'xlsx-project', 'xlsx-invoices', 'csv-times', 'csv-invoices']) {
@@ -49,4 +50,3 @@ fs.mkdirSync(outputDir, { recursive: true });
   console.error(error);
   process.exitCode = 1;
 });
-
