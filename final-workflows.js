@@ -14,6 +14,19 @@
   function iso(date) { return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0'); }
   function dateFor(plan, dayIndex) { const d = new Date(plan.monday + 'T12:00:00'); d.setDate(d.getDate() + dayIndex); return iso(d); }
   function dateLabel(plan, dayIndex) { const d = new Date(dateFor(plan, dayIndex) + 'T12:00:00'); return String(d.getDate()).padStart(2, '0') + '.' + String(d.getMonth() + 1).padStart(2, '0') + '.'; }
+  function currentCalendarWeek() {
+    const now = new Date();
+    const date = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+    date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay() || 7));
+    const year = date.getUTCFullYear();
+    const yearStart = new Date(Date.UTC(year, 0, 1));
+    return { week: Math.ceil((((date - yearStart) / 86400000) + 1) / 7), year: year, today: now.toLocaleDateString('de-DE') };
+  }
+  function weekRange(p) {
+    const firstYear = new Date(dateFor(p, 0) + 'T12:00:00').getFullYear();
+    const lastYear = new Date(dateFor(p, 5) + 'T12:00:00').getFullYear();
+    return dateLabel(p, 0) + (firstYear === lastYear ? '' : firstYear) + '–' + dateLabel(p, 5) + lastYear;
+  }
   function employee(db, id) { return db.employees.find(function (x) { return x.id === id; }); }
   function project(db, number) { return db.sites.find(function (x) { return x.number === number; }); }
   function plan(db, week) { return db.weekPlans.find(function (x) { return x.week === Number(week); }); }
@@ -68,6 +81,7 @@
 
   function renderPlanning(db, ctx) {
     const p = plan(db, ctx.ui.planningWeek) || db.weekPlans[db.weekPlans.length - 1];
+    const currentWeek = currentCalendarWeek();
     const rows = activeRows(db, p);
     const byGroup = function (group) {
       const list = rows.filter(function (row) { return row.group === group; });
@@ -87,7 +101,7 @@
       '<p class="decision-note"><strong>Bedienbare Demo:</strong> Entwurf / veröffentlicht, Vorwoche kopieren, Mehrfachzuweisung sowie Schule/Fortbildung sind Demo-Vorschläge. Genehmigter Urlaub bleibt sichtbar.</p>' +
       '<div class="toolbar"><span><strong>' + (p.status === 'PUBLISHED' ? 'Veröffentlicht' : 'Entwurf · Änderungen noch nicht veröffentlicht') + '</strong><small>' + h(p.publishedAt || '') + '</small></span><div class="form-actions"><button class="secondary" data-action="new-plan-week">Neue Woche planen</button><button class="primary" data-action="publish-plan" data-week="' + p.week + '" ' + (p.status === 'PUBLISHED' ? 'disabled' : '') + '>Planung veröffentlichen</button><button class="secondary" data-mm-action="xlsx-planning">XLSX</button><button class="secondary" data-mm-action="print" data-template="planning" data-week="' + p.week + '">PDF / Druck</button></div></div>' +
       '<section class="card card-pad week-matrix editable-week"><div class="section-title"><h2>Wochenplanung 2026 · KW ' + p.week + '</h2><div class="filter-row">' + db.weekPlans.map(function (x) { return '<button class="filter-button ' + (x.week === p.week ? 'active' : '') + '" data-action="planning-week" data-week="' + x.week + '">KW ' + x.week + '</button>'; }).join('') + '</div></div><p class="mobile-plan-hint">Tabelle seitlich wischen: Bau-Nr. und Baustellenname stehen gemeinsam in jeder Tageszelle.</p><div class="table-scroll"><table><thead><tr><th>Nr.</th><th>Mitarbeiter</th>' + DAYS.map(function (day, index) { return '<th>' + day + '<small>' + dateLabel(p, index) + '</small></th>'; }).join('') + '</tr></thead><tbody>' + byGroup('Mitarbeiter') + byGroup('Auszubildende / Praktikum') + byGroup('Subunternehmer') + '</tbody></table></div></section>' +
-      '<section class="card card-pad section batch-planning"><div class="section-title"><div><h2>Kolonne oder mehrere Tage planen</h2><p>Demo-Vorschlag für wenige Klicks.</p></div></div><form data-form="plan-batch"><input type="hidden" name="week" value="' + p.week + '"><fieldset><legend>Mitarbeiter</legend><div class="plan-check-grid">' + employeeChecks + '</div></fieldset><fieldset><legend>Tage</legend><div class="plan-check-grid days">' + dayChecks + '</div></fieldset><div class="form-grid"><label>Zuweisung<select name="value">' + planValueOptions(db, '') + '</select></label><label>Grund – optional<input name="reason" placeholder="z. B. Terminverschiebung"></label></div><button class="primary">Auf Auswahl anwenden</button></form></section>' +
+      '<section class="card card-pad section batch-planning"><div class="section-title"><div><h2>Kolonne oder mehrere Tage planen · KW ' + p.week + '</h2><p>Demo-Vorschlag für wenige Klicks.</p></div></div><div class="batch-week-context"><strong>Aktuelle Kalenderwoche: KW ' + currentWeek.week + ' / ' + currentWeek.year + '</strong><small>Stand ' + h(currentWeek.today) + ' · laut diesem Gerät</small></div><form data-form="plan-batch"><label class="batch-week-select">Kalenderwoche für diese Planung<select name="week" data-batch-plan-week required>' + db.weekPlans.map(function (x) { return '<option value="' + x.week + '" ' + (x.week === p.week ? 'selected' : '') + '>KW ' + x.week + ' · ' + h(weekRange(x)) + '</option>'; }).join('') + '</select></label><p class="batch-week-selected">Ausgewählt: <strong>KW ' + p.week + ' · ' + h(weekRange(p)) + '</strong>. Die Wochenmatrix oben zeigt dieselbe KW.</p><fieldset><legend>Mitarbeiter</legend><div class="plan-check-grid">' + employeeChecks + '</div></fieldset><fieldset><legend>Tage</legend><div class="plan-check-grid days">' + dayChecks + '</div></fieldset><div class="form-grid"><label>Zuweisung<select name="value">' + planValueOptions(db, '') + '</select></label><label>Grund – optional<input name="reason" placeholder="z. B. Terminverschiebung"></label></div><button class="primary">Auf Auswahl anwenden</button></form></section>' +
       '<section class="section"><div class="section-title"><h2>Änderungsverlauf KW ' + p.week + '</h2><span class="meta">' + changes.length + ' letzte Änderungen</span></div><div class="list">' + (changes.map(function (x) { return '<article class="audit-box"><strong>' + h(x.employeeName) + ' · ' + h(DAYS[x.day]) + ': ' + h(projectLabel(db, x.before)) + ' → ' + h(projectLabel(db, x.after)) + '</strong><small>' + h(x.changedBy) + ' · ' + h(x.changedAt) + (x.reason ? ' · ' + h(x.reason) : '') + '</small></article>'; }).join('') || '<div class="empty-note">Noch keine Änderung an dieser Woche.</div>') + '</div></section>';
   }
 

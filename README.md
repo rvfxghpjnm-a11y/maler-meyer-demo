@@ -8,6 +8,8 @@ Vier Perspektiven sind bedienbar: Geschäftsführung, Büro, Vorarbeiter und Mit
 
 In der Wochenmatrix werden Bau-Nr. und Baustellenname gemeinsam angezeigt. Die mobile Mitarbeiterauswahl für Kolonnen-/Mehrtagesplanung ist ohne überlappende Checkboxen oder Namen bedienbar; die breite Wochenmatrix wird auf Smartphones seitlich gewischt.
 
+Die Kolonnen-/Mehrtagesplanung zeigt die laut Gerätedatum aktuelle Kalenderwoche als Orientierung. Die zu bearbeitende KW wird ausdrücklich ausgewählt und zusammen mit ihrem Datumsbereich angezeigt; beim Wechsel zeigt die Wochenmatrix dieselbe KW. Andere Wochen werden nur als KW mit Datum bezeichnet, nicht relativ als „nächste Woche“.
+
 ## Betriebsverwaltung und Büro-Hilfe
 
 Torben, Steffen und die beiden vollständig synthetischen Büro-Demokonten besitzen in Demo-Version 11 dieselbe umfangreiche Verwaltungsansicht. Dort können sie Projekte anlegen und bearbeiten, Mitarbeiter anlegen und bearbeiten, Planung unterstützen sowie Mitarbeiter oder Projekte deaktivieren und wieder aktivieren. „Entfernen“ ist bewusst als nachvollziehbare Deaktivierung umgesetzt: Zeitdaten, Dokumente und Änderungsverläufe bleiben erhalten.

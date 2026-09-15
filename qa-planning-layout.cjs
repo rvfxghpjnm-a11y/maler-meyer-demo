@@ -31,11 +31,34 @@ const url = process.env.DEMO_URL || 'http://127.0.0.1:4175/';
       assert.ok((await cell.locator('.planning-site-name').textContent()).trim().length > 2, `Baustellenname fehlt bei ${width}px`);
       assert.ok((await cell.getAttribute('title')).includes('26-102'));
 
+      const weekSelect = page.locator('form[data-form="plan-batch"] select[name="week"]');
+      assert.equal(await weekSelect.inputValue(), '37', 'Planungsbox muss die angezeigte KW vorauswählen');
+      const optionLabels = await weekSelect.locator('option').allTextContents();
+      assert.ok(optionLabels.length >= 5 && optionLabels.every(text => /^KW \d+ · \d{2}\.\d{2}\.–\d{2}\.\d{2}\.\d{4}$/.test(text)), 'Nur KW und Datumsbereich, keine relativen Wochenbegriffe');
+      assert.match(await page.locator('.batch-week-context strong').textContent(), /^Aktuelle Kalenderwoche: KW \d+ \/ \d{4}$/);
+      assert.match(await page.locator('.batch-week-selected').textContent(), /Ausgewählt: KW 37/);
+
       if (width === 390) {
         await checkbox.locator('input').check();
         assert.equal(await checkbox.locator('input').isChecked(), true, 'Mobile Mitarbeiterauswahl muss bedienbar sein');
         await checkbox.scrollIntoViewIfNeeded();
         await page.screenshot({ path: path.join(os.tmpdir(), 'maler-meyer-planning-layout-390.png') });
+        await weekSelect.scrollIntoViewIfNeeded();
+        await page.screenshot({ path: path.join(os.tmpdir(), 'maler-meyer-batch-week-390.png') });
+
+        await weekSelect.selectOption('38');
+        await page.getByRole('heading', { name: 'Kolonne oder mehrere Tage planen · KW 38' }).waitFor();
+        assert.equal(await page.locator('form[data-form="plan-batch"] select[name="week"]').inputValue(), '38');
+        assert.equal(await page.locator('form[data-form="plan-batch"] input[name="employee"][value="M-0001"]').isChecked(), true, 'Mitarbeiterwahl bleibt beim KW-Wechsel erhalten');
+        assert.match(await page.locator('.batch-week-selected').textContent(), /Ausgewählt: KW 38/);
+        await page.getByRole('heading', { name: 'Wochenplanung 2026 · KW 38' }).waitFor();
+        await page.locator('form[data-form="plan-batch"] input[name="employee"][value="M-0001"]').check();
+        await page.locator('form[data-form="plan-batch"] input[name="day"][value="0"]').check();
+        await page.locator('form[data-form="plan-batch"] select[name="value"]').selectOption('26-103');
+        await page.locator('form[data-form="plan-batch"] button.primary').click();
+        const data = await page.evaluate(() => JSON.parse(localStorage.getItem('maler-meyer-demo-v11')).data);
+        assert.equal(data.weekPlans.find(x => x.week === 38).rows.find(x => x.employeeId === 'M-0001').values[0], '26-103');
+        assert.notEqual(data.weekPlans.find(x => x.week === 37).rows.find(x => x.employeeId === 'M-0001').values[0], '26-103', 'Andere KW darf nicht verändert werden');
       }
 
       const pageWidth = await page.evaluate(() => document.documentElement.scrollWidth);

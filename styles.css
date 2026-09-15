@@ -485,6 +485,11 @@ legend { margin-bottom: .65rem; color: var(--navy); font-weight: 900; }
 .plan-check-grid label { min-width: 0; }
 .plan-check-grid label span { min-width: 0; overflow-wrap: anywhere; }
 .plan-check-grid input[type="checkbox"] { flex: 0 0 22px; width: 22px; height: 22px; min-height: 22px; margin: 0; padding: 0; border-radius: 5px; }
+.batch-week-context { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; margin: 2px 0 16px; padding: 11px 13px; background: #edf7ef; border: 1px solid #c2dfc7; border-radius: 9px; color: var(--navy); }
+.batch-week-context small { color: var(--muted); }
+.batch-week-select { display: block; margin-bottom: 6px; }
+.batch-week-selected { margin: 0 0 18px; font-size: .87rem; color: var(--muted); }
+.batch-week-selected strong { color: var(--navy); }
 @media (max-width: 560px) {
   .mobile-plan-hint { display: block; }
   .plan-check-grid:not(.days) { grid-template-columns: minmax(0, 1fr); }

@@ -650,6 +650,25 @@ app.addEventListener('input', function (event) {
 });
 
 app.addEventListener('change', function (event) {
+  if (event.target.matches('[data-batch-plan-week]')) {
+    const oldForm = event.target.closest('form');
+    const selectedEmployees = new Set(Array.from(oldForm.querySelectorAll('input[name="employee"]:checked'), input => input.value));
+    const selectedDays = new Set(Array.from(oldForm.querySelectorAll('input[name="day"]:checked'), input => input.value));
+    const assignment = oldForm.querySelector('select[name="value"]').value;
+    const reason = oldForm.querySelector('input[name="reason"]').value;
+    ui.planningWeek = Number(event.target.value);
+    render();
+    const select = app.querySelector('[data-batch-plan-week]');
+    const newForm = select && select.closest('form');
+    if (newForm) {
+      newForm.querySelectorAll('input[name="employee"]').forEach(input => { input.checked = selectedEmployees.has(input.value); });
+      newForm.querySelectorAll('input[name="day"]').forEach(input => { input.checked = selectedDays.has(input.value); });
+      newForm.querySelector('select[name="value"]').value = assignment;
+      newForm.querySelector('input[name="reason"]').value = reason;
+    }
+    if (select) { select.focus({ preventScroll: true }); select.scrollIntoView({ block: 'nearest' }); }
+    return;
+  }
   if (!event.target.matches('[data-local-photo]')) return;
   const file = event.target.files && event.target.files[0];
   const preview = event.target.closest('form').querySelector('[data-photo-preview]');
