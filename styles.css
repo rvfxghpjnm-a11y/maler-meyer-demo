@@ -476,3 +476,17 @@ legend { margin-bottom: .65rem; color: var(--navy); font-weight: 900; }
 .management-quick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:0 0 18px}.planning-cell{width:100%;min-width:124px;min-height:58px;padding:8px;border:0;border-radius:7px;background:transparent;color:inherit;text-align:left;cursor:pointer}.planning-cell:hover,.planning-cell:focus-visible{outline:2px solid var(--green);outline-offset:-2px;background:rgba(255,255,255,.65)}.planning-cell strong,.planning-cell small{display:block}.planning-cell small{margin-top:4px;color:var(--muted);font-size:.72rem}.editable-week td{padding:0}.plan-check-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.plan-check-grid.days{grid-template-columns:repeat(6,minmax(0,1fr))}.plan-check-grid label{display:flex;gap:8px;align-items:center;min-height:42px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff}.batch-planning fieldset{margin:0 0 16px;padding:12px;border:1px solid var(--line);border-radius:10px}.batch-planning legend{padding:0 7px;font-weight:700}.commercial-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:15px 0}.commercial-metrics div{padding:12px;border:1px solid var(--line);border-radius:9px;background:#f8faf9}.commercial-metrics small,.commercial-metrics strong{display:block}.commercial-metrics strong{margin-top:5px;color:var(--navy)}.commercial-columns{display:grid;grid-template-columns:1.35fr 1fr;gap:20px}.cost-row{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid var(--line)}.cost-row span,.cost-row small{display:block}.cost-row>strong{white-space:nowrap}.my-week-days{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}.my-week-days>div{min-height:82px;padding:10px;border:1px solid var(--line);border-radius:9px}.my-week-days small,.my-week-days strong{display:block}.my-week-days strong{margin-top:7px}
 @media (max-width:900px){.management-quick,.commercial-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.plan-check-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.plan-check-grid.days,.my-week-days{grid-template-columns:repeat(3,minmax(0,1fr))}.commercial-columns{grid-template-columns:1fr}}
 @media (max-width:560px){.management-quick{grid-template-columns:1fr 1fr}.commercial-metrics,.plan-check-grid,.plan-check-grid.days,.my-week-days{grid-template-columns:1fr 1fr}.planning-cell{min-width:112px}}
+
+/* Wochenplanung: Bau-Nr. und Baustellenname bleiben auch in der mobilen Matrix lesbar. */
+.editable-week table { min-width: 1450px; }
+.editable-week .planning-cell { min-width: 166px; }
+.planning-site-name { display: block; margin-top: 3px; font-size: .8rem; font-weight: 600; line-height: 1.25; overflow-wrap: anywhere; }
+.mobile-plan-hint { display: none; color: var(--muted); font-size: .83rem; margin: -3px 0 11px; }
+.plan-check-grid label { min-width: 0; }
+.plan-check-grid label span { min-width: 0; overflow-wrap: anywhere; }
+.plan-check-grid input[type="checkbox"] { flex: 0 0 22px; width: 22px; height: 22px; min-height: 22px; margin: 0; padding: 0; border-radius: 5px; }
+@media (max-width: 560px) {
+  .mobile-plan-hint { display: block; }
+  .plan-check-grid:not(.days) { grid-template-columns: minmax(0, 1fr); }
+  .plan-check-grid.days { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
