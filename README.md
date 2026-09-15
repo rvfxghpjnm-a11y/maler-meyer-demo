@@ -4,15 +4,17 @@
 
 Die Demo hat kein Backend, keine echte Anmeldung und keine Verbindung zu Maler Meyer. Eingaben und Statusänderungen werden ausschließlich lokal im jeweiligen Browser gespeichert und können über „Demo zurücksetzen“ vollständig verworfen werden.
 
-Vier Perspektiven sind bedienbar: Geschäftsführung, Büro, Vorarbeiter und Mitarbeiter. Planung, Zeitereignisse, Korrekturen, Zusatzarbeiten, Baustellenmappe und Wochenzettel verwenden einen gemeinsamen synthetischen Demo-Zustand. Der erweiterte Datensatz umfasst mehrere editierbare Planungswochen und einen synthetischen Arbeitszeitverlauf vom 3. August bis 11. September 2026. Aktueller Stand ist Demo-Version 11.
+Vier Perspektiven sind bedienbar: Geschäftsführung, Büro, Vorarbeiter und Mitarbeiter. Planung, Zeitereignisse, Korrekturen, Zusatzarbeiten, Baustellenmappe und Wochenzettel verwenden einen gemeinsamen synthetischen Demo-Zustand. Der erweiterte Datensatz umfasst mehrere editierbare Planungswochen und einen synthetischen Arbeitszeitverlauf vom 3. August bis 11. September 2026. Aktueller Stand ist Demo-Version 12.
 
 In der Wochenmatrix werden Bau-Nr. und Baustellenname gemeinsam angezeigt. Die mobile Mitarbeiterauswahl für Kolonnen-/Mehrtagesplanung ist ohne überlappende Checkboxen oder Namen bedienbar; die breite Wochenmatrix wird auf Smartphones seitlich gewischt.
 
 Die Kolonnen-/Mehrtagesplanung zeigt die laut Gerätedatum aktuelle Kalenderwoche als Orientierung. Die zu bearbeitende KW wird ausdrücklich ausgewählt und zusammen mit ihrem Datumsbereich angezeigt; beim Wechsel zeigt die Wochenmatrix dieselbe KW. Andere Wochen werden nur als KW mit Datum bezeichnet, nicht relativ als „nächste Woche“.
 
+Demo-Version 12 erweitert die Projektanlage: Der editierbare Bau-Nr.-Vorschlag folgt der höchsten vorhandenen Nummer des Gerätejahres; auch archivierte Projekte zählen mit. In einem neuen Kalenderjahr beginnt die Demo bei `JJ-001`. Zusätzlich zu den Grunddaten können Einsatzzeitraum, Baustellenleitung, Zugang, Leistungsumfang, weitere Aufgaben, Materialhinweise sowie interne und kaufmännische Eckdaten erfasst und später bearbeitet werden. Dies ist keine produktive Nummernreservierung; die Bau-Nr. bestehender verknüpfter Projekte wird nicht still geändert.
+
 ## Betriebsverwaltung und Büro-Hilfe
 
-Torben, Steffen und die beiden vollständig synthetischen Büro-Demokonten besitzen in Demo-Version 11 dieselbe umfangreiche Verwaltungsansicht. Dort können sie Projekte anlegen und bearbeiten, Mitarbeiter anlegen und bearbeiten, Planung unterstützen sowie Mitarbeiter oder Projekte deaktivieren und wieder aktivieren. „Entfernen“ ist bewusst als nachvollziehbare Deaktivierung umgesetzt: Zeitdaten, Dokumente und Änderungsverläufe bleiben erhalten.
+Torben, Steffen und die beiden vollständig synthetischen Büro-Demokonten besitzen in Demo-Version 12 dieselbe umfangreiche Verwaltungsansicht. Dort können sie Projekte anlegen und bearbeiten, Mitarbeiter anlegen und bearbeiten, Planung unterstützen sowie Mitarbeiter oder Projekte deaktivieren und wieder aktivieren. „Entfernen“ ist bewusst als nachvollziehbare Deaktivierung umgesetzt: Zeitdaten, Dokumente und Änderungsverläufe bleiben erhalten.
 
 Wenn ein Mitarbeiter sein Smartphone nicht dabeihat oder Hilfe benötigt, kann das Büro eine aktuelle Zeitaktion stellvertretend auslösen. Die Demo speichert dabei getrennt, welcher Mitarbeiter betroffen ist, welches Verwaltungskonto gehandelt hat, wann die Aktion erfolgte und welcher Grund angegeben wurde. Rückwirkende Änderungen laufen weiterhin über den Korrekturprozess.
 

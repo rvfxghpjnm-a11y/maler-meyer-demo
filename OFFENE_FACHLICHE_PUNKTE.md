@@ -18,7 +18,7 @@ Diese Fragen sind durch die Bedienungsdemo nicht entschieden. Demo-Annahmen dür
 14. „Rechnung schreiben?“: endgültige Status, Verantwortlicher und Abschlusskriterium
 15. OCR: Teil der ersten Produktivversion oder später
 16. Original-Excel: Dateien, Formeln und Zellverknüpfungen stehen noch aus
-17. Bau-Nr.: Zeitpunkt der Vergabe und Änderbarkeit
+17. Bau-Nr.: Der Nutzer wünscht einen editierbaren Vorschlag aus Jahr und fortlaufender Nummer (Demo: `JJ-NNN`, neues Jahr beginnt mit `001`). Offen bleiben endgültiger Nummernaufbau, Zeitpunkt der verbindlichen Vergabe/Reservierung, parallele Projektanlagen und ob/wie eine bereits verknüpfte Bau-Nr. später geändert werden darf.
 18. Betriebsrat und Mitbestimmung
 19. Aufbewahrung und Löschfristen
 20. Betreiber, AVV und Datenschutzverantwortung

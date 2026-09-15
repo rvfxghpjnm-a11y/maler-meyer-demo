@@ -89,10 +89,10 @@ async function openAdmin(page) {
 
     await openAdmin(page);
     const project = page.locator('details.admin-record').filter({ hasText: '26-107' });
-    await project.locator('summary').click();
+    await project.locator(':scope > summary').click();
     await project.getByRole('button', { name: 'Archivieren' }).click();
     await page.getByText(/26-107 wurde archiviert/).waitFor();
-    await project.locator('summary').click();
+    await project.locator(':scope > summary').click();
     await project.getByRole('button', { name: 'Reaktivieren' }).click();
     checks.push('Projekt bearbeiten, archivieren und reaktivieren');
 

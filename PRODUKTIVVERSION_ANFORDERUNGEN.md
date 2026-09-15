@@ -154,3 +154,7 @@ Die Demo erfasst sichere Rohpositionen und bildet ausschließlich Kategoriesumme
 ## 26. Planungs- und Unterkontoexporte
 
 Demo-Exporte verwenden den aktuellen lokalen Zustand. Produktiv müssen Exporte serverseitig reproduzierbar, versioniert und eindeutig einem Datenstand zugeordnet sein. Gleichzeitige Änderungen während eines Exports, Berechtigungen, Vorlagenversionen und die spätere Analyse der Original-XLSX sind gesondert zu lösen.
+
+## 27. Projektstammdaten und Bau-Nr.-Vergabe
+
+Die Demo zeigt weitere editierbare Projektfelder und einen lokalen, vor dem Speichern änderbaren Nummernvorschlag. Produktiv braucht es ein validiertes Projektstammdatenmodell, serverseitige Rollenprüfung, Audit für Feldänderungen und Sichtbarkeitsgrenzen für interne/kaufmännische Angaben. Die Nummer muss serverseitig eindeutig und bei parallelen Anlagen transaktional vergeben oder reserviert werden; Jahreswechsel und Kollisionen sind zu testen. Gerätejahr und localStorage dürfen weder Nummernautorität noch produktiver Datenbestand sein. Schema, Vergabephase und eine mögliche spätere Umnummerierung verknüpfter Projekte bleiben fachlich offen.

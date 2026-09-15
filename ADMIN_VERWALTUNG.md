@@ -1,6 +1,6 @@
 # Betriebsverwaltung und direkte Büro-Hilfe
 
-Verwaltungsmeilenstein: Demo-Version 9 vom 12. September 2026; in Demo-Version 10 unverändert enthalten.
+Verwaltungsmeilenstein: Demo-Version 9 vom 12. September 2026; Projektanlage in Demo-Version 12 erweitert.
 
 Alle Daten und Namen in diesem Dokument und in der öffentlichen Demo sind synthetisch. Die beiden Büro-Demokonten „Sabine Beispiel“ und „Tina Demo“ stehen ausschließlich für die zwei noch nicht namentlich festgelegten Bürokräfte.
 
@@ -32,6 +32,14 @@ Alle vier können in der Demo:
 - Zusatzarbeiten und Dokumentation prüfen,
 - Dokumente und Exporte aufrufen,
 - den Änderungsverlauf einsehen.
+
+## Projektanlage und Bau-Nr.-Vorschlag
+
+Die Bau-Nr. wird beim Öffnen des Formulars aus dem Gerätejahr und der höchsten vorhandenen Nummer desselben Jahres vorgeschlagen. Archivierte Projekte bleiben berücksichtigt. Beispiel: nach `26-106` folgt `26-107`; im ersten Projekt des Kalenderjahres 2027 erscheint `27-001`. Das Feld ist vor dem Speichern frei editierbar, eine doppelte Nummer wird abgewiesen. `JJ-NNN` ist die Demo-Darstellung der Nutzerbeschreibung; der endgültige produktive Nummernprozess bleibt offen.
+
+Optionale Felder ergänzen geplanten Zeitraum, Baustellenleitung, Zugang, Leistungsumfang, weitere Aufgaben, Materialhinweise, synthetischen Auftragswert netto, Soll-Stunden, Abrechnungshinweis und interne Büro-Notiz. Diese Angaben sind später in „Projektstammdaten“ bearbeitbar. Interne/kaufmännische Angaben sind nicht Teil der Mitarbeiteransicht. Geplante Materialhinweise ersetzen keine Materialbuchung, weitere geplante Aufgaben keine bestätigte Zusatzarbeit.
+
+Die Nummer eines bestehenden Projekts bleibt im Bearbeitungsformular fest. Ein späterer Nummernwechsel mit verknüpften Vorgängen erfordert einen gesonderten fachlichen und technischen Prozess.
 
 ## Entfernen bedeutet Deaktivieren
 
