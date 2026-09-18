@@ -94,7 +94,7 @@ Diese Datei trennt die bedienbare öffentliche Demo von der echten Maler-Meyer-A
 
 ## 13. Excel
 
-Die vier bereitgestellten Original-Arbeitsmappen wurden lokal und nur strukturell gelesen. Eine zentrale Bauliste mit vielen Bau-Nr.-Projektblättern, getrennte Wochenblätter, ein Urlaubsplaner und eine separate Kostenübersicht sind beobachtet. In der Bauliste sind Gesamtkosten, geschriebene Rechnungen und Ergebnis als getrennte Nachbarspalten sowie Blattbezüge sichtbar. Das beweist nicht, dass deren bestehende Formeln als Regeln der neuen App übernommen werden sollen. Noch nötig: vollständiger zellgenauer Audit von Formeln, Zellbezügen, Summen, benannten/versteckten Bereichen, bedingter Formatierung, Druckbereichen und Hauptliste-Projektblatt-Verknüpfungen; danach fachliche Freigabe. Keine Originaldaten oder Fixwerte in der öffentlichen Demo.
+Die vier bereitgestellten Original-Arbeitsmappen wurden lokal analysiert. Die Bauliste enthält 200 Blätter und nachweisbare Formeln und Blattbezüge für Stunden, Material, weitere Kosten, Rechnungen, Gesamtkosten, Ergebnis und Stundenwerte. Eine einheitliche Variante ist mit synthetischen Werten in App und Export umgesetzt; private Fixwerte wurden ersetzt. Die Wochenplanung besitzt 54 Wochenblätter, der Urlaubsplaner drei Blätter und die Kostenübersicht zwei. Noch nötig: vollständiger zellgenauer Audit aller Varianten und Eingaben, Übernahme der benötigten Urlaubs-/Kostenübersichten, Vergleich von benannten/versteckten Bereichen, bedingter Formatierung, Druckbereichen und Verknüpfungen sowie fachliche Freigabe der künftigen Rechenregeln. Ein Demo-XLSX ist weder eine Kopie noch ein Ersatz der privaten Originaldatei. Details: `EXCEL_QUELLABGLEICH.md`.
 
 ## 14. Produktive Exporte
 

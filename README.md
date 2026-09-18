@@ -4,7 +4,7 @@
 
 Die Demo hat kein Backend, keine echte Anmeldung und keine Verbindung zu Maler Meyer. Eingaben und Statusänderungen werden ausschließlich lokal im jeweiligen Browser gespeichert und können über „Demo zurücksetzen“ vollständig verworfen werden.
 
-Vier Perspektiven sind bedienbar: Geschäftsführung, Büro, Vorarbeiter und Mitarbeiter. Planung, Zeitereignisse, Korrekturen, Zusatzarbeiten, Baustellenmappe und Wochenzettel verwenden einen gemeinsamen synthetischen Demo-Zustand. Der erweiterte Datensatz umfasst mehrere editierbare Planungswochen und einen synthetischen Arbeitszeitverlauf vom 3. August bis 11. September 2026. Aktueller Stand ist Demo-Version 12.
+Vier Perspektiven sind bedienbar: Geschäftsführung, Büro, Vorarbeiter und Mitarbeiter. Planung, Zeitereignisse, Korrekturen, Zusatzarbeiten, Baustellenmappe und Wochenzettel verwenden einen gemeinsamen synthetischen Demo-Zustand. Der erweiterte Datensatz umfasst mehrere editierbare Planungswochen und einen synthetischen Arbeitszeitverlauf vom 3. August bis 11. September 2026. Aktueller Stand ist Demo-Version 13.
 
 In der Wochenmatrix werden Bau-Nr. und Baustellenname gemeinsam angezeigt. Die mobile Mitarbeiterauswahl für Kolonnen-/Mehrtagesplanung ist ohne überlappende Checkboxen oder Namen bedienbar; die breite Wochenmatrix wird auf Smartphones seitlich gewischt.
 
@@ -22,7 +22,7 @@ Der beantwortete Vorab-Fragebogen bestätigt die umfangreiche Verwaltungsrolle d
 
 Unter „Dokumente & Exporte“ und in der jeweiligen Baustellenmappe stehen originalnah gestaltete Druckansichten für Arbeitszeitnachweis, Arbeitszettel, Materialanforderung, Materialeinsatz, Tageslohnnachweis, Aufmaß, Baubesprechungsprotokoll, Urlaubsantrag und Angebot bereit. Hinzu kommen XLSX-Exporte für Wochenplanung, Bauliste/Nachkalkulation, Projekt-Unterkonto und „Rechnung schreiben?“ sowie CSV-Ausgaben für Zeitdaten und die Rechnungsliste. Die Demo erzeugt ausschließlich neue Dateien und schreibt nie in eine bestehende Excel-Arbeitsmappe.
 
-Die Referenzstruktur einschließlich eines datenschutzgerechten, strukturellen Abgleichs der inzwischen bereitgestellten Original-Arbeitsmappen steht in [EXPORT_REFERENZ_MATRIX.md](./EXPORT_REFERENZ_MATRIX.md). Weder Originaldateien noch echte Inhalte liegen im öffentlichen Repository. Es gibt keine automatische Lohn-, Überstunden-, Fahrzeit- oder Aufmaßbewertung.
+Die Bauliste und die Projekt-Unterkonten übernehmen jetzt mehrere tatsächlich beobachtete Formel- und Blattbeziehungen mit vollständig synthetischen Eingaben. App und XLSX verwenden dieselbe Demo-Rechnung; der private Kalkulationssatz ist durch einen ausdrücklich erfundenen Wert ersetzt. Der genaue Stand und die noch fehlenden Arbeitsmappen stehen in [EXCEL_QUELLABGLEICH.md](./EXCEL_QUELLABGLEICH.md). Die allgemeine Referenzstruktur steht in [EXPORT_REFERENZ_MATRIX.md](./EXPORT_REFERENZ_MATRIX.md). Weder Originaldateien noch echte Inhalte liegen im öffentlichen Repository. Es gibt keine automatische Lohn-, Überstunden-, Fahrzeit- oder Aufmaßbewertung.
 
 ## Mobile Bestätigungen
 
@@ -61,7 +61,7 @@ Der vollständige interne Praxistest mit 34 Bedienfällen ist in [VIDEO_CALL_QA.
 
 Authentifizierung, serverseitige Rechte, echte Offline-Synchronisierung, Dateiablage, Push, sichere PIN-Prüfung, produktive Exporte, Hosting, Backup/Restore, Datenschutz und weitere technische Anforderungen sind in [PRODUKTIVVERSION_ANFORDERUNGEN.md](./PRODUKTIVVERSION_ANFORDERUNGEN.md) festgehalten.
 
-Noch nicht entschiedene Geschäftsregeln – darunter genaue Fahrzeit-/Überstundenbewertung, Materialbewertung, Urlaubs-Sonderfälle und die fachliche Übernahme von Original-Excel-Formeln – stehen in [OFFENE_FACHLICHE_PUNKTE.md](./OFFENE_FACHLICHE_PUNKTE.md). Bestätigte Zielrichtungen und produktive Umsetzungslücken sind dort getrennt. Keine Demo-Annahme ist allein durch ihre Darstellung zur verbindlichen Betriebsregel geworden.
+Noch nicht entschiedene Geschäftsregeln – darunter genaue Fahrzeit-/Überstundenbewertung, Materialbewertung, Urlaubs-Sonderfälle und die fachliche Freigabe der nun teilweise bekannten Original-Excel-Rechenwege – stehen in [OFFENE_FACHLICHE_PUNKTE.md](./OFFENE_FACHLICHE_PUNKTE.md). Bestätigte Zielrichtungen und produktive Umsetzungslücken sind dort getrennt. Keine Demo-Annahme ist allein durch ihre Darstellung zur verbindlichen Betriebsregel geworden.
 
 OCR und KI, produktiver Rechnungseingang, echte Dateiablage, rechtswirksame Freigaben, echter Web Push sowie direkte Excel-Integration bleiben ausdrücklich zurückgestellt. Aufmaßformeln werden nicht erfunden.
 
