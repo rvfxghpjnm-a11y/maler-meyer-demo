@@ -130,6 +130,9 @@ async function assertClean(page, errors, external, label) {
       await page.locator('[data-action="select-shared-user"][data-id="M-0001"]').click();
       await page.locator('[name="pin"]').fill('123456');
       await page.getByRole('button', { name: 'Eigene Ansicht öffnen' }).click();
+      const sharedState = await page.evaluate(key => JSON.parse(localStorage.getItem(key)).data, storageKey);
+      assert.equal(sharedState.sharedDevice.autoLockMinutes, 5, 'Fahrzeuggerät: fünf Minuten Demo-Sperrzeit');
+      await page.getByText(/automatische Sperre nach 5 Minuten/).waitFor();
       await page.getByRole('button', { name: 'Benutzer wechseln' }).click();
       await page.getByRole('heading', { name: 'Gemeinsames Firmen-iPad' }).waitFor();
       await switchRole(page, 'management');
@@ -150,6 +153,11 @@ async function assertClean(page, errors, external, label) {
       await navigate(page, 'material');
       await page.locator('[data-action="material-status"][data-id="MATV-001"]').click();
       await page.getByText('In Bearbeitung', { exact: true }).first().waitFor();
+      await switchRole(page, 'office');
+      await navigate(page, 'leave');
+      assert.equal(await page.locator('form[data-form="leave-decision"]').count(), 0, 'Büro sieht Urlaubsanträge ohne Entscheidungsaktion');
+      await page.getByText(/endgültige Entscheidung trifft die Geschäftsführung/).first().waitFor();
+      await switchRole(page, 'management');
       await navigate(page, 'leave');
       await page.locator('form[data-form="leave-decision"][data-id="U-001"] [name="reason"]').fill('Synthetische Demo-Genehmigung.');
       await page.locator('form[data-form="leave-decision"][data-id="U-001"] button[value="APPROVED"]').click();

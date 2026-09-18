@@ -97,7 +97,7 @@
       extraQuestion: true
     };
     db.offlineSimulation = { offline: false, queue: [], lastSync: 'Noch keine Demo-Synchronisierung ausgeführt' };
-    db.sharedDevice = { deviceName: 'Fahrzeug-iPad Demo 01', registered: true, autoLockMinutes: 10, lastUserId: null };
+    db.sharedDevice = { deviceName: 'Fahrzeug-iPad Demo 01', registered: true, autoLockMinutes: 5, lastUserId: null };
     db.audit.unshift({ id: 'A-DEMO-V10', type: 'DEMO_SCOPE', entity: 'V10', title: 'Erweiterte Bedienungsabläufe vorbereitet', before: 'Export- und Kernabläufe', after: 'Foto/Sprache, Material, Urlaub, Fahrzeuggerät, Offline und Feedback', actor: 'System · synthetische Demo', time: '14.09.2026 · 09:00 Uhr', reason: 'Spätere fachliche Entscheidungen; keine Produktivarchitektur' });
     return db;
   };

@@ -1,6 +1,6 @@
 # Referenz- und Exportmatrix
 
-Stand: 12. September 2026  
+Stand: 18. September 2026  
 Quelle: Originalfotos des Vor-Ort-Termins, ausschließlich visuell ausgewertet  
 Datenschutz: Die Originalfotos, OCR-Rohtexte und darin enthaltene Echtinformationen sind nicht Bestandteil dieses Repositorys. Alle Ausgaben verwenden vollständig erfundene Beispieldaten.
 
@@ -55,4 +55,17 @@ Die QR-/Fragemarker IMG_9297, IMG_9313 und IMG_9316 sind bewusst keine Exportvor
 
 ## Verbindliche Grenzen
 
-Die Demo schreibt niemals in eine bestehende Excel-Arbeitsmappe. Sie erzeugt ausschließlich neue Exportdateien. Fahrzeitvergütung, 40/45/60-Minuten-Regeln, Überstunden, Rüstzeit, Lohn, Nachtarbeit, rechtliche Unterschriftswirkung, automatische Rechnungsfreigabe und malerfachliche Aufmaßformeln werden nicht erfunden.
+Die Demo schreibt niemals in eine bestehende Excel-Arbeitsmappe. Sie erzeugt ausschließlich neue Exportdateien. Fahrzeitvergütung, fallabhängige Fahrtgrenzen, Überstunden, Rüstzeit, Lohn, Nachtarbeit, rechtliche Unterschriftswirkung, automatische Rechnungsfreigabe und malerfachliche Aufmaßformeln werden nicht erfunden.
+
+## Ergänzender Strukturabgleich der bereitgestellten Arbeitsmappen
+
+Die vier Arbeitsmappen wurden lokal, lesend und ohne Übernahme von Inhalten ins Repository geprüft. Dieser Abgleich ergänzt die Foto-Referenz, ersetzt aber keine vollständige Excel-Migrationsanalyse.
+
+| Arbeitsmittel | sicher beobachtete Struktur | Konsequenz für die Demo |
+|---|---|---|
+| Jährliche Bau-Nr.-Liste | Hauptübersicht und zahlreiche nummerierte Projektblätter. Die Hauptliste trennt Soll-/Ist-/Fahrt-/Azubi-Stunden, mehrere Kostenarten, Gesamtkosten, geschriebene Rechnungen und Ergebnis. Blattbezüge verbinden Übersicht und Projektblätter. | Synthetische Hauptliste und Unterkonten bleiben getrennt, über Bau-Nr. verknüpft. Beobachtete historische Formeln werden nicht ohne Freigabe zu App-Regeln. |
+| Wochenplanung | Separate Wochenblätter mit Mitarbeitergruppen und Montag–Samstag-Matrix. | Die Demo hält eine editierbare KW-Matrix und exportiert ihren aktuellen synthetischen Zustand. |
+| Urlaubsplaner | Separate Jahresübersicht, einschließlich differenzierter Abwesenheiten. | Genehmigter Urlaub erscheint in der Planung; Sonderfälle und Anspruchsberechnung bleiben offen. |
+| Kostenübersichten | Separate Personal-/Betriebskostenübersicht, nicht bloß ein Projekt-Unterkonto. | Kein Nachbau mit Originalzahlen und keine automatische Übernahme in Wirtschaftlichkeitsformeln. |
+
+Der konkrete Spalten- und Formelaudit der Originaldateien bleibt ein eigener fachlich freizugebender Schritt. Der öffentliche Export enthält ausschließlich synthetische Daten.

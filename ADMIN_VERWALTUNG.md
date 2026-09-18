@@ -8,11 +8,11 @@ Alle Daten und Namen in diesem Dokument und in der öffentlichen Demo sind synth
 
 Im Vor-Ort-Meeting blieb die genaue Rechteverteilung zwischen Geschäftsführung und Büro offen. Am 12. September 2026 wurde für die Bedienungsdemo später festgelegt, dass Torben, Steffen und beide Bürokräfte möglichst umfangreiche typische Verwaltungsrechte erhalten und Mitarbeiter bei Geräte- oder Bedienproblemen direkt aus dem Büro unterstützen können.
 
-Dies ist eine spätere Projektentscheidung und wird nicht als Meeting-Beschluss bezeichnet.
+Der inzwischen beantwortete Vorab-Fragebogen bestätigt die umfangreiche Verwaltungsrolle des Büros für die genannten Kernaufgaben. Er grenzt jedoch die endgültige Urlaubsentscheidung auf die beiden Geschäftsführungsrollen ein. Die produktive Einzelrechte-Matrix und Vertretung bleiben zu spezifizieren.
 
 ## Vier umfangreiche Verwaltungskonten
 
-Die Demo stellt vier gleichberechtigte Verwaltungskonten bereit:
+Die Demo stellt vier umfangreiche Verwaltungskonten bereit:
 
 - Torben – Geschäftsführung · Admin
 - Steffen – Geschäftsführung · Admin
@@ -32,6 +32,8 @@ Alle vier können in der Demo:
 - Zusatzarbeiten und Dokumentation prüfen,
 - Dokumente und Exporte aufrufen,
 - den Änderungsverlauf einsehen.
+
+Urlaubsanträge sehen alle vier. Genehmigen oder Ablehnen können in der Bedienungsdemo nur die beiden Geschäftsführungsrollen. Büro kann vorbereiten, aber nicht final entscheiden. Diese Unterscheidung ist keine produktive Zugriffskontrolle: Sie muss im Echtbetrieb serverseitig erzwungen und auditiert werden.
 
 ## Projektanlage und Bau-Nr.-Vorschlag
 

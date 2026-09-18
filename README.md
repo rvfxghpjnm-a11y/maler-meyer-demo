@@ -18,11 +18,11 @@ Torben, Steffen und die beiden vollständig synthetischen Büro-Demokonten besit
 
 Wenn ein Mitarbeiter sein Smartphone nicht dabeihat oder Hilfe benötigt, kann das Büro eine aktuelle Zeitaktion stellvertretend auslösen. Die Demo speichert dabei getrennt, welcher Mitarbeiter betroffen ist, welches Verwaltungskonto gehandelt hat, wann die Aktion erfolgte und welcher Grund angegeben wurde. Rückwirkende Änderungen laufen weiterhin über den Korrekturprozess.
 
-Diese Gleichstellung der vier Verwaltungskonten ist eine spätere Projektentscheidung vom 12. September 2026 und kein rückwirkender Meeting-Beschluss. Die Namen der beiden Büro-Demokonten sind erfunden. Die statische Demo simuliert Bedienrechte nur im Browser; die echte Anwendung muss Anmeldung, Rollenrechte und Audit serverseitig erzwingen. Details stehen in [ADMIN_VERWALTUNG.md](./ADMIN_VERWALTUNG.md).
+Der beantwortete Vorab-Fragebogen bestätigt die umfangreiche Verwaltungsrolle des Büros, aber mit einer wichtigen Ausnahme: Urlaubsanträge kann das Büro einsehen und vorbereiten; die endgültige Entscheidung liegt bei den beiden Geschäftsführungsrollen. Das gemeinsame Fahrzeuggerät zeigt als Demo-Ziel fünf Minuten bis zur automatischen Sperre. Die Namen der Büro-Demokonten sind erfunden. Diese statische Demo simuliert Bedienrechte nur im Browser; die echte Anwendung muss Anmeldung, Rollenrechte, sichere PIN-Wiederherstellung und Audit serverseitig erzwingen. Details stehen in [ADMIN_VERWALTUNG.md](./ADMIN_VERWALTUNG.md).
 
 Unter „Dokumente & Exporte“ und in der jeweiligen Baustellenmappe stehen originalnah gestaltete Druckansichten für Arbeitszeitnachweis, Arbeitszettel, Materialanforderung, Materialeinsatz, Tageslohnnachweis, Aufmaß, Baubesprechungsprotokoll, Urlaubsantrag und Angebot bereit. Hinzu kommen XLSX-Exporte für Wochenplanung, Bauliste/Nachkalkulation, Projekt-Unterkonto und „Rechnung schreiben?“ sowie CSV-Ausgaben für Zeitdaten und die Rechnungsliste. Die Demo erzeugt ausschließlich neue Dateien und schreibt nie in eine bestehende Excel-Arbeitsmappe.
 
-Die Referenzstruktur und alle bewusst offenen Details sind in [EXPORT_REFERENZ_MATRIX.md](./EXPORT_REFERENZ_MATRIX.md) dokumentiert. Es gibt keine automatische Lohn-, Überstunden-, Fahrzeit- oder Aufmaßbewertung.
+Die Referenzstruktur einschließlich eines datenschutzgerechten, strukturellen Abgleichs der inzwischen bereitgestellten Original-Arbeitsmappen steht in [EXPORT_REFERENZ_MATRIX.md](./EXPORT_REFERENZ_MATRIX.md). Weder Originaldateien noch echte Inhalte liegen im öffentlichen Repository. Es gibt keine automatische Lohn-, Überstunden-, Fahrzeit- oder Aufmaßbewertung.
 
 ## Mobile Bestätigungen
 
@@ -61,7 +61,7 @@ Der vollständige interne Praxistest mit 34 Bedienfällen ist in [VIDEO_CALL_QA.
 
 Authentifizierung, serverseitige Rechte, echte Offline-Synchronisierung, Dateiablage, Push, sichere PIN-Prüfung, produktive Exporte, Hosting, Backup/Restore, Datenschutz und weitere technische Anforderungen sind in [PRODUKTIVVERSION_ANFORDERUNGEN.md](./PRODUKTIVVERSION_ANFORDERUNGEN.md) festgehalten.
 
-Noch nicht entschiedene Geschäftsregeln – darunter Fahrzeit, Überstunden, Materialbewertung, Urlaubsrechte, Offline-PIN und Original-Excel-Formeln – stehen in [OFFENE_FACHLICHE_PUNKTE.md](./OFFENE_FACHLICHE_PUNKTE.md). Keine Demo-Annahme ist allein durch ihre Darstellung zur verbindlichen Betriebsregel geworden.
+Noch nicht entschiedene Geschäftsregeln – darunter genaue Fahrzeit-/Überstundenbewertung, Materialbewertung, Urlaubs-Sonderfälle und die fachliche Übernahme von Original-Excel-Formeln – stehen in [OFFENE_FACHLICHE_PUNKTE.md](./OFFENE_FACHLICHE_PUNKTE.md). Bestätigte Zielrichtungen und produktive Umsetzungslücken sind dort getrennt. Keine Demo-Annahme ist allein durch ihre Darstellung zur verbindlichen Betriebsregel geworden.
 
 OCR und KI, produktiver Rechnungseingang, echte Dateiablage, rechtswirksame Freigaben, echter Web Push sowie direkte Excel-Integration bleiben ausdrücklich zurückgestellt. Aufmaßformeln werden nicht erfunden.
 

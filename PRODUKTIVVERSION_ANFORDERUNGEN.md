@@ -16,7 +16,9 @@ Diese Datei trennt die bedienbare öffentliche Demo von der echten Maler-Meyer-A
 - Sicherer Hash, Rate Limit, Fehlversuchsbegrenzung sowie Cooldown/Sperre
 - Autorisierte Geräte, Geräteentzug und Audit
 - Sichere, strikt getrennte Sessions zwischen Mitarbeitern
-- Offline-PIN-Verhalten fachlich entscheiden
+- Offline-Entsperrung ist als Ziel bestätigt; sichere technische Umsetzung, Gerätezulassung und Widerruf ausarbeiten
+- Zielwert für automatische Gerätesperre: fünf Minuten Inaktivität; produktiv auf echten Geräten und bei Hintergrundwechsel prüfen
+- Vergessene PINs über Identitätsprüfung und Zurücksetzen behandeln. Niemand, auch nicht das Büro, darf einen gespeicherten Klartext-PIN auslesen können.
 
 ## 3. Echte Datenbank
 
@@ -38,7 +40,7 @@ Diese Datei trennt die bedienbare öffentliche Demo von der echten Maler-Meyer-A
 - Unveränderbare Rohereignisse für Start, Pause, Pause Ende, Baustelle verlassen, Fahrt, Ankunft, Weiterarbeiten und Feierabend
 - Audit und Korrekturanfragen
 - ADMIN/OFFICE-Korrekturen mit vorher, nachher und Grund
-- Offen bleiben: Fahrzeitvergütung, Überstunden, Rüstzeit und Nacht-/Mitternachtsregeln
+- Fahrzeitgrenzen können je Baustelle unterschiedlich sein; die genaue Regel und ihre Bewertung sind noch zu klären. Überstunden und Rüstzeit nicht aus den vorhandenen Rohdaten ableiten. Nacht-/Mitternachtsfälle sind laut Fragebogen heute nicht üblich, technisch aber gesondert zu behandeln.
 
 ## 6. Wochenzettel
 
@@ -53,6 +55,7 @@ Diese Datei trennt die bedienbare öffentliche Demo von der echten Maler-Meyer-A
 - Echter Web-Push bzw. Push-Service, Push-Abonnements und Gerätebezug
 - Serverseitige Trigger und Zustellung bei geschlossener App
 - Benachrichtigungseinstellungen, Retry und Fehlerbehandlung
+- Bestätigte Zielkategorien umfassen Wochenzettel, geänderte Planung, bearbeitete Korrektur, Urlaubsentscheidung und Rückfrage zu Zusatzarbeit; genaue Empfänger und Zeitpunkte offen
 
 ## 8. Foto / Dateien
 
@@ -72,12 +75,15 @@ Diese Datei trennt die bedienbare öffentliche Demo von der echten Maler-Meyer-A
 ## 10. Material
 
 - Materialanforderung, Entnahme, Verbrauch, Bau-Nr.-Zuordnung, Büroprüfung und Audit
-- Fachlich offen: Lagerbestand, Mindestbestand, Bestellung, Barcode, Artikelstamm und Bewertungsmethode
+- Materialprüfung durch Geschäftsführung/Büro als Zielprozess berücksichtigen
+- Fachlich offen: Umfang der Lagerwirtschaft, Mindestbestand, Bestellung, Barcode, Artikelstamm und Bewertungsmethode
 
 ## 11. Urlaub
 
 - Antrag, Genehmigung/Ablehnung, Planung, Benachrichtigung und Audit
-- Fachlich offen: Genehmigungsrechte, Resturlaub, Vertretung, Berechnung der Arbeitstage, Sonderurlaub und weitere Sonderfälle
+- Die beiden Geschäftsführungsrollen entscheiden final; Büro kann Anträge einsehen und vorbereiten. Diese Berechtigung muss produktiv serverseitig abgesichert werden.
+- Genehmigten Urlaub in Planung und Mitarbeiteransicht konsistent abbilden
+- Fachlich offen: Resturlaub, Vertretung, Berechnung halber/unbezahlter Tage, Sonderurlaub und weitere Sonderfälle
 
 ## 12. Zusatzarbeiten / Signatur
 
@@ -88,7 +94,7 @@ Diese Datei trennt die bedienbare öffentliche Demo von der echten Maler-Meyer-A
 
 ## 13. Excel
 
-Die Original-XLSX-Dateien von Maler Meyer müssen später gesondert analysiert werden: Blattnamen, Formeln, Zellbezüge, Summen, benannte Bereiche, versteckte Blätter, bedingte Formatierung, Druckbereiche und Verknüpfungen zwischen Hauptliste und Projektblättern. Bis dahin keine unbekannte Formel erfinden.
+Die vier bereitgestellten Original-Arbeitsmappen wurden lokal und nur strukturell gelesen. Eine zentrale Bauliste mit vielen Bau-Nr.-Projektblättern, getrennte Wochenblätter, ein Urlaubsplaner und eine separate Kostenübersicht sind beobachtet. In der Bauliste sind Gesamtkosten, geschriebene Rechnungen und Ergebnis als getrennte Nachbarspalten sowie Blattbezüge sichtbar. Das beweist nicht, dass deren bestehende Formeln als Regeln der neuen App übernommen werden sollen. Noch nötig: vollständiger zellgenauer Audit von Formeln, Zellbezügen, Summen, benannten/versteckten Bereichen, bedingter Formatierung, Druckbereichen und Hauptliste-Projektblatt-Verknüpfungen; danach fachliche Freigabe. Keine Originaldaten oder Fixwerte in der öffentlichen Demo.
 
 ## 14. Produktive Exporte
 
@@ -157,4 +163,4 @@ Demo-Exporte verwenden den aktuellen lokalen Zustand. Produktiv müssen Exporte 
 
 ## 27. Projektstammdaten und Bau-Nr.-Vergabe
 
-Die Demo zeigt weitere editierbare Projektfelder und einen lokalen, vor dem Speichern änderbaren Nummernvorschlag. Produktiv braucht es ein validiertes Projektstammdatenmodell, serverseitige Rollenprüfung, Audit für Feldänderungen und Sichtbarkeitsgrenzen für interne/kaufmännische Angaben. Die Nummer muss serverseitig eindeutig und bei parallelen Anlagen transaktional vergeben oder reserviert werden; Jahreswechsel und Kollisionen sind zu testen. Gerätejahr und localStorage dürfen weder Nummernautorität noch produktiver Datenbestand sein. Schema, Vergabephase und eine mögliche spätere Umnummerierung verknüpfter Projekte bleiben fachlich offen.
+Die Demo zeigt weitere editierbare Projektfelder und einen lokalen, vor dem Speichern änderbaren Nummernvorschlag. Produktiv braucht es ein validiertes Projektstammdatenmodell, serverseitige Rollenprüfung, Audit für Feldänderungen und Sichtbarkeitsgrenzen für interne/kaufmännische Angaben. Die Bau-Nr. soll fachlich nach Auftragserteilung vergeben werden; die Demo-Nummer bei erster Projektanlage ist deshalb nur eine Bedienannahme. Die Nummer muss serverseitig eindeutig und bei parallelen Anlagen transaktional vergeben oder reserviert werden; Jahreswechsel und Kollisionen sind zu testen. Gerätejahr und localStorage dürfen weder Nummernautorität noch produktiver Datenbestand sein. Endgültiges Schema und eine mögliche spätere Umnummerierung verknüpfter Projekte bleiben offen.
