@@ -20,7 +20,7 @@ fs.mkdirSync(outputDir, { recursive: true });
   await page.locator('button[data-action="navigate"][data-view="exports"]:visible').first().click();
   await page.getByRole('heading', { name: 'Dokumente & Exporte', exact: true }).waitFor();
 
-  for (const action of ['xlsx-planning', 'xlsx-calculation', 'xlsx-project', 'xlsx-invoices', 'csv-times', 'csv-invoices']) {
+  for (const action of ['xlsx-planning', 'xlsx-leave', 'xlsx-calculation', 'xlsx-project', 'xlsx-invoices', 'csv-times', 'csv-invoices']) {
     const downloadPromise = page.waitForEvent('download');
     await page.locator('[data-mm-action="' + action + '"]').first().click();
     const download = await downloadPromise;
