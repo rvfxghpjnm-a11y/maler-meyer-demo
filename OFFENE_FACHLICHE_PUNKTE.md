@@ -39,6 +39,7 @@ Zusätzlich offen bleiben das endgültige Material-Bewertungsmodell, die Auswahl
 23. Wochenplanung: Soll es im Echtbetrieb verbindlich die Zustände Entwurf und veröffentlicht geben?
 24. Wochenplanung: Wer darf veröffentlichen, kurzfristig ändern und eine veröffentlichte Woche zurückziehen?
 25. Wochenplanung: Welche Änderungen sollen eine Meldung auslösen und wie wird deren Kenntnisnahme behandelt?
+26. Projektstunden: Wann gelten rohe Zeitereignisse produktiv als akzeptiert, und welche Freigabe ist für eine Neuaggregation nach Korrekturen erforderlich? Die Demo nutzt nur eine synthetische akzeptierte Zeitprojektion; eine Wochenzettel-Bestätigung allein beantwortet diese Frage nicht.
 26. Planung: Sind Schule/Fortbildung und sonstige Abwesenheit gewünschte feste Status oder nur Freitext?
 27. Projektkosten: Wer darf Kostenpositionen, Eingangsrechnungen und geschriebene Rechnungen anlegen, ändern oder stornieren?
 28. Projektkosten: Welche Beleg- und Pflichtfelder werden je Kostenart benötigt?

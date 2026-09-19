@@ -27,9 +27,22 @@
     const lastYear = new Date(dateFor(p, 5) + 'T12:00:00').getFullYear();
     return dateLabel(p, 0) + (firstYear === lastYear ? '' : firstYear) + '–' + dateLabel(p, 5) + lastYear;
   }
+  function weekInfo(monday) {
+    const date = new Date(String(monday) + 'T00:00:00Z');
+    if (Number.isNaN(date.getTime()) || date.getUTCDay() !== 1) return null;
+    date.setUTCDate(date.getUTCDate() + 3);
+    const year = date.getUTCFullYear();
+    const first = new Date(Date.UTC(year, 0, 1));
+    return { week: Math.ceil((((date - first) / 86400000) + 1) / 7), year: year };
+  }
+  function weekTitle(p) { const info = weekInfo(p.monday); return 'KW ' + p.week + ' / ' + (info ? info.year : 'Jahr offen'); }
   function employee(db, id) { return db.employees.find(function (x) { return x.id === id; }); }
   function project(db, number) { return db.sites.find(function (x) { return x.number === number; }); }
-  function plan(db, week) { return db.weekPlans.find(function (x) { return x.week === Number(week); }); }
+  function plan(db, reference) {
+    const value = String(reference || '');
+    return db.weekPlans.find(function (x) { return x.monday === value; }) ||
+      db.weekPlans.find(function (x) { return x.week === Number(value) && weekInfo(x.monday)?.year === 2026; });
+  }
   function projectLabel(db, value) { const item = project(db, value); return item ? value + ' · ' + item.name : value || 'frei'; }
   function activeRows(db, p) { return p.rows.filter(function (row) { const person = employee(db, row.employeeId); return !person || person.active !== false; }); }
   function rowName(db, row) { const person = employee(db, row.employeeId); return row.displayName || (person && person.name) || row.employeeId; }
@@ -90,19 +103,19 @@
         return '<tr><td>' + (rowIndex + 1) + '</td><th>' + h(rowName(db, row)) + '</th>' + row.values.map(function (value, dayIndex) {
           const kind = value === 'Krank' ? 'week-sick' : value === 'Urlaub' ? 'week-leave' : '';
           const site = project(db, value);
-          return '<td class="' + kind + '"><button class="planning-cell" data-action="plan-cell" data-week="' + p.week + '" data-employee="' + h(row.employeeId) + '" data-day="' + dayIndex + '" title="' + h(projectLabel(db, value)) + ' · Planung bearbeiten"><strong>' + h(value || 'frei') + '</strong>' + (site ? '<span class="planning-site-name">' + h(site.name) + '</span>' : '') + '<small>' + h(dateLabel(p, dayIndex)) + '</small></button></td>';
+          return '<td class="' + kind + '"><button class="planning-cell" data-action="plan-cell" data-week="' + p.monday + '" data-employee="' + h(row.employeeId) + '" data-day="' + dayIndex + '" title="' + h(projectLabel(db, value)) + ' · Planung bearbeiten"><strong>' + h(value || 'frei') + '</strong>' + (site ? '<span class="planning-site-name">' + h(site.name) + '</span>' : '') + '<small>' + h(dateLabel(p, dayIndex)) + '</small></button></td>';
         }).join('') + '</tr>';
       }).join('');
     };
     const employeeChecks = rows.filter(function (row) { return employee(db, row.employeeId); }).map(function (row) { return '<label><input type="checkbox" name="employee" value="' + h(row.employeeId) + '"><span>' + h(rowName(db, row)) + '</span></label>'; }).join('');
     const dayChecks = DAYS.map(function (day, index) { return '<label><input type="checkbox" name="day" value="' + index + '"><span>' + day + '</span></label>'; }).join('');
-    const changes = db.planChanges.filter(function (x) { return x.week === p.week; }).slice(0, 12);
-    return ctx.head('Wochenplanung', 'KW ' + p.week + ' · Jede Tageszelle ist direkt bearbeitbar') +
+    const changes = db.planChanges.filter(function (x) { return x.monday === p.monday || (!x.monday && x.week === p.week && weekInfo(p.monday)?.year === 2026); }).slice(0, 12);
+    return ctx.head('Wochenplanung', weekTitle(p) + ' · Jede Tageszelle ist direkt bearbeitbar') +
       '<p class="decision-note"><strong>Bedienbare Demo:</strong> Entwurf / veröffentlicht, Vorwoche kopieren, Mehrfachzuweisung sowie Schule/Fortbildung sind Demo-Vorschläge. Genehmigter Urlaub bleibt sichtbar.</p>' +
-      '<div class="toolbar"><span><strong>' + (p.status === 'PUBLISHED' ? 'Veröffentlicht' : 'Entwurf · Änderungen noch nicht veröffentlicht') + '</strong><small>' + h(p.publishedAt || '') + '</small></span><div class="form-actions"><button class="secondary" data-action="new-plan-week">Neue Woche planen</button><button class="primary" data-action="publish-plan" data-week="' + p.week + '" ' + (p.status === 'PUBLISHED' ? 'disabled' : '') + '>Planung veröffentlichen</button><button class="secondary" data-mm-action="xlsx-planning">XLSX</button><button class="secondary" data-mm-action="print" data-template="planning" data-week="' + p.week + '">PDF / Druck</button></div></div>' +
-      '<section class="card card-pad week-matrix editable-week"><div class="section-title"><h2>Wochenplanung 2026 · KW ' + p.week + '</h2><div class="filter-row">' + db.weekPlans.map(function (x) { return '<button class="filter-button ' + (x.week === p.week ? 'active' : '') + '" data-action="planning-week" data-week="' + x.week + '">KW ' + x.week + '</button>'; }).join('') + '</div></div><p class="mobile-plan-hint">Tabelle seitlich wischen: Bau-Nr. und Baustellenname stehen gemeinsam in jeder Tageszelle.</p><div class="table-scroll"><table><thead><tr><th>Nr.</th><th>Mitarbeiter</th>' + DAYS.map(function (day, index) { return '<th>' + day + '<small>' + dateLabel(p, index) + '</small></th>'; }).join('') + '</tr></thead><tbody>' + byGroup('Mitarbeiter') + byGroup('Auszubildende / Praktikum') + byGroup('Subunternehmer') + '</tbody></table></div></section>' +
-      '<section class="card card-pad section batch-planning"><div class="section-title"><div><h2>Kolonne oder mehrere Tage planen · KW ' + p.week + '</h2><p>Demo-Vorschlag für wenige Klicks.</p></div></div><div class="batch-week-context"><strong>Aktuelle Kalenderwoche: KW ' + currentWeek.week + ' / ' + currentWeek.year + '</strong><small>Stand ' + h(currentWeek.today) + ' · laut diesem Gerät</small></div><form data-form="plan-batch"><label class="batch-week-select">Kalenderwoche für diese Planung<select name="week" data-batch-plan-week required>' + db.weekPlans.map(function (x) { return '<option value="' + x.week + '" ' + (x.week === p.week ? 'selected' : '') + '>KW ' + x.week + ' · ' + h(weekRange(x)) + '</option>'; }).join('') + '</select></label><p class="batch-week-selected">Ausgewählt: <strong>KW ' + p.week + ' · ' + h(weekRange(p)) + '</strong>. Die Wochenmatrix oben zeigt dieselbe KW.</p><fieldset><legend>Mitarbeiter</legend><div class="plan-check-grid">' + employeeChecks + '</div></fieldset><fieldset><legend>Tage</legend><div class="plan-check-grid days">' + dayChecks + '</div></fieldset><div class="form-grid"><label>Zuweisung<select name="value">' + planValueOptions(db, '') + '</select></label><label>Grund – optional<input name="reason" placeholder="z. B. Terminverschiebung"></label></div><button class="primary">Auf Auswahl anwenden</button></form></section>' +
-      '<section class="section"><div class="section-title"><h2>Änderungsverlauf KW ' + p.week + '</h2><span class="meta">' + changes.length + ' letzte Änderungen</span></div><div class="list">' + (changes.map(function (x) { return '<article class="audit-box"><strong>' + h(x.employeeName) + ' · ' + h(DAYS[x.day]) + ': ' + h(projectLabel(db, x.before)) + ' → ' + h(projectLabel(db, x.after)) + '</strong><small>' + h(x.changedBy) + ' · ' + h(x.changedAt) + (x.reason ? ' · ' + h(x.reason) : '') + '</small></article>'; }).join('') || '<div class="empty-note">Noch keine Änderung an dieser Woche.</div>') + '</div></section>';
+      '<div class="toolbar"><span><strong>' + (p.status === 'PUBLISHED' ? 'Veröffentlicht' : 'Entwurf · Änderungen noch nicht veröffentlicht') + '</strong><small>' + h(p.publishedAt || '') + '</small></span><div class="form-actions"><button class="secondary" data-action="new-plan-week">Neue Woche planen</button><button class="primary" data-action="publish-plan" data-week="' + p.monday + '" ' + (p.status === 'PUBLISHED' ? 'disabled' : '') + '>Planung veröffentlichen</button><button class="secondary" data-mm-action="xlsx-planning">XLSX</button><button class="secondary" data-mm-action="print" data-template="planning" data-week="' + p.monday + '">PDF / Druck</button></div></div>' +
+      '<section class="card card-pad week-matrix editable-week"><div class="section-title"><h2>Wochenplanung ' + weekInfo(p.monday).year + ' · KW ' + p.week + '</h2><div class="filter-row">' + db.weekPlans.map(function (x) { return '<button class="filter-button ' + (x.monday === p.monday ? 'active' : '') + '" data-action="planning-week" data-week="' + x.monday + '">' + weekTitle(x) + '</button>'; }).join('') + '</div></div><p class="mobile-plan-hint">Tabelle seitlich wischen: Bau-Nr. und Baustellenname stehen gemeinsam in jeder Tageszelle.</p><div class="table-scroll"><table><thead><tr><th>Nr.</th><th>Mitarbeiter</th>' + DAYS.map(function (day, index) { return '<th>' + day + '<small>' + dateLabel(p, index) + '</small></th>'; }).join('') + '</tr></thead><tbody>' + byGroup('Mitarbeiter') + byGroup('Auszubildende / Praktikum') + byGroup('Subunternehmer') + '</tbody></table></div></section>' +
+      '<section class="card card-pad section batch-planning"><div class="section-title"><div><h2>Kolonne oder mehrere Tage planen · ' + weekTitle(p) + '</h2><p>Demo-Vorschlag für wenige Klicks.</p></div></div><div class="batch-week-context"><strong>Aktuelle Kalenderwoche: KW ' + currentWeek.week + ' / ' + currentWeek.year + '</strong><small>Stand ' + h(currentWeek.today) + ' · laut diesem Gerät</small></div><form data-form="plan-batch"><label class="batch-week-select">Kalenderwoche für diese Planung<select name="week" data-batch-plan-week required>' + db.weekPlans.map(function (x) { return '<option value="' + x.monday + '" ' + (x.monday === p.monday ? 'selected' : '') + '>' + weekTitle(x) + ' · ' + h(weekRange(x)) + '</option>'; }).join('') + '</select></label><p class="batch-week-selected">Ausgewählt: <strong>' + weekTitle(p) + ' · ' + h(weekRange(p)) + '</strong>. Die Wochenmatrix oben zeigt dieselbe KW.</p><fieldset><legend>Mitarbeiter</legend><div class="plan-check-grid">' + employeeChecks + '</div></fieldset><fieldset><legend>Tage</legend><div class="plan-check-grid days">' + dayChecks + '</div></fieldset><div class="form-grid"><label>Zuweisung<select name="value">' + planValueOptions(db, '') + '</select></label><label>Grund – optional<input name="reason" placeholder="z. B. Terminverschiebung"></label></div><button class="primary">Auf Auswahl anwenden</button></form></section>' +
+      '<section class="section"><div class="section-title"><h2>Änderungsverlauf ' + weekTitle(p) + '</h2><span class="meta">' + changes.length + ' letzte Änderungen</span></div><div class="list">' + (changes.map(function (x) { return '<article class="audit-box"><strong>' + h(x.employeeName) + ' · ' + h(DAYS[x.day]) + ': ' + h(projectLabel(db, x.before)) + ' → ' + h(projectLabel(db, x.after)) + '</strong><small>' + h(x.changedBy) + ' · ' + h(x.changedAt) + (x.reason ? ' · ' + h(x.reason) : '') + '</small></article>'; }).join('') || '<div class="empty-note">Noch keine Änderung an dieser Woche.</div>') + '</div></section>';
   }
 
   function renderPlanModal(db, modal) {
@@ -110,11 +123,14 @@
     if (modal.type === 'cell') {
       const p = plan(db, modal.week); const row = p && p.rows.find(function (x) { return x.employeeId === modal.employeeId; });
       if (!p || !row) return '';
-      return '<div class="modal-backdrop" role="dialog" aria-modal="true"><form class="login-card" data-form="plan-cell"><input type="hidden" name="week" value="' + p.week + '"><input type="hidden" name="employee" value="' + h(row.employeeId) + '"><input type="hidden" name="day" value="' + modal.day + '"><div class="action-modal-head"><div><span class="build-number">KW ' + p.week + ' · ' + DAYS[modal.day] + '</span><h2>' + h(rowName(db, row)) + ' planen</h2><p>' + h(dateLabel(p, modal.day)) + '2026 · bisher ' + h(projectLabel(db, row.values[modal.day])) + '</p></div><button type="button" class="modal-close" data-action="close-final-modal">×</button></div><label>Zuweisung<select name="value">' + planValueOptions(db, row.values[modal.day]) + '</select></label><label>Änderungsgrund – optional<input name="reason" placeholder="Nur falls hilfreich"></label><button class="primary full-button">Planung speichern</button></form></div>';
+      return '<div class="modal-backdrop" role="dialog" aria-modal="true"><form class="login-card" data-form="plan-cell"><input type="hidden" name="week" value="' + p.monday + '"><input type="hidden" name="employee" value="' + h(row.employeeId) + '"><input type="hidden" name="day" value="' + modal.day + '"><div class="action-modal-head"><div><span class="build-number">' + weekTitle(p) + ' · ' + DAYS[modal.day] + '</span><h2>' + h(rowName(db, row)) + ' planen</h2><p>' + h(dateFor(p, modal.day)) + ' · bisher ' + h(projectLabel(db, row.values[modal.day])) + '</p></div><button type="button" class="modal-close" data-action="close-final-modal">×</button></div><label>Zuweisung<select name="value">' + planValueOptions(db, row.values[modal.day]) + '</select></label><label>Änderungsgrund – optional<input name="reason" placeholder="Nur falls hilfreich"></label><button class="primary full-button">Planung speichern</button></form></div>';
     }
     if (modal.type === 'new-week') {
-      const latest = Math.max.apply(null, db.weekPlans.map(function (x) { return x.week; }));
-      return '<div class="modal-backdrop" role="dialog" aria-modal="true"><form class="login-card" data-form="new-plan-week"><div class="action-modal-head"><div><h2>Neue Woche planen</h2><p>Leere Woche oder Vorwoche kopieren · Demo-Vorschlag</p></div><button type="button" class="modal-close" data-action="close-final-modal">×</button></div><label>Kalenderwoche<input name="week" type="number" min="1" max="53" value="' + (latest + 1) + '" required></label><label>Montag<input name="monday" type="date" value="2026-09-21" required></label><label>Ausgangspunkt<select name="mode"><option value="COPY">Vorwoche kopieren</option><option value="EMPTY">Leere Woche erstellen</option></select></label><button class="primary full-button">Woche erstellen</button></form></div>';
+      const latest = db.weekPlans.slice().sort(function (a, b) { return b.monday.localeCompare(a.monday); })[0];
+      const next = new Date(latest.monday + 'T12:00:00Z'); next.setUTCDate(next.getUTCDate() + 7);
+      const nextMonday = next.toISOString().slice(0, 10);
+      const nextInfo = weekInfo(nextMonday);
+      return '<div class="modal-backdrop" role="dialog" aria-modal="true"><form class="login-card" data-form="new-plan-week"><div class="action-modal-head"><div><h2>Neue Woche planen</h2><p>Leere Woche oder Vorwoche kopieren · Demo-Vorschlag</p></div><button type="button" class="modal-close" data-action="close-final-modal">×</button></div><label>Montag der neuen Woche<input name="monday" type="date" value="' + nextMonday + '" required></label><p data-week-preview>Kalenderwoche: <strong>KW ' + nextInfo.week + ' / ' + nextInfo.year + '</strong></p><label>Ausgangspunkt<select name="mode"><option value="COPY">Vorwoche kopieren</option><option value="EMPTY">Leere Woche erstellen</option></select></label><button class="primary full-button">Woche erstellen</button></form></div>';
     }
     if (modal.type === 'cost') return renderCostModal(db, modal.site);
     if (modal.type === 'supplier') return renderSupplierModal(db, modal.site);
@@ -128,7 +144,7 @@
     row.values[dayIndex] = value;
     p.status = 'DRAFT';
     if (!p.pendingEmployeeIds.includes(row.employeeId)) p.pendingEmployeeIds.push(row.employeeId);
-    const change = { id: ctx.makeId('PL'), week: p.week, day: dayIndex, date: dateFor(p, dayIndex), employeeId: row.employeeId, employeeName: rowName(db, row), before: before, after: value, changedBy: ctx.actor(), changedAt: ctx.dateTimeNow(), reason: reason || '' };
+    const change = { id: ctx.makeId('PL'), week: p.week, monday: p.monday, day: dayIndex, date: dateFor(p, dayIndex), employeeId: row.employeeId, employeeName: rowName(db, row), before: before, after: value, changedBy: ctx.actor(), changedAt: ctx.dateTimeNow(), reason: reason || '' };
     db.planChanges.unshift(change);
     ctx.audit('WEEK_PLAN_CHANGED', row.employeeId, 'Wochenplanung geändert · KW ' + p.week + ' · ' + DAYS[dayIndex], projectLabel(db, before), projectLabel(db, value), reason || 'Initiale/kurze Planung ohne Grundzwang');
     if (dateFor(p, dayIndex) === DEMO_TODAY && employee(db, row.employeeId)) {
@@ -156,14 +172,17 @@
       ctx.saveDb(); ctx.toast(changed + ' Planungszelle' + (changed === 1 ? '' : 'n') + ' aktualisiert.'); return true;
     }
     if (form.dataset.form === 'new-plan-week') {
-      const week = Number(values.get('week'));
-      if (plan(db, week)) { ctx.toast('KW ' + week + ' ist bereits vorhanden.'); return true; }
-      const latest = db.weekPlans.slice().sort(function (a, b) { return b.week - a.week; })[0];
-      const rows = clone(latest.rows); if (values.get('mode') === 'EMPTY') rows.forEach(function (row) { row.values = new Array(6).fill(''); });
-      const next = { week: week, monday: values.get('monday'), rows: rows, status: 'DRAFT', publishedRows: [], pendingEmployeeIds: rows.map(function (x) { return x.employeeId; }), publishedAt: '' };
-      db.weekPlans.push(next); db.weekPlans.sort(function (a, b) { return a.week - b.week; }); ctx.ui.planningWeek = week; ctx.ui.finalModal = null;
-      ctx.audit('WEEK_PLAN_CREATED', 'KW-' + week, 'Neue Woche geplant', '–', values.get('mode') === 'COPY' ? 'Vorwoche kopiert' : 'Leere Woche', 'Demo-Vorschlag');
-      ctx.saveDb(); ctx.toast('KW ' + week + ' als Entwurf erstellt.'); return true;
+      const monday = String(values.get('monday') || '');
+      const info = weekInfo(monday);
+      if (!info) { ctx.toast('Bitte einen Montag als Wochenbeginn wählen.'); return true; }
+      if (plan(db, monday)) { ctx.toast('KW ' + info.week + ' / ' + info.year + ' ist bereits vorhanden.'); return true; }
+      const previous = db.weekPlans.filter(function (x) { return x.monday < monday; }).sort(function (a, b) { return b.monday.localeCompare(a.monday); })[0];
+      if (!previous) { ctx.toast('Für diese Woche gibt es keine Vorwoche als Ausgangspunkt.'); return true; }
+      const rows = clone(previous.rows); if (values.get('mode') === 'EMPTY') rows.forEach(function (row) { row.values = new Array(6).fill(''); });
+      const next = { week: info.week, monday: monday, rows: rows, status: 'DRAFT', publishedRows: [], pendingEmployeeIds: rows.map(function (x) { return x.employeeId; }), publishedAt: '' };
+      db.weekPlans.push(next); db.weekPlans.sort(function (a, b) { return a.monday.localeCompare(b.monday); }); ctx.ui.planningWeek = monday; ctx.ui.finalModal = null;
+      ctx.audit('WEEK_PLAN_CREATED', monday, 'Neue Woche geplant · KW ' + info.week + '/' + info.year, '–', values.get('mode') === 'COPY' ? 'Vorwoche kopiert' : 'Leere Woche', 'Demo-Vorschlag');
+      ctx.saveDb(); ctx.toast('KW ' + info.week + ' / ' + info.year + ' als Entwurf erstellt.'); return true;
     }
     if (form.dataset.form === 'project-cost') {
       const entry = { id: ctx.makeId('KOST'), site: values.get('site'), date: values.get('date'), type: values.get('type'), description: values.get('description'), supplier: values.get('supplier') || '', net: Number(values.get('net')), reference: values.get('reference') || '', source: 'MANUAL', createdAt: ctx.dateTimeNow(), createdBy: ctx.actor() };
@@ -188,13 +207,13 @@
 
   function handleAction(db, target, ctx) {
     const action = target.dataset.action;
-    if (action === 'plan-cell') { ctx.ui.finalModal = { type: 'cell', week: Number(target.dataset.week), employeeId: target.dataset.employee, day: Number(target.dataset.day) }; ctx.render(); return true; }
+    if (action === 'plan-cell') { ctx.ui.finalModal = { type: 'cell', week: target.dataset.week, employeeId: target.dataset.employee, day: Number(target.dataset.day) }; ctx.render(); return true; }
     if (action === 'new-plan-week') { ctx.ui.finalModal = { type: 'new-week' }; ctx.render(); return true; }
     if (action === 'close-final-modal') { ctx.ui.finalModal = null; ctx.render(); return true; }
     if (action === 'publish-plan') {
       const p = plan(db, target.dataset.week); const changed = p.pendingEmployeeIds.slice(); p.publishedRows = clone(p.rows); p.status = 'PUBLISHED'; p.publishedAt = ctx.dateTimeNow() + ' · ' + ctx.actor(); p.pendingEmployeeIds = [];
-      db.planPublications.unshift({ id: ctx.makeId('PLANPUB'), week: p.week, publishedAt: p.publishedAt, publishedBy: ctx.actor(), changedEmployees: changed });
-      changed.filter(function (id) { return employee(db, id); }).forEach(function (id) { db.notifications.unshift({ id: ctx.makeId('NOT'), employeeId: id, type: 'PLANNING_CHANGED', title: 'Deine Planung für KW ' + p.week + ' wurde geändert.', body: 'Öffne „Meine Woche“, um die veröffentlichte Planung zu prüfen.', planningWeek: p.week, createdAt: 'Heute · ' + ctx.dateTimeNow(), read: false }); });
+      db.planPublications.unshift({ id: ctx.makeId('PLANPUB'), week: p.week, monday: p.monday, publishedAt: p.publishedAt, publishedBy: ctx.actor(), changedEmployees: changed });
+      changed.filter(function (id) { return employee(db, id); }).forEach(function (id) { db.notifications.unshift({ id: ctx.makeId('NOT'), employeeId: id, type: 'PLANNING_CHANGED', title: 'Deine Planung für ' + weekTitle(p) + ' wurde geändert.', body: 'Öffne „Meine Woche“, um die veröffentlichte Planung zu prüfen.', planningWeek: p.monday, createdAt: 'Heute · ' + ctx.dateTimeNow(), read: false }); });
       ctx.audit('WEEK_PLAN_PUBLISHED', 'KW-' + p.week, 'Planung veröffentlicht', 'Entwurf', 'Veröffentlicht · ' + changed.length + ' Hinweise', 'Demo-Vorschlag'); ctx.saveDb(); ctx.toast('Planung veröffentlicht · Mitarbeiterhinweise erzeugt.'); return true;
     }
     if (action === 'open-project-cost') { ctx.ui.finalModal = { type: 'cost', site: target.dataset.site }; ctx.render(); return true; }
@@ -225,10 +244,10 @@
   }
 
   function renderMyWeek(db, employeeId) {
-    const p = db.weekPlans.slice().sort(function (a, b) { return b.week - a.week; }).find(function (x) { return (x.publishedRows || []).some(function (row) { return row.employeeId === employeeId; }); });
+    const p = db.weekPlans.slice().sort(function (a, b) { return b.monday.localeCompare(a.monday); }).find(function (x) { return (x.publishedRows || []).some(function (row) { return row.employeeId === employeeId; }); });
     if (!p) return '';
     const row = p.publishedRows.find(function (x) { return x.employeeId === employeeId; });
-    return '<section class="section card card-pad my-week"><div class="section-title"><div><h2>Meine Woche · KW ' + p.week + '</h2><p>Zuletzt veröffentlichte Planung</p></div><button class="secondary" data-action="navigate" data-view="notifications">Hinweise</button></div><div class="my-week-days">' + DAYS.map(function (day, index) { return '<div class="' + (row.values[index] === 'Urlaub' ? 'week-leave' : row.values[index] === 'Krank' ? 'week-sick' : '') + '"><small>' + day.slice(0, 2) + ' · ' + dateLabel(p, index) + '</small><strong>' + h(projectLabel(db, row.values[index])) + '</strong></div>'; }).join('') + '</div><p class="meta">Entwurf / veröffentlicht ist ein Demo-Vorschlag. Nur veröffentlichte Werte werden hier gezeigt.</p></section>';
+    return '<section class="section card card-pad my-week"><div class="section-title"><div><h2>Meine Woche · ' + weekTitle(p) + '</h2><p>Zuletzt veröffentlichte Planung</p></div><button class="secondary" data-action="navigate" data-view="notifications">Hinweise</button></div><div class="my-week-days">' + DAYS.map(function (day, index) { return '<div class="' + (row.values[index] === 'Urlaub' ? 'week-leave' : row.values[index] === 'Krank' ? 'week-sick' : '') + '"><small>' + day.slice(0, 2) + ' · ' + dateLabel(p, index) + '</small><strong>' + h(projectLabel(db, row.values[index])) + '</strong></div>'; }).join('') + '</div><p class="meta">Entwurf / veröffentlicht ist ein Demo-Vorschlag. Nur veröffentlichte Werte werden hier gezeigt.</p></section>';
   }
 
   function renderTaskHub(db, ctx) {
@@ -248,6 +267,6 @@
     return window.MMExcel ? Object.assign(values, window.MMExcel.account(db, x)) : values;
   }
 
-  window.MMFinal = { days: DAYS, costTypes: COST_TYPES, renderPlanning: renderPlanning, renderPlanModal: renderPlanModal, renderCommercial: renderCommercial, renderMyWeek: renderMyWeek, renderTaskHub: renderTaskHub, renderInvoiceList: renderInvoiceList, handleForm: handleForm, handleAction: handleAction, dynamicAccount: dynamicAccount, categoryTotal: categoryTotal, dateFor: dateFor };
+  window.MMFinal = { days: DAYS, costTypes: COST_TYPES, renderPlanning: renderPlanning, renderPlanModal: renderPlanModal, renderCommercial: renderCommercial, renderMyWeek: renderMyWeek, renderTaskHub: renderTaskHub, renderInvoiceList: renderInvoiceList, handleForm: handleForm, handleAction: handleAction, dynamicAccount: dynamicAccount, categoryTotal: categoryTotal, dateFor: dateFor, weekInfo: weekInfo };
   window.DEMO_DATA_VERSION = 11;
 }());

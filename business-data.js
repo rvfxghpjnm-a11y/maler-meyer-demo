@@ -179,6 +179,30 @@
       maxWeek.status = 'DRAFT';
       maxWeek.days = maxWeek.days.map(function (day) { return Object.assign({}, day, day.day === 'Do' ? { start: '07:05', issue: '' } : {}); });
       maxWeek.history = ['Entwurf aus vollständigen Zeitereignissen erstellt', 'Bereit zur Prüfung durch Max Beispiel'];
+      // Keep this featured weekly-sheet scenario and the accepted demo-time
+      // projection consistent before any office correction is applied.
+      const minutes = function (value) {
+        const match = String(value || '').match(/^(\d{2}):(\d{2})$/);
+        return match ? Number(match[1]) * 60 + Number(match[2]) : null;
+      };
+      maxWeek.days.forEach(function (day) {
+        const parts = String(day.date || '').match(/^(\d{2})\.(\d{2})\.$/);
+        const record = parts && db.monthHistory.find(function (item) {
+          return item.employeeId === maxWeek.employeeId && item.date === '2026-' + parts[2] + '-' + parts[1];
+        });
+        if (!record || !siteNumbers.includes(day.site)) return;
+        const start = minutes(day.start);
+        const end = minutes(day.end);
+        const pause = minutes(day.break) || 0;
+        record.site = day.site;
+        record.marker = '';
+        record.start = day.start;
+        record.end = day.end;
+        record.breakMinutes = pause;
+        record.travelMinutes = minutes(day.travel) || 0;
+        record.acceptedMinutes = start != null && end != null && end >= start + pause ? end - start - pause : null;
+        record.issue = day.issue;
+      });
     }
     if (!db.weeklySheets.some(function (sheet) { return sheet.id === 'W-002'; })) {
       db.weeklySheets.push({

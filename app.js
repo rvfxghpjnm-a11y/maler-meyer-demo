@@ -384,6 +384,33 @@ function saveTimeCorrection(form) {
     if (day && request.bookingField) {
       day[request.bookingField] = after;
       day.issue = '';
+      // The monthly demo history is an accepted-time projection, not the raw event log.
+      // Only an unambiguous existing date/employee record may follow an office correction.
+      const dateSuffix = String(day.date || '').match(/^(\d{2})\.(\d{2})\./);
+      const matching = dateSuffix ? (db.monthHistory || []).filter(function (item) {
+        return item.employeeId === sheet.employeeId && item.date.endsWith('-' + dateSuffix[2] + '-' + dateSuffix[1]);
+      }) : [];
+      if (matching.length === 1) {
+        const record = matching[0];
+        if (request.bookingField === 'site' && site(after)) record.site = after;
+        if (request.bookingField === 'start' || request.bookingField === 'end' || request.bookingField === 'break') {
+          const clockMinutes = function (value) {
+            const match = String(value || '').match(/^(\d{1,2}):(\d{2})$/);
+            return match ? Number(match[1]) * 60 + Number(match[2]) : null;
+          };
+          const start = clockMinutes(day.start);
+          const end = clockMinutes(day.end);
+          const pause = day.break === '–' ? 0 : clockMinutes(day.break);
+          record.acceptedMinutes = start != null && end != null && pause != null && end >= start + pause ? end - start - pause : null;
+          if (request.bookingField === 'start') record.start = day.start;
+          if (request.bookingField === 'end') record.end = day.end;
+          if (request.bookingField === 'break') record.breakMinutes = pause;
+        }
+        if (request.bookingField === 'travel') {
+          const travel = String(day.travel || '').match(/^(\d{1,2}):(\d{2})$/);
+          record.travelMinutes = travel ? Number(travel[1]) * 60 + Number(travel[2]) : 0;
+        }
+      }
     }
     sheet.version = oldVersion + 1;
     sheet.status = 'NEEDS_RECONFIRM';
@@ -644,7 +671,7 @@ function renderMoreV6() {
     '<section class="card card-pad"><h2>Demo-Konto wechseln</h2><p>Dieselben synthetischen Vorgänge mit vier Verwaltungs-Konten sowie Vorarbeiter- und Mitarbeiteransicht prüfen.</p><div class="role-grid">' + roleButtons + '</div></section>' +
     operations + officeDirect +
     '<div class="more-grid section"><section class="card more-card"><h2>Fahrzeuggerät</h2><p>Benutzerwahl, 6-stelliger Demo-PIN und Sperre testen.</p><button class="primary" data-action="navigate" data-view="shared-device">Gemeinsames iPad öffnen</button></section><section class="card more-card"><h2>Anmeldung</h2><p>Vorschau der späteren Anmeldung.</p><button class="secondary" data-action="show-login">Anmeldeseite ansehen</button></section><section class="card more-card"><h2>Demo zurücksetzen</h2><p>Alle erfundenen Ausgangsdaten wiederherstellen.</p><button class="danger-button" data-action="reset-demo">Demo-Daten zurücksetzen</button></section><section class="card more-card"><h2>Benachrichtigungen</h2><p>Hinweise öffnen direkt die passende Wochenübersicht.</p><button class="secondary" data-action="navigate" data-view="notifications">Hinweise öffnen</button></section><section class="card more-card"><h2>Dokumente & Exporte</h2><p>Originalnahe Formulare, Wochenplanung und Nachkalkulationsdateien.</p><button class="primary" data-action="navigate" data-view="exports">Bereich öffnen</button></section></div>' +
-    '<details class="developer-area"><summary>Entwickler- und Testinformationen</summary><p>Statische Demo ohne Backend und echte serverseitige Rechte. Die vier Verwaltungs-Konten simulieren denselben umfangreichen Adminzugriff; produktiv muss dies serverseitig erzwungen werden. Änderungen, Snapshots und gezeichnete Demo-Unterschriften bleiben nur lokal in diesem Browser.</p><p>Offline, PIN, Spracheingabe, Planveröffentlichung und Synchronisierung sind ausdrücklich Bedienungssimulationen. Browser-localStorage und die Demo-Datenstruktur sind kein Produktivdatenmodell.</p><p>Browser-Benachrichtigungen funktionieren nur nach Erlaubnis und nur solange die statische Seite aktiv ist. Geschlossene-App-Push benötigt später Backend, Push-Service, Service Worker und Benutzer-/Gerätezuordnung.</p><p>Demo-Version 14 · vollständig synthetisch. Die Excel-Struktur ist anonymisiert abgeglichen; historische Formeln und der frei erfundene Kalkulationssatz sind keine beschlossenen Betriebsregeln.</p></details>';
+    '<details class="developer-area"><summary>Entwickler- und Testinformationen</summary><p>Statische Demo ohne Backend und echte serverseitige Rechte. Die vier Verwaltungs-Konten simulieren denselben umfangreichen Adminzugriff; produktiv muss dies serverseitig erzwungen werden. Änderungen, Snapshots und gezeichnete Demo-Unterschriften bleiben nur lokal in diesem Browser.</p><p>Offline, PIN, Spracheingabe, Planveröffentlichung und Synchronisierung sind ausdrücklich Bedienungssimulationen. Browser-localStorage und die Demo-Datenstruktur sind kein Produktivdatenmodell.</p><p>Browser-Benachrichtigungen funktionieren nur nach Erlaubnis und nur solange die statische Seite aktiv ist. Geschlossene-App-Push benötigt später Backend, Push-Service, Service Worker und Benutzer-/Gerätezuordnung.</p><p>Demo-Version 15 · vollständig synthetisch. Die Excel-Struktur ist anonymisiert abgeglichen; historische Formeln und der frei erfundene Kalkulationssatz sind keine beschlossenen Betriebsregeln.</p></details>';
 }
 
 app.addEventListener('input', function (event) {
@@ -662,7 +689,7 @@ app.addEventListener('change', function (event) {
     const selectedDays = new Set(Array.from(oldForm.querySelectorAll('input[name="day"]:checked'), input => input.value));
     const assignment = oldForm.querySelector('select[name="value"]').value;
     const reason = oldForm.querySelector('input[name="reason"]').value;
-    ui.planningWeek = Number(event.target.value);
+    ui.planningWeek = event.target.value;
     render();
     const select = app.querySelector('[data-batch-plan-week]');
     const newForm = select && select.closest('form');
@@ -673,6 +700,12 @@ app.addEventListener('change', function (event) {
       newForm.querySelector('input[name="reason"]').value = reason;
     }
     if (select) { select.focus({ preventScroll: true }); select.scrollIntoView({ block: 'nearest' }); }
+    return;
+  }
+  if (event.target.matches('form[data-form="new-plan-week"] input[name="monday"]')) {
+    const info = window.MMFinal.weekInfo(event.target.value);
+    const preview = app.querySelector('[data-week-preview]');
+    if (preview) preview.textContent = info ? 'Kalenderwoche: KW ' + info.week + ' / ' + info.year : 'Bitte einen Montag auswählen.';
     return;
   }
   if (!event.target.matches('[data-local-photo]')) return;
@@ -1071,7 +1104,7 @@ app.addEventListener('click', async function (event) {
     audit('PROJECT_REACTIVATED', project.number, 'Projekt reaktiviert', 'Archiviert', 'Aktiv', 'Reaktivierung in der Verwaltung');
     saveDb(); render(); return toast('Bau-Nr. ' + project.number + ' wurde reaktiviert.');
   }
-  if (action === 'planning-week') { ui.planningWeek = Number(target.dataset.week); return render(); }
+  if (action === 'planning-week') { ui.planningWeek = target.dataset.week; return render(); }
   if (action === 'filter-status') { ui.employeeFilter = target.dataset.status; return navigate('employees'); }
   if (action === 'employee-filter') { ui.employeeFilter = target.dataset.status; return render(); }
   if (action === 'open-site') { ui.selectedSite = target.dataset.id; ui.view = 'sites'; ui.query = ''; render(); return setTimeout(function () { const detail = document.querySelector('.folder-detail'); if (detail) detail.scrollIntoView({ block: 'start' }); }, 0); }
@@ -1128,7 +1161,7 @@ app.addEventListener('click', async function (event) {
     item.read = true;
     saveDb();
     if (item.sheetId) { ui.selectedWeek = item.sheetId; return navigate('weeks'); }
-    if (item.planningWeek) { ui.planningWeek = Number(item.planningWeek); return navigate('today'); }
+    if (item.planningWeek) { ui.planningWeek = item.planningWeek; return navigate('today'); }
     return render();
   }
   if (action === 'test-notification') {

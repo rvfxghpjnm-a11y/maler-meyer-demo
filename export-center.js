@@ -16,7 +16,7 @@
   function render(db) {
     const projectOptions = selectOptions(db.sites, function (item) { return item.number; }, function (item) { return item.number + ' · ' + item.name; });
     const employeeOptions = selectOptions(db.employees, function (item) { return item.id; }, function (item) { return item.name; });
-    const weekOptions = db.weekPlans.map(function (item) { return '<option value="' + item.week + '">KW ' + item.week + '</option>'; }).join('');
+    const weekOptions = db.weekPlans.map(function (item) { return '<option value="' + item.monday + '">KW ' + item.week + ' / ' + item.monday.slice(0, 4) + '</option>'; }).join('');
     const years = Array.from(new Set((db.weekPlans || []).map(function (item) { return String(item.monday).slice(0, 4); }).concat((db.leaveRequests || []).map(function (item) { return String(item.from).slice(0, 4); })))).filter(function (item) { return /^\d{4}$/.test(item); }).sort();
     const yearOptions = years.map(function (item) { return '<option value="' + item + '">' + item + '</option>'; }).join('');
     return headBlock() +
@@ -73,10 +73,13 @@
     const employeeSelect = document.getElementById('mm-export-employee');
     const weekSelect = document.getElementById('mm-export-week');
     const yearSelect = document.getElementById('mm-export-year');
+    const weekRef = target && target.dataset.week ? target.dataset.week : (weekSelect ? weekSelect.value : db.weekPlans[db.weekPlans.length - 1].monday);
+    const chosenPlan = db.weekPlans.find(function (item) { return item.monday === weekRef; }) || db.weekPlans.find(function (item) { return item.week === Number(weekRef) && item.monday.startsWith('2026-'); }) || db.weekPlans[0];
     return {
       site: target && target.dataset.site ? target.dataset.site : (siteSelect ? siteSelect.value : db.sites[0].number),
       employeeId: employeeSelect ? employeeSelect.value : db.employees[0].id,
-      week: Number(target && target.dataset.week ? target.dataset.week : (weekSelect ? weekSelect.value : db.weekPlans[db.weekPlans.length - 1].week)),
+      week: chosenPlan.week,
+      planMonday: chosenPlan.monday,
       year: Number(yearSelect ? yearSelect.value : String(db.weekPlans[0].monday).slice(0, 4))
     };
   }
@@ -162,7 +165,7 @@
     const emp = employee(db, pick.employeeId);
     const requestedWeek = 'KW ' + pick.week;
     const sheet = db.weeklySheets.find(function (item) { return item.employeeId === emp.id && item.week === requestedWeek; });
-    const plan = db.weekPlans.find(function (item) { return item.week === pick.week; }) || db.weekPlans[0];
+    const plan = db.weekPlans.find(function (item) { return item.monday === pick.planMonday; }) || db.weekPlans[0];
     const monday = new Date((plan && plan.monday ? plan.monday : '2026-09-07') + 'T12:00:00');
     const days = ['Mo.', 'Di.', 'Mi.', 'Do.', 'Fr.', 'Sa.'];
     const rows = days.map(function (day, index) {
@@ -201,11 +204,12 @@
   }
 
   function planningHtml(db, pick) {
-    const plan = db.weekPlans.find(function (item) { return item.week === pick.week; }) || db.weekPlans[0];
+    const plan = db.weekPlans.find(function (item) { return item.monday === pick.planMonday; }) || db.weekPlans[0];
     const monday = new Date(plan.monday + 'T12:00:00');
     const dates = new Array(6).fill(0).map(function (_, index) { const date = new Date(monday); date.setDate(date.getDate() + index); return isoToDe(date.toISOString().slice(0, 10)); });
     const group = function (name) { const rows = plan.rows.filter(function (row) { return row.group === name; }); return '<tr><th colspan="8" style="background:#d9ead3">' + h(name) + '</th></tr>' + rows.map(function (row, index) { const who = row.displayName || employee(db, row.employeeId).name; return '<tr><td>' + (index + 1) + '</td><td class="bold">' + h(who) + '</td>' + row.values.map(function (value) { const color = value === 'Krank' ? 'color:#c62828;font-weight:700' : value === 'Urlaub' ? 'color:#2f8a43;font-weight:700' : ''; const site = db.sites.find(function (item) { return item.number === value; }); return '<td style="' + color + '">' + h(site ? site.number + ' · ' + site.name : value) + '</td>'; }).join('') + '</tr>'; }).join(''); };
-    return { title: 'Wochenplanung 2026', orientation: 'landscape', body: '<main class="page planning-doc">' + docHeader('Wochenplanung 2026') + '<table><thead><tr><th>KW ' + plan.week + '</th><th></th>' + ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'].map(function (d,i){return '<th class="center">'+d+'<br><span class="small">'+dates[i]+'</span></th>';}).join('') + '</tr></thead><tbody>' + group('Mitarbeiter') + group('Auszubildende / Praktikum') + group('Subunternehmer') + '</tbody></table></main>' };
+    const year = plan.monday.slice(0, 4);
+    return { title: 'Wochenplanung ' + year, orientation: 'landscape', body: '<main class="page planning-doc">' + docHeader('Wochenplanung ' + year) + '<table><thead><tr><th>KW ' + plan.week + '/' + year + '</th><th></th>' + ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'].map(function (d,i){return '<th class="center">'+d+'<br><span class="small">'+dates[i]+'</span></th>';}).join('') + '</tr></thead><tbody>' + group('Mitarbeiter') + group('Auszubildende / Praktikum') + group('Subunternehmer') + '</tbody></table></main>' };
   }
 
   function invoiceListHtml(db) { return { title: 'Rechnung schreiben?', body: '<main class="page">' + docHeader('Rechnung schreiben?') + '<table><thead><tr><th>Datum</th><th>BV / Kunde</th><th>Mitarbeiter</th><th>Rechnung schreiben?</th></tr></thead><tbody>' + db.invoiceTasks.map(function (item) { return '<tr><td>' + h(isoToDe(item.date)) + '</td><td>' + h(item.project) + '</td><td>' + h(item.employee) + '</td><td>' + h(statusLabels[item.status] + (item.note ? ' · ' + item.note : '')) + '</td></tr>'; }).join('') + '</tbody></table><p class="small">Digitale Status sind ein Demo-Vorschlag und keine abschließend beschlossene Betriebsregel.</p></main>' }; }
@@ -261,7 +265,24 @@
     return [{ name: x.site, rows: rows, widths: [22, 20, 32, 14, 14], freeze: { rows: 1, cols: 0 }, landscape: true }];
   }
   function excelSerial(iso) { return Math.round((Date.parse(iso + 'T00:00:00Z') - Date.UTC(1899, 11, 30)) / 86400000); }
-  function planningWorkbook(db){return db.weekPlans.map(function(plan){const monday=excelSerial(plan.monday);const dates=[cell(monday,7)];for(let i=1;i<6;i+=1)dates.push(cell(monday+i,7,String.fromCharCode(66+i)+'3+1'));const rows=[['Wochenplanung 2026'],['KW '+plan.week,'Mitarbeiter','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],['',''].concat(dates)];const label=function(value){const site=db.sites.find(function(x){return x.number===value;});return site?site.number+' · '+site.name:value;};['Mitarbeiter','Auszubildende / Praktikum','Subunternehmer'].forEach(function(group,index){if(index){rows.push([cell('KW '+plan.week,0,'A2')]);rows.push(['',''].concat(dates.map(function(d,i){return cell(monday+i,7,String.fromCharCode(67+i)+'3');})));}else rows.push([cell(group,3)]);plan.rows.filter(function(r){return r.group===group;}).forEach(function(r,i){rows.push([i+1,r.displayName||employee(db,r.employeeId).name].concat(r.values.map(label)));});rows.push([]);});return{name:'KW '+plan.week,rows:rows,widths:[8,24,29,29,29,29,29,29],freeze:{rows:3,cols:2},landscape:true};});}
+  function planningWorkbook(db) {
+    return db.weekPlans.map(function (plan) {
+      const info = window.MMFinal.weekInfo(plan.monday);
+      const title = 'KW ' + String(info.week).padStart(2, '0') + '-' + info.year;
+      const monday = excelSerial(plan.monday);
+      const dates = [cell(monday, 7)];
+      for (let i = 1; i < 6; i += 1) dates.push(cell(monday + i, 7, String.fromCharCode(66 + i) + '3+1'));
+      const rows = [['Wochenplanung ' + info.year], ['KW ' + info.week + '/' + info.year, 'Mitarbeiter', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'], ['', ''].concat(dates)];
+      const label = function (value) { const site = db.sites.find(function (x) { return x.number === value; }); return site ? site.number + ' · ' + site.name : value; };
+      ['Mitarbeiter', 'Auszubildende / Praktikum', 'Subunternehmer'].forEach(function (group, index) {
+        if (index) { rows.push([cell('KW ' + info.week + '/' + info.year, 0, 'A2')]); rows.push(['', ''].concat(dates.map(function (d, i) { return cell(monday + i, 7, String.fromCharCode(67 + i) + '3'); }))); }
+        else rows.push([cell(group, 3)]);
+        plan.rows.filter(function (r) { return r.group === group; }).forEach(function (r, i) { rows.push([i + 1, r.displayName || employee(db, r.employeeId).name].concat(r.values.map(label))); });
+        rows.push([]);
+      });
+      return { name: title, rows: rows, widths: [8, 24, 29, 29, 29, 29, 29, 29], freeze: { rows: 3, cols: 2 }, landscape: true };
+    });
+  }
   function invoiceWorkbook(db){return[{name:'Rechnung schreiben',rows:[['Rechnung schreiben?'],['Datum','BV / Kunde','Mitarbeiter','Rechnung schreiben?']].concat(db.invoiceTasks.map(function(x){return[x.date,x.project,x.employee,statusLabels[x.status]+(x.note?' · '+x.note:'')];})),widths:[14,42,22,36],freeze:{rows:2,cols:0},landscape:false}];}
 
   function saveXlsx(name,sheets){saveBlob(name,buildXlsx(sheets));}

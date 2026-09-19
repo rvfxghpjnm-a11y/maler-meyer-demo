@@ -1,6 +1,6 @@
-# Interner Torben-Praxistest – Demo-Version 11
+# Interner Torben-Praxistest – Demo-Version 15
 
-Stand: 15. September 2026. Alle Fälle verwenden ausschließlich synthetische Daten. „Bestanden“ bezeichnet die Bedienungsdemo, nicht die Produktivreife.
+Stand: 19. September 2026. Alle Fälle verwenden ausschließlich synthetische Daten. „Bestanden“ bezeichnet die Bedienungsdemo, nicht die Produktivreife.
 
 ## Bestehende Bedienfälle 1–24
 
@@ -50,6 +50,9 @@ Stand: 15. September 2026. Alle Fälle verwenden ausschließlich synthetische Da
 - `qa-completion-workflows.cjs`: Foto/Sprache, Material, Urlaub, PIN, Offline, Feedback und Reset
 - `qa-final-practice.cjs`: Fälle 25–34 einschließlich dynamischem Projekt-Unterkonto-XLSX
 - `qa-exports.cjs` und `qa-xlsx.mjs`: PDF-, XLSX- und CSV-Erzeugung, Dateiformate, Formeln und Fehlerwerte
+- `qa-source-excel.cjs`: datierte akzeptierte Projektstunden, Wochenwerte, Summenanker und Fortsetzung über 54 Kalenderwochen
+- `qa-year-week.cjs`: unabhängige Planung und XLSX-Blätter für gleiche Kalenderwochennummern verschiedener Jahre
+- `qa-mobile-workflows.cjs`: zusätzlich Bürokorrektur bis zu den datierten Stunden des Projekt-Unterkontos verfolgt
 
 ## Bewusste Grenzen
 

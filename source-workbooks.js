@@ -30,14 +30,17 @@
     for (let col = 5; col <= 13; col += 1) put(rows, 6, col, c(0, 5, 'SUM(' + letter(col) + '7:' + letter(col) + '60)'));
     put(rows, 6, 15, c(x.travelHoursRaw, 5, 'SUM(O7:O60)'));
     put(rows, 6, 27, c(x.traineeHours, 5, 'SUM(AB6:AL6)'));
-    put(rows, 6, 28, c(x.traineeHours, 5, 'SUM(AB7:AB58)'));
-    for (let col = 29; col <= 38; col += 1) put(rows, 6, col, c(0, 5, 'SUM(' + letter(col) + '7:' + letter(col) + '58)'));
-    // Existing demo aggregates have no reliable per-week split. Keep the sum
-    // in one explicitly labelled source row instead of inventing KW shares.
-    put(rows, 7, 1, 'Demo-Sammelwert · KW offen');
-    put(rows, 7, 4, c(amount(x.acceptedHours), 5));
-    put(rows, 7, 15, c(amount(x.travelHoursRaw), 5));
-    put(rows, 7, 28, c(amount(x.traineeHours), 5));
+    put(rows, 6, 28, c(x.traineeHours, 5, 'SUM(AB7:AB60)'));
+    for (let col = 29; col <= 38; col += 1) put(rows, 6, col, c(0, 5, 'SUM(' + letter(col) + '7:' + letter(col) + '60)'));
+    // Only accepted demo minutes with an explicit date and project are grouped.
+    // Travel is a separate raw value; no wage or overtime rule is applied.
+    (x.workWeeks || []).slice(0, 54).forEach(function (week, index) {
+      const row = 7 + index;
+      put(rows, row, 1, 'KW ' + String(week.week).padStart(2, '0') + '/' + week.year);
+      put(rows, row, 4, c(week.workerHours, 5));
+      put(rows, row, 15, c(week.travelHoursRaw, 5));
+      put(rows, row, 28, c(week.traineeHours, 5));
+    });
     put(rows, 5, 21, 'geschriebene Rechnungen');
     put(rows, 6, 21, 'Datum'); put(rows, 6, 22, 'Beleg'); put(rows, 6, 23, 'Netto-Betrag');
     const projectBills = (db.billingRecords || []).filter(function (bill) { return bill.site === x.site; });
@@ -117,6 +120,25 @@
         if (matching.length) rows[sumRow - 1][10].f = rows[sumRow - 1][10].f.slice(0, -1) + ',' + matching.join(',') + ')';
       });
     }
+    // A project spanning more than 54 calendar weeks must not silently lose
+    // time. Keep the observed summary cells and extend their formulas to a
+    // clearly marked continuation block outside the canonical layout.
+    const extraWeeks = (x.workWeeks || []).slice(54);
+    if (extraWeeks.length) {
+      const first = Math.max(rows.length + 2, 1000);
+      put(rows, first - 1, 1, 'Weitere datierte Wochen (synthetische Fortsetzung)');
+      extraWeeks.forEach(function (week, index) {
+        const row = first + index;
+        put(rows, row, 1, 'KW ' + String(week.week).padStart(2, '0') + '/' + week.year);
+        put(rows, row, 4, c(week.workerHours, 5));
+        put(rows, row, 15, c(week.travelHoursRaw, 5));
+        put(rows, row, 28, c(week.traineeHours, 5));
+      });
+      const last = first + extraWeeks.length - 1;
+      rows[5][3].f = 'SUM(D7:D60,D' + first + ':D' + last + ')';
+      rows[5][14].f = 'SUM(O7:O60,O' + first + ':O' + last + ')';
+      rows[5][27].f = 'SUM(AB7:AB60,AB' + first + ':AB' + last + ')';
+    }
     if (linkedToMain) put(rows, 1, 1, 'Projektblatt · ' + site);
     else put(rows, 1, 1, 'Projekt-Unterkonto · ' + site);
     return { name: site, rows: rows, widths: [16, 18, 32, 12, 11, 11, 11, 11, 14, 10, 16, 11, 11, 4, 15, 11, 11, 11, 11, 4, 15, 22, 18, 10, 10, 10, 10, 14, 12, 11, 11, 11, 11, 11, 11, 11, 11, 11], freeze: { rows: 6, cols: 3 }, landscape: true };
@@ -132,7 +154,7 @@
       ['B200: K162/K163 referenzieren historisch die Vorzeilenmenge.'],
       ['Neue Demo-Positionen nutzen Menge mal Einzelpreis derselben Zeile; Fachprüfung offen.'],
       ['Kostenübersicht K001: C17, C20 und C178 bleiben ungeklärt und werden nicht nachgebaut.'],
-      ['Wochenstunden ohne belegte Einzel-KW werden als Demo-Sammelwert ausgewiesen.']
+      ['Projektstunden stammen aus datierten akzeptierten Demo-Minuten; Bürofreigabe und Rohereignisse bleiben getrennt.']
     ], widths: [98, 18], freeze: { rows: 0, cols: 0 }, landscape: false };
   }
   function calculation(db) {

@@ -28,7 +28,7 @@ async function nav(page, view) {
     await page.reload({ waitUntil: 'networkidle' });
 
     await nav(page, 'planning');
-    await page.locator('[data-action="planning-week"][data-week="38"]').click();
+    await page.locator('[data-action="planning-week"][data-week="2026-09-14"]').click();
     await page.getByRole('heading', { name: 'Wochenplanung 2026 · KW 38' }).waitFor();
     assert.equal(await page.locator('.planning-cell').count() > 20, true);
     checks.push('25 vollständige neue Woche ist zellenweise planbar');
@@ -48,13 +48,13 @@ async function nav(page, view) {
     assert.deepEqual(state.weekPlans.find(x => x.week === 38).rows.find(x => x.employeeId === 'M-0002').values.slice(0, 3), ['26-103', '26-103', '26-103']);
     checks.push('27 drei Mitarbeiter Montag bis Mittwoch derselben Baustelle zugeordnet');
 
-    await page.locator('[data-action="planning-week"][data-week="37"]').click();
+    await page.locator('[data-action="planning-week"][data-week="2026-09-07"]').click();
     await page.locator('.planning-cell[data-employee="M-0004"][data-day="3"]').click();
     await page.locator('form[data-form="plan-cell"] select[name="value"]').selectOption('26-105');
     await page.locator('form[data-form="plan-cell"] button.primary').click();
     state = await page.evaluate(key => JSON.parse(localStorage.getItem(key)).data, storageKey);
     assert.equal(state.assignments.find(x => x.employeeId === 'M-0004').site, '26-105', 'Demo-Tag muss heutige Zuordnung aktualisieren');
-    await page.locator('[data-action="planning-week"][data-week="38"]').click();
+    await page.locator('[data-action="planning-week"][data-week="2026-09-14"]').click();
     await page.locator('.planning-cell[data-employee="M-0004"][data-day="3"]').click();
     await page.locator('form[data-form="plan-cell"] select[name="value"]').selectOption('26-101');
     await page.locator('form[data-form="plan-cell"] button.primary').click();
@@ -63,7 +63,6 @@ async function nav(page, view) {
     checks.push('Planungsdatum aktualisiert nur am synthetischen Demo-Tag die heutige Zuordnung');
 
     await page.locator('[data-action="new-plan-week"]').click();
-    await page.locator('form[data-form="new-plan-week"] input[name="week"]').fill('39');
     await page.locator('form[data-form="new-plan-week"] input[name="monday"]').fill('2026-09-21');
     await page.locator('form[data-form="new-plan-week"] select[name="mode"]').selectOption('COPY');
     await page.locator('form[data-form="new-plan-week"] button.primary').click();
@@ -71,15 +70,15 @@ async function nav(page, view) {
     assert.equal(state.weekPlans.find(x => x.week === 39).rows.length, state.weekPlans.find(x => x.week === 38).rows.length);
     checks.push('28 Vorwoche kopiert');
 
-    await page.locator('[data-action="planning-week"][data-week="38"]').click();
-    await page.locator('[data-action="publish-plan"][data-week="38"]').click();
+    await page.locator('[data-action="planning-week"][data-week="2026-09-14"]').click();
+    await page.locator('[data-action="publish-plan"][data-week="2026-09-14"]').click();
     await nav(page, 'more');
     await page.locator('[data-action="switch-role"][data-role="employee"]').click();
-    await page.getByRole('heading', { name: 'Meine Woche · KW 38' }).waitFor();
+    await page.getByRole('heading', { name: 'Meine Woche · KW 38 / 2026' }).waitFor();
     assert.equal(await page.locator('.my-week-days').getByText(/26-103/).count() >= 1, true);
     checks.push('29 Mitarbeiter sieht eigene veröffentlichte Woche');
     await nav(page, 'notifications');
-    assert.equal(await page.getByText('Deine Planung für KW 38 wurde geändert.', { exact: true }).count() >= 1, true);
+    assert.equal(await page.getByText('Deine Planung für KW 38 / 2026 wurde geändert.', { exact: true }).count() >= 1, true);
     checks.push('30 Planänderung erzeugt Mitarbeiter-Hinweis');
 
     await nav(page, 'more');

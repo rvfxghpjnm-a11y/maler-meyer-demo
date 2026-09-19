@@ -106,6 +106,12 @@ async function drawMouse(page) {
     await switchRole(page, 'office');
     await navigate(page, 'times');
     const requestId = await page.evaluate(key => JSON.parse(localStorage.getItem(key)).data.correctionRequests.find(item => item.sheetId === 'W-001' && item.status === 'OPEN').id, storageKey);
+    const accountBeforeCorrection = await page.evaluate(key => {
+      const data = JSON.parse(localStorage.getItem(key)).data;
+      const request = data.correctionRequests.find(item => item.sheetId === 'W-001' && item.status === 'OPEN');
+      const account = data.projectAccounts.find(item => item.site === request.site);
+      return window.MMExcel.account(data, account).acceptedHours;
+    }, storageKey);
     await page.locator(`[data-action="open-correction"][data-id="${requestId}"]`).click();
     await page.locator(`form[data-form="time-correction"][data-id="${requestId}"] textarea[name="reason"]`).fill('Mit Mitarbeiter im synthetischen Testfall geprüft.');
     await page.locator(`form[data-form="time-correction"][data-id="${requestId}"] button[data-action="submit-correction"]`).click();
@@ -115,7 +121,15 @@ async function drawMouse(page) {
       const old = data.weeklySnapshots.find(item => item.sheetId === 'W-001' && item.version === 1);
       return sheet.version === 2 && sheet.status === 'NEEDS_RECONFIRM' && old.supersededByVersion === 2 && !sheet.confirmedSnapshotId;
     }, storageKey);
+    const accountAfterCorrection = await page.evaluate(key => {
+      const data = JSON.parse(localStorage.getItem(key)).data;
+      const request = data.correctionRequests.find(item => item.id === data.corrections[0].requestId);
+      const account = data.projectAccounts.find(item => item.site === request.site);
+      return window.MMExcel.account(data, account).acceptedHours;
+    }, storageKey);
+    assert.notEqual(accountAfterCorrection, accountBeforeCorrection, 'Bürokorrektur muss die datierten Projektstunden im Exportmodell aktualisieren');
     checks.push('Bürokorrektur erzeugt Version 2 und erhält Version 1');
+    checks.push('Bürokorrektur aktualisiert datierte Stunden im Projekt-Unterkonto');
 
     await switchRole(page, 'employee');
     await navigate(page, 'weeks');

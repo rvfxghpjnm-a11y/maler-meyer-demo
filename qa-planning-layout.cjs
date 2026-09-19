@@ -32,9 +32,9 @@ const url = process.env.DEMO_URL || 'http://127.0.0.1:4175/';
       assert.ok((await cell.getAttribute('title')).includes('26-102'));
 
       const weekSelect = page.locator('form[data-form="plan-batch"] select[name="week"]');
-      assert.equal(await weekSelect.inputValue(), '37', 'Planungsbox muss die angezeigte KW vorauswählen');
+      assert.equal(await weekSelect.inputValue(), '2026-09-07', 'Planungsbox muss die angezeigte KW vorauswählen');
       const optionLabels = await weekSelect.locator('option').allTextContents();
-      assert.ok(optionLabels.length >= 5 && optionLabels.every(text => /^KW \d+ · \d{2}\.\d{2}\.–\d{2}\.\d{2}\.\d{4}$/.test(text)), 'Nur KW und Datumsbereich, keine relativen Wochenbegriffe');
+      assert.ok(optionLabels.length >= 5 && optionLabels.every(text => /^KW \d+ \/ \d{4} · \d{2}\.\d{2}\.–\d{2}\.\d{2}\.\d{4}$/.test(text)), 'KW, Jahr und Datumsbereich statt relativer Wochenbegriffe');
       assert.match(await page.locator('.batch-week-context strong').textContent(), /^Aktuelle Kalenderwoche: KW \d+ \/ \d{4}$/);
       assert.match(await page.locator('.batch-week-selected').textContent(), /Ausgewählt: KW 37/);
 
@@ -46,9 +46,9 @@ const url = process.env.DEMO_URL || 'http://127.0.0.1:4175/';
         await weekSelect.scrollIntoViewIfNeeded();
         await page.screenshot({ path: path.join(os.tmpdir(), 'maler-meyer-batch-week-390.png') });
 
-        await weekSelect.selectOption('38');
-        await page.getByRole('heading', { name: 'Kolonne oder mehrere Tage planen · KW 38' }).waitFor();
-        assert.equal(await page.locator('form[data-form="plan-batch"] select[name="week"]').inputValue(), '38');
+        await weekSelect.selectOption('2026-09-14');
+        await page.getByRole('heading', { name: 'Kolonne oder mehrere Tage planen · KW 38 / 2026' }).waitFor();
+        assert.equal(await page.locator('form[data-form="plan-batch"] select[name="week"]').inputValue(), '2026-09-14');
         assert.equal(await page.locator('form[data-form="plan-batch"] input[name="employee"][value="M-0001"]').isChecked(), true, 'Mitarbeiterwahl bleibt beim KW-Wechsel erhalten');
         assert.match(await page.locator('.batch-week-selected').textContent(), /Ausgewählt: KW 38/);
         await page.getByRole('heading', { name: 'Wochenplanung 2026 · KW 38' }).waitFor();
