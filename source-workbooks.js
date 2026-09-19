@@ -165,12 +165,12 @@
       const headingRow = 1 + pair * bandHeight;
       const dateRow = headingRow + 1;
       const firstMonth = pair * 2;
-      employees.forEach(function (item, index) { put(rows, headingRow + 2 + index, 1, item.name); });
+      employees.forEach(function (item, index) { put(rows, headingRow + 2 + index, 1, c(item.name, 3)); });
       for (let half = 0; half < 2; half += 1) {
         const month = firstMonth + half;
         const days = new Date(Date.UTC(selectedYear, month + 1, 0)).getUTCDate();
         const firstCol = half === 0 ? 2 : 2 + new Date(Date.UTC(selectedYear, firstMonth + 1, 0)).getUTCDate();
-        put(rows, headingRow, firstCol, monthNames[month]);
+        put(rows, headingRow, firstCol, c(monthNames[month], 2));
         for (let day = 1; day <= days; day += 1) {
           const col = firstCol + day - 1;
           const date = iso(month, day);
@@ -181,7 +181,7 @@
           put(rows, dateRow, col, c(serial(month, day), 8, formula));
           employees.forEach(function (employee, index) {
             const onLeave = approved.some(function (request) { return request.employeeId === employee.id && request.from <= date && request.to >= date; });
-            if (onLeave) put(rows, headingRow + 2 + index, col, 'U');
+            put(rows, headingRow + 2 + index, col, onLeave ? c('U', 6) : c('', 9));
           });
         }
       }
