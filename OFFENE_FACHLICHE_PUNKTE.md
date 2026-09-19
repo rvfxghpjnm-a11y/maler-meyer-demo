@@ -45,3 +45,4 @@ Zusätzlich offen bleiben das endgültige Material-Bewertungsmodell, die Auswahl
 28. Projektkosten: Welche Beleg- und Pflichtfelder werden je Kostenart benötigt?
 29. Eingangsrechnungen: Umsatzsteuerbehandlung, Prüfschritte, Kontierung und OCR-Zeitpunkt
 30. Geschriebene Rechnungen: Verhältnis zwischen Projekt-Unterkonto, „Rechnung schreiben?“-Liste und späterem Rechnungssystem
+31. Pilotbetrieb: Welcher bisherige Nachweis bleibt bis zur Abnahme führend, welche ein bis zwei Baustellen werden verglichen und wer zeichnet tägliche bzw. wöchentliche Differenzen fachlich ab?

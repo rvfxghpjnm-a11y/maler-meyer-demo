@@ -182,7 +182,11 @@ function renderManagement() {
 function renderManagementV11() {
   const base = renderManagement();
   const quick = `<section class="management-quick"><button class="primary" data-action="navigate" data-view="planning">Planung bearbeiten</button><button class="secondary" data-action="navigate" data-view="admin">Neue Baustelle</button><button class="secondary" data-action="navigate" data-view="admin">Mitarbeiter helfen</button><button class="secondary" data-action="navigate" data-view="times">Offene Zeiten prüfen</button></section>`;
-  return base.replace(/<div class="toolbar admin-shortcut">[\s\S]*?<\/div>/, quick);
+  return base.replace(/<div class="toolbar admin-shortcut">[\s\S]*?<\/div>/, quick + renderPilotScenarioCard());
+}
+function renderPilotScenarioCard() {
+  const pilot = db.pilotScenario;
+  return `<section class="card card-pad section pilot-scenario"><h2>Torben-Praxistest · vollständig erfunden</h2><p>${pilot ? `Bau-Nr. ${esc(pilot.projectNumber)} · Projekt Stephan (Demo) · Stefan Eins und Stefan Zwei sind in diesem Browser angelegt.` : 'Ein Klick legt Stefan Eins, Stefan Zwei und Projekt Stephan samt Planung, Zeit, Material, Kosten und Rechnung an.'}</p><div class="form-actions">${pilot ? `<button class="primary" data-action="open-site" data-id="${esc(pilot.projectNumber)}">Projekt ansehen</button><button class="secondary" data-action="open-pilot-planning">KW 38 ansehen</button>` : '<button class="primary" data-action="load-torben-pilot">Praxistest laden</button>'}</div><p class="meta">Nur synthetische Daten · Speicherung ausschließlich in diesem Browser · keine echte Betriebsfreigabe.</p></section>`;
 }
 function renderOffice() {
   return `${head(greeting(profile().name), 'Arbeitsvorrat und Betriebsverwaltung · ' + DEMO_DATE)}<div class="work-queue"><button class="queue-card problem-card" data-action="navigate" data-view="times"><strong>${openCorrections().length}</strong><span>Zeitkorrekturen offen</span><small>Original und Änderung bleiben sichtbar</small></button><button class="queue-card" data-action="navigate" data-view="extras"><strong>${openExtras().length}</strong><span>Zusatzarbeiten offen</span><small>kaufmännische Prüfung</small></button><button class="queue-card" data-action="navigate" data-view="weeks"><strong>${pendingWeeks().length}</strong><span>Wochenzettel offen</span><small>prüfen oder freigeben</small></button><button class="queue-card" data-action="navigate" data-view="material"><strong>${db.materialRecords.filter(function (item) { return item.status === 'NEW'; }).length}</strong><span>Materialanforderungen neu</span><small>bearbeiten und prüfen</small></button><button class="queue-card" data-action="navigate" data-view="leave"><strong>${db.leaveRequests.filter(function (item) { return item.status === 'REQUESTED'; }).length}</strong><span>Urlaubsanträge offen</span><small>für Geschäftsführung vorbereiten</small></button><button class="queue-card" data-action="navigate" data-view="admin"><strong>${activeEmployees().length}</strong><span>Verwaltung & Büro-Hilfe</span><small>Projekte, Mitarbeiter, Anrufer unterstützen</small></button></div><p class="decision-note"><strong>Im Vorab-Fragebogen bestätigt:</strong> Die Büro-Demokonten können die genannten Verwaltungsaufgaben bearbeiten. Die endgültige Urlaubsentscheidung bleibt bei der Geschäftsführung. Die statische Demo erzwingt keine produktiven Rechte.</p>`;
@@ -669,7 +673,7 @@ function renderMoreV6() {
   const officeDirect = isOfficeRole() ? '<section class="card card-pad section"><h2>Direkt zu Büroaufgaben</h2><div class="quick-grid"><button class="secondary" data-action="navigate" data-view="times">Zeiten prüfen</button><button class="secondary" data-action="navigate" data-view="weeks">Wochenzettel</button><button class="secondary" data-action="navigate" data-view="extras">Zusatzarbeiten</button><button class="secondary" data-action="navigate" data-view="material">Material</button><button class="secondary" data-action="navigate" data-view="leave">Urlaub</button></div></section>' : '';
   return head('Mehr', 'Rollenwechsel, Demo-Steuerung und seltene Bereiche') +
     '<section class="card card-pad"><h2>Demo-Konto wechseln</h2><p>Dieselben synthetischen Vorgänge mit vier Verwaltungs-Konten sowie Vorarbeiter- und Mitarbeiteransicht prüfen.</p><div class="role-grid">' + roleButtons + '</div></section>' +
-    operations + officeDirect +
+    operations + officeDirect + (isOfficeRole() ? renderPilotScenarioCard() : '') +
     '<div class="more-grid section"><section class="card more-card"><h2>Fahrzeuggerät</h2><p>Benutzerwahl, 6-stelliger Demo-PIN und Sperre testen.</p><button class="primary" data-action="navigate" data-view="shared-device">Gemeinsames iPad öffnen</button></section><section class="card more-card"><h2>Anmeldung</h2><p>Vorschau der späteren Anmeldung.</p><button class="secondary" data-action="show-login">Anmeldeseite ansehen</button></section><section class="card more-card"><h2>Demo zurücksetzen</h2><p>Alle erfundenen Ausgangsdaten wiederherstellen.</p><button class="danger-button" data-action="reset-demo">Demo-Daten zurücksetzen</button></section><section class="card more-card"><h2>Benachrichtigungen</h2><p>Hinweise öffnen direkt die passende Wochenübersicht.</p><button class="secondary" data-action="navigate" data-view="notifications">Hinweise öffnen</button></section><section class="card more-card"><h2>Dokumente & Exporte</h2><p>Originalnahe Formulare, Wochenplanung und Nachkalkulationsdateien.</p><button class="primary" data-action="navigate" data-view="exports">Bereich öffnen</button></section></div>' +
     '<details class="developer-area"><summary>Entwickler- und Testinformationen</summary><p>Statische Demo ohne Backend und echte serverseitige Rechte. Die vier Verwaltungs-Konten simulieren denselben umfangreichen Adminzugriff; produktiv muss dies serverseitig erzwungen werden. Änderungen, Snapshots und gezeichnete Demo-Unterschriften bleiben nur lokal in diesem Browser.</p><p>Offline, PIN, Spracheingabe, Planveröffentlichung und Synchronisierung sind ausdrücklich Bedienungssimulationen. Browser-localStorage und die Demo-Datenstruktur sind kein Produktivdatenmodell.</p><p>Browser-Benachrichtigungen funktionieren nur nach Erlaubnis und nur solange die statische Seite aktiv ist. Geschlossene-App-Push benötigt später Backend, Push-Service, Service Worker und Benutzer-/Gerätezuordnung.</p><p>Demo-Version 15 · vollständig synthetisch. Die Excel-Struktur ist anonymisiert abgeglichen; historische Formeln und der frei erfundene Kalkulationssatz sind keine beschlossenen Betriebsregeln.</p></details>';
 }
@@ -1176,6 +1180,17 @@ app.addEventListener('click', async function (event) {
   if (action === 'show-login') { ui.login = true; return render(); }
   if (action === 'hide-login') { ui.login = false; return render(); }
   if (action === 'reset-demo') { resetDb(); render(); return toast('Synthetische Ausgangsdaten wiederhergestellt.'); }
+  if (action === 'load-torben-pilot') {
+    if (!isOfficeRole()) return toast('Der Praxistest ist nur in der Verwaltungsansicht verfügbar.');
+    try {
+      const result = window.MMPilotScenario.install(db);
+      ui.selectedSite = result.scenario.projectNumber;
+      ui.view = 'sites';
+      saveDb(); render();
+      return toast(result.created ? 'Synthetischer Praxistest geladen. Projekt, Mitarbeitende und Exporte sind verbunden.' : 'Praxistest ist bereits geladen.');
+    } catch (error) { return toast(error.message); }
+  }
+  if (action === 'open-pilot-planning') { ui.planningWeek = '2026-09-14'; return navigate('planning'); }
   if (action === 'open-employee-action') { ui.employeeAction = target.dataset.kind; ui.documentationTemplate = target.dataset.template || null; return render(); }
   if (action === 'close-action') { ui.employeeAction = null; ui.documentationTemplate = null; return render(); }
   if (action === 'switch-site') { ui.switchSite = true; return render(); }
