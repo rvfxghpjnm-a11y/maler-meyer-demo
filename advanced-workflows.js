@@ -11,6 +11,10 @@
     'M-0005': '567890',
     'M-0006': '678901'
   };
+  function assignedDemoPin(employeeId, db) {
+    const employee = db && (db.employees || []).find(function (item) { return item.id === employeeId; });
+    return demoPins[employeeId] || (employee && employee.demoPin) || '';
+  }
 
   function clone(value) {
     return JSON.parse(JSON.stringify(value));
@@ -107,9 +111,9 @@
     clone: clone,
     workdays: workdays,
     applyApprovedLeave: applyApprovedLeave,
-    checkDemoPin: function (employeeId, pin) { return demoPins[employeeId] === String(pin); },
-    hasDemoPin: function (employeeId) { return Boolean(demoPins[employeeId]); },
-    demoPinHint: function (employeeId) { return demoPins[employeeId] || '123456'; }
+    checkDemoPin: function (employeeId, pin, db) { return assignedDemoPin(employeeId, db) === String(pin); },
+    hasDemoPin: function (employeeId, db) { return Boolean(assignedDemoPin(employeeId, db)); },
+    demoPinHint: function (employeeId, db) { return assignedDemoPin(employeeId, db) || 'Kein Demo-PIN'; }
   };
   window.DEMO_DATA_VERSION = 10;
 }());

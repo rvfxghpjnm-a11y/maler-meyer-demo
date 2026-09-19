@@ -53,7 +53,7 @@
     NAMES.forEach(function (name, index) {
       db.employees.push({ id: ids[index], name: name, job: 'Mitarbeiter', role: 'EMPLOYEE',
         status: 'NOT_PLANNED', site: null, plannedSite: null, since: '–', active: true,
-        createdAt: STAMP, createdBy: 'Torben · Demo' });
+        createdAt: STAMP, createdBy: 'Torben · Demo', demoPin: index === 0 ? '111111' : '222222' });
       addAudit(db, 'EMPLOYEE_CREATED_' + index, ids[index], 'Mitarbeiter angelegt', name);
     });
     db.weekPlans.forEach(function (week) {

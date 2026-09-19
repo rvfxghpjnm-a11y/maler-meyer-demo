@@ -6,6 +6,8 @@ Die öffentliche Demo ist **kein paralleles Betriebssystem für echte Daten**. S
 
 Auf Torbens Startseite „Praxistest laden“ wählen. Das ergänzt den vorhandenen Browserzustand einmalig und öffnet die Baustelle. Ein Zurücksetzen der Demo entfernt den Fall wieder. Bei frischem Ausgangsstand entsteht Bau-Nr. `26-107`; ist diese schon belegt, nimmt die Demo die nächste freie Nummer des Jahres 2026.
 
+Die Testplanung liegt in KW 38 (14.–18.09.2026). Die allgemeine Demo-Tagesübersicht steht bewusst noch auf dem fiktiven 10.09.2026; dort sind die beiden neuen Personen deshalb nicht als „heute vor Ort“ eingeplant. Über „Mehr → Fahrzeuggerät“ sind beide mit den sichtbar angegebenen synthetischen Test-PINs auswählbar und sehen „Meine Woche“. Das ist keine echte Anmeldung.
+
 | Eingabe / Vorgang | Synthetischer Testwert | In der Demo prüfen |
 |---|---:|---|
 | Projekt | Projekt Stephan (Demo), Auftragswert netto 6.000 € | Baustellenmappe, Bauliste |
