@@ -25,6 +25,9 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
     await create('2027-01-04'); // KW 1/2027
     await page.getByRole('heading', { name: 'Wochenplanung 2027 · KW 1' }).waitFor();
     await create('2027-12-27'); // KW 52/2027, same week number as 2026
+    await create('2029-12-31'); // KW 01/2030, although Monday is in 2029
+    await page.getByRole('heading', { name: 'Wochenplanung 2030 · KW 1' }).waitFor();
+    await page.locator('[data-action="planning-week"][data-week="2027-12-27"]').click();
 
     let state = await page.evaluate(() => JSON.parse(localStorage.getItem('maler-meyer-demo-v11')).data);
     assert.equal(state.weekPlans.filter(item => item.week === 52).length, 2);
@@ -43,6 +46,18 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
     assert.match(workbook, /name="KW 52-2026"/);
     assert.match(workbook, /name="KW 01-2027"/);
     assert.match(workbook, /name="KW 52-2027"/);
+    assert.match(workbook, /name="KW 01-2030"/);
+    await page.locator('[data-action="navigate"][data-view="more"]:visible').first().click();
+    await page.locator('[data-action="navigate"][data-view="exports"]:visible').first().click();
+    const weekOption = page.locator('#mm-export-week option[value="2029-12-31"]');
+    assert.equal(await weekOption.textContent(), 'KW 1 / 2030');
+    await page.locator('#mm-export-week').selectOption('2029-12-31');
+    const popupPromise = page.waitForEvent('popup');
+    await page.locator('[data-mm-action="print"][data-template="planning"]').click();
+    const popup = await popupPromise;
+    await popup.waitForLoadState('domcontentloaded');
+    assert.match(await popup.locator('body').textContent(), /Wochenplanung 2030/);
+    assert.match(await popup.locator('body').textContent(), /KW 1\/2030/);
     assert.deepEqual(errors, []);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 2), true);
     console.log('OK KW/Jahr: Jahreswechsel, gleiche KW in verschiedenen Jahren, Änderung und XLSX');

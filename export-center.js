@@ -16,7 +16,7 @@
   function render(db) {
     const projectOptions = selectOptions(db.sites, function (item) { return item.number; }, function (item) { return item.number + ' · ' + item.name; });
     const employeeOptions = selectOptions(db.employees, function (item) { return item.id; }, function (item) { return item.name; });
-    const weekOptions = db.weekPlans.map(function (item) { return '<option value="' + item.monday + '">KW ' + item.week + ' / ' + item.monday.slice(0, 4) + '</option>'; }).join('');
+    const weekOptions = db.weekPlans.map(function (item) { const info = window.MMFinal.weekInfo(item.monday); return '<option value="' + item.monday + '">KW ' + info.week + ' / ' + info.year + '</option>'; }).join('');
     const years = Array.from(new Set((db.weekPlans || []).map(function (item) { return String(item.monday).slice(0, 4); }).concat((db.leaveRequests || []).map(function (item) { return String(item.from).slice(0, 4); })))).filter(function (item) { return /^\d{4}$/.test(item); }).sort();
     const yearOptions = years.map(function (item) { return '<option value="' + item + '">' + item + '</option>'; }).join('');
     return headBlock() +
@@ -208,7 +208,7 @@
     const monday = new Date(plan.monday + 'T12:00:00');
     const dates = new Array(6).fill(0).map(function (_, index) { const date = new Date(monday); date.setDate(date.getDate() + index); return isoToDe(date.toISOString().slice(0, 10)); });
     const group = function (name) { const rows = plan.rows.filter(function (row) { return row.group === name; }); return '<tr><th colspan="8" style="background:#d9ead3">' + h(name) + '</th></tr>' + rows.map(function (row, index) { const who = row.displayName || employee(db, row.employeeId).name; return '<tr><td>' + (index + 1) + '</td><td class="bold">' + h(who) + '</td>' + row.values.map(function (value) { const color = value === 'Krank' ? 'color:#c62828;font-weight:700' : value === 'Urlaub' ? 'color:#2f8a43;font-weight:700' : ''; const site = db.sites.find(function (item) { return item.number === value; }); return '<td style="' + color + '">' + h(site ? site.number + ' · ' + site.name : value) + '</td>'; }).join('') + '</tr>'; }).join(''); };
-    const year = plan.monday.slice(0, 4);
+    const year = window.MMFinal.weekInfo(plan.monday).year;
     return { title: 'Wochenplanung ' + year, orientation: 'landscape', body: '<main class="page planning-doc">' + docHeader('Wochenplanung ' + year) + '<table><thead><tr><th>KW ' + plan.week + '/' + year + '</th><th></th>' + ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'].map(function (d,i){return '<th class="center">'+d+'<br><span class="small">'+dates[i]+'</span></th>';}).join('') + '</tr></thead><tbody>' + group('Mitarbeiter') + group('Auszubildende / Praktikum') + group('Subunternehmer') + '</tbody></table></main>' };
   }
 
