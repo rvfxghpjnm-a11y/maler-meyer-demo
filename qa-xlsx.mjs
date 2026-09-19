@@ -8,7 +8,7 @@ if (!outputDir || !artifactToolPath) throw new Error('QA_EXPORT_DIR und ARTIFACT
 
 const { FileBlob, SpreadsheetFile } = await import(pathToFileURL(artifactToolPath).href);
 const names = (await fs.readdir(outputDir)).filter(name => name.endsWith('.xlsx')).sort();
-if (names.length !== 4) throw new Error('Vier XLSX-Dateien erwartet, gefunden: ' + names.length);
+if (names.length !== 5) throw new Error('Fünf XLSX-Dateien erwartet, gefunden: ' + names.length);
 
 for (const name of names) {
   const input = await FileBlob.load(path.join(outputDir, name));
