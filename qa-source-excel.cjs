@@ -56,7 +56,9 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
       leaveFirstDate: leaveSheet.rows[1][1].v,
       leaveNextDateFormula: leaveSheet.rows[1][2].f,
       leaveMarchFormula: leaveSheet.rows[35][1].f,
-      leaveApprovedStatus: leaveSheet.rows[138 + approvedEmployeeIndex][21]
+      leaveApprovedStatus: leaveSheet.rows[138 + approvedEmployeeIndex][21].v,
+      leaveApprovedStyle: leaveSheet.rows[138 + approvedEmployeeIndex][21].s,
+      leaveBlankStyle: leaveSheet.rows[138 + approvedEmployeeIndex][20].s
     };
   });
   assert.equal(report.count, report.sourceNames.length);
@@ -80,6 +82,8 @@ const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
   assert.equal(report.leaveNextDateFormula, 'B2+1');
   assert.equal(report.leaveMarchFormula, 'BH2+1');
   assert.equal(report.leaveApprovedStatus, 'U');
+  assert.equal(report.leaveApprovedStyle, 6);
+  assert.equal(report.leaveBlankStyle, 9);
   assert.equal(report.formulas.materialSum, 'SUM(K67:K229)');
   assert.equal(report.formulas.liftSum, 'SUM(K234:L235)');
   assert.equal(report.formulas.subSum, 'SUM(K239:L240)');
