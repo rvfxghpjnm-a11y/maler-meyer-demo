@@ -1,6 +1,6 @@
 # Offene fachliche Punkte
 
-Stand: 18. September 2026. Der beantwortete Vorab-Fragebogen und vier Original-Arbeitsmappen wurden nur lokal gelesen. Diese Datei enthält keine Originaldaten. Demo-Annahmen dürfen nicht als Betriebsregel in die Produktivversion übernommen werden.
+Stand: 19. September 2026. Der beantwortete Vorab-Fragebogen und vier Original-Arbeitsmappen wurden nur lokal gelesen. Der anonymisierte Audit, das 200-Blatt-Register und das Formel-Mapping wurden als Referenz geprüft, nicht veröffentlicht. Diese Datei enthält keine Originaldaten. Demo-Annahmen dürfen nicht als Betriebsregel in die Produktivversion übernommen werden.
 
 ## Durch den Vorab-Fragebogen geklärt (fachliche Zielrichtung)
 
@@ -26,7 +26,7 @@ Stand: 18. September 2026. Der beantwortete Vorab-Fragebogen und vier Original-A
 13. Push: genaue Trigger, Empfänger und Zeitpunkte; die wichtigsten Meldungskategorien wurden im Fragebogen bestätigt
 14. „Rechnung schreiben?“: endgültige Status, Verantwortlicher und Abschlusskriterium
 15. OCR: Teil der ersten Produktivversion oder später
-16. Original-Excel: Die Hauptformelbeziehungen der Bauliste und eines Projektblatt-Typs sind nun bekannt und synthetisch umgesetzt. Offen sind projektweise Blattvarianten, der vollständige zellgenaue Abgleich, Kostenübersicht und Urlaubsplaner als XLSX sowie die fachliche Freigabe für eine künftige Neuberechnung; siehe `EXCEL_QUELLABGLEICH.md`.
+16. Original-Excel: Alle 200 Projekt-/Baulistenblätter, 54 Wochenplanungsblätter, drei Urlaubsplanerblätter und zwei Kostenübersichtsblätter sind strukturell/formelseitig inventarisiert. Die Demo verwendet ein kanonisches B200-orientiertes Projektblatt und einen synthetischen Urlaubsplaner. Offen bleiben die fachliche Freigabe künftiger Kennzahlformeln und historischer Rate-Varianten, die systematisch verschobenen Materialreferenzen (B200 `K162`/`K163`), fehlende Summenanker einzelner Blätter sowie die Kostenübersichts-Abweichungen `K001!C17`, `C20` und `C178`. Die eigenständige Kostenübersicht wird deshalb nicht exportiert; siehe `EXCEL_QUELLABGLEICH.md`.
 17. Bau-Nr.: Die Vergabe nach Auftragserteilung ist bestätigt. Offen bleiben endgültiger Nummernaufbau, technische Reservierung bei parallelen Anlagen und ob/wie eine bereits verknüpfte Bau-Nr. geändert werden darf. `JJ-NNN` bleibt Demo-Vorschlag.
 18. Betriebsrat und Mitbestimmung
 19. Aufbewahrung und Löschfristen
