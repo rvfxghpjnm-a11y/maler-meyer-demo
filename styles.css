@@ -517,6 +517,73 @@ legend { margin-bottom: .65rem; color: var(--navy); font-weight: 900; }
 .feedback-card > summary span:first-child { min-width: 0; display: grid; gap: .2rem; }
 .feedback-detail { padding: .8rem 1rem 1rem; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
 .extra-status-grid .status-card.active { border-color: var(--navy); box-shadow: inset 0 0 0 2px var(--navy); }
+
+/* Interaktiver Torben-Praxistest V17 */
+.interactive-test-entry { border: 2px solid #c2dfc7; background: linear-gradient(135deg,#f7fcf8,#eef7ef); }
+.interactive-test-entry h2 { margin: .2rem 0 .45rem; }
+.interactive-test-entry small { display: block; margin-top: .7rem; color: var(--muted); }
+.practice-intro,.practice-current,.practice-complete,.practice-pause,.practice-progress,.practice-finish,.practice-overview { max-width: 920px; margin-inline: auto; }
+.practice-intro ul { padding-left: 1.25rem; line-height: 1.6; }
+.practice-progress { display: grid; grid-template-columns: minmax(0,1fr) minmax(180px,340px); align-items: center; gap: 1rem; }
+.practice-progress strong,.practice-progress small { display: block; }
+.practice-progress small { margin-top: .25rem; color: var(--muted); }
+.practice-progress progress { width: 100%; height: 16px; accent-color: var(--green); }
+.practice-current-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+.practice-current-head small { color: var(--muted); font-weight: 800; }
+.practice-current-head h2 { margin: .25rem 0 0; }
+.practice-status { flex: 0 0 auto; padding: .35rem .65rem; border-radius: 999px; background: #eef3f7; color: var(--navy); font-size: .8rem; font-weight: 900; }
+.practice-status.done,.practice-item-row.done small { color: #1d6633; }
+.practice-status.unclear,.practice-item-row.unclear small { color: #805b00; }
+.practice-status.error,.practice-item-row.error small { color: var(--danger); }
+.practice-status.skipped,.practice-item-row.skipped small { color: var(--muted); }
+.practice-instruction { margin: 1rem 0; padding: .85rem 1rem; border-left: 4px solid var(--green); background: #f2f8f3; line-height: 1.55; }
+.practice-note { display: grid; gap: .45rem; margin-top: 1rem; font-weight: 800; }
+.practice-note textarea { min-height: 112px; }
+.practice-rating { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: .65rem; margin-top: 1rem; }
+.success-button { background: #e4f4e8; color: #195c2d; border-color: #a9d8b5; }
+.practice-navigation { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: .75rem; margin-top: 1rem; }
+.practice-navigation span { color: var(--muted); text-align: center; font-size: .86rem; font-weight: 800; }
+.pause-button { width: 100%; min-height: 48px; margin-top: 1rem; background: #fff8e8; color: #6d4b0d; border-color: #e6cd91; }
+.practice-pause { border: 2px solid #e6cd91; background: #fffaf0; }
+.practice-pause .form-actions,.practice-complete .form-actions { margin-top: 1rem; }
+.practice-overview > summary { cursor: pointer; color: var(--navy); font-weight: 900; }
+.practice-overview h3 { margin: 1.1rem 0 .55rem; }
+.practice-item-list { display: grid; gap: .4rem; }
+.practice-item-row { display: grid; grid-template-columns: 42px minmax(0,1fr) auto; align-items: center; gap: .65rem; width: 100%; min-height: 46px; padding: .45rem .65rem; border: 1px solid var(--line); border-radius: 8px; background: white; color: var(--ink); text-align: left; }
+.practice-item-row > span { display: grid; place-items: center; width: 34px; height: 30px; border-radius: 7px; background: #eef3f7; color: var(--navy); font-weight: 900; }
+.practice-item-row small { font-weight: 800; }
+.practice-item-row.active { border-color: var(--navy); box-shadow: inset 0 0 0 1px var(--navy); }
+.practice-item-row.done { background: #f5fbf6; }
+.practice-item-row.error { background: #fff6f4; }
+.practice-finish { border-top: 4px solid var(--navy); }
+.practice-complete { text-align: center; }
+.practice-complete button { margin: .35rem; }
+.practice-dock-spacer { height: 98px; }
+.practice-dock { position: fixed; left: calc(240px + 1.25rem); right: 1.25rem; bottom: 1rem; z-index: 70; display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: stretch; gap: .6rem; padding: .65rem; border: 1px solid #a9d8b5; border-radius: 14px; background: rgba(255,255,255,.97); box-shadow: 0 12px 38px rgba(23,50,77,.2); backdrop-filter: blur(12px); }
+.practice-dock.paused { border-color: #e6cd91; background: rgba(255,250,240,.98); }
+.practice-dock-main { display: grid; align-content: center; gap: .1rem; min-width: 0; padding: .45rem .6rem; border: 0; background: transparent; color: var(--ink); text-align: left; }
+.practice-dock-main small { color: var(--muted); font-weight: 800; }
+.practice-dock-main strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.practice-dock-actions { display: flex; align-items: center; gap: .4rem; }
+.practice-dock-actions button { min-height: 42px; padding: .5rem .75rem; background: #eef3f7; color: var(--navy); border-color: #c1ccd5; }
+
+@media (max-width:900px) {
+  .practice-dock-spacer { height: 150px; }
+  .practice-dock { left: .55rem; right: .55rem; bottom: calc(68px + env(safe-area-inset-bottom)); grid-template-columns: 1fr; }
+  .practice-dock-actions { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); }
+  .practice-dock-actions button { width: 100%; }
+}
+
+@media (max-width:600px) {
+  .practice-progress { grid-template-columns: 1fr; }
+  .practice-current-head { align-items: flex-start; flex-direction: column; }
+  .practice-rating { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .practice-navigation { grid-template-columns: 1fr 1fr; }
+  .practice-navigation span { grid-column: 1/-1; grid-row: 1; }
+  .practice-item-row { grid-template-columns: 38px minmax(0,1fr); }
+  .practice-item-row small { grid-column: 2; }
+  .practice-dock-main strong { white-space: normal; line-height: 1.25; }
+}
 .facts, .facts dd, .facts a, .commercial-columns, .commercial-columns > *, .cost-row > span, .document-row > span, .material-timeline article > * { min-width: 0; overflow-wrap: anywhere; word-break: break-word; }
 .commercial-metrics > div { min-width: 0; overflow-wrap: anywhere; }
 .cost-row > span { flex: 1 1 auto; }

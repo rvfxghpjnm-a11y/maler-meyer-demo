@@ -128,7 +128,8 @@ function searchResults() {
     { words: 'material bedarf anfordern entnahme einsatz verbrauch', action: 'navigate', view: 'material', main: 'Material', sub: 'Bedarf, Anforderung, Entnahme und Einsatz' },
     { words: 'urlaub abwesenheit krank', action: 'navigate', view: 'leave', main: 'Urlaub und Abwesenheit', sub: 'Anträge und Planung' },
     { words: 'dokumente export excel pdf xlsx', action: 'navigate', view: 'exports', main: 'Dokumente und Exporte', sub: 'PDF-, XLSX- und CSV-Ausgaben' },
-    { words: 'feedback fehler bedienproblem hilfe', action: 'navigate', view: 'feedback', main: 'Feedback / Bedienproblem melden', sub: 'Lokalen Demo-Fall anlegen' }
+    { words: 'feedback fehler bedienproblem hilfe', action: 'navigate', view: 'feedback', main: 'Feedback / Bedienproblem melden', sub: 'Lokalen Demo-Fall anlegen' },
+    { words: 'praxistest interaktiver test torben fragenkatalog videocall', action: 'navigate', view: 'praxis-test', main: 'Interaktiven Praxistest starten', sub: 'Aufgaben, Fragen, Pausen und Ergebnisdatei' }
   ] : [];
   commands.forEach(function (item) { if ((item.words + ' ' + item.main + ' ' + item.sub).toLowerCase().includes(q)) matches.push({ type: 'command', id: '', action: item.action, view: item.view || '', main: item.main, sub: item.sub }); });
   db.sites.forEach(function (item) { if ((item.number + ' ' + item.name + ' ' + item.address).toLowerCase().includes(q)) matches.push({ type: 'site', id: item.number, main: 'Bau-Nr. ' + item.number + ' · ' + item.name, sub: item.address }); });
@@ -137,11 +138,12 @@ function searchResults() {
 }
 function renderShell() {
   const p = profile();
-  return `<div class="test-strip">TESTSYSTEM – KEINE PRODUKTIVDATEN <span>Alle Personen, Baustellen, Bilder und Vorgänge sind erfunden.</span></div><div class="app-shell"><aside class="sidebar"><a class="brand" href="#" data-action="navigate" data-view="today">${logo()}<small>Digitale Baustellenorganisation</small></a><nav class="side-nav">${navItems().map(navButton).join('')}</nav><div class="sidebar-footer"><strong>${esc(p.name)}</strong><small>${esc(p.label)} · Demo</small><small>powered by ShoreLogic</small></div></aside><div class="main-column"><header class="topbar"><a class="mobile-brand" href="#" data-action="navigate" data-view="today">${logo('compact')}</a>${isOfficeRole() ? `<div class="search-wrap"><span class="search-symbol">⌕</span><label class="sr-only" for="global-search">Baustelle, Mitarbeiter oder Funktion suchen</label><input id="global-search" class="search-box" value="${esc(ui.query)}" placeholder="Baustelle, Mitarbeiter oder Funktion suchen">${searchResults()}</div>` : '<div></div>'}<button class="profile-button" data-action="navigate" data-view="more"><span class="avatar">${p.initial}</span><span class="profile-copy"><strong>${esc(p.name)}</strong><small>${esc(p.label)}</small></span></button></header>${syncBanner()}<main id="main-content" class="content" tabindex="-1">${renderView()}</main></div></div><nav class="mobile-nav">${mobileItems().map(navButton).join('')}</nav>${renderOverlays()}`;
+  return `<div class="test-strip">TESTSYSTEM – KEINE PRODUKTIVDATEN <span>Alle Personen, Baustellen, Bilder und Vorgänge sind erfunden.</span></div><div class="app-shell"><aside class="sidebar"><a class="brand" href="#" data-action="navigate" data-view="today">${logo()}<small>Digitale Baustellenorganisation</small></a><nav class="side-nav">${navItems().map(navButton).join('')}</nav><div class="sidebar-footer"><strong>${esc(p.name)}</strong><small>${esc(p.label)} · Demo</small><small>powered by ShoreLogic</small></div></aside><div class="main-column"><header class="topbar"><a class="mobile-brand" href="#" data-action="navigate" data-view="today">${logo('compact')}</a>${isOfficeRole() ? `<div class="search-wrap"><span class="search-symbol">⌕</span><label class="sr-only" for="global-search">Baustelle, Mitarbeiter oder Funktion suchen</label><input id="global-search" class="search-box" value="${esc(ui.query)}" placeholder="Baustelle, Mitarbeiter oder Funktion suchen">${searchResults()}</div>` : '<div></div>'}<button class="profile-button" data-action="navigate" data-view="more"><span class="avatar">${p.initial}</span><span class="profile-copy"><strong>${esc(p.name)}</strong><small>${esc(p.label)}</small></span></button></header>${syncBanner()}<main id="main-content" class="content" tabindex="-1">${renderView()}</main></div></div><nav class="mobile-nav">${mobileItems().map(navButton).join('')}</nav>${window.MMPraxisTest && ui.view !== 'praxis-test' ? window.MMPraxisTest.renderDock() : ''}${renderOverlays()}`;
 }
 function renderView() {
   if (ui.view === 'employee-extra') { ui.employeeAction = 'extra'; ui.view = 'today'; }
   if (ui.view === 'employee-note') { ui.employeeAction = 'note'; ui.view = 'today'; }
+  if (ui.view === 'praxis-test') return window.MMPraxisTest.render();
   if (roleArea() === 'employee') {
     if (ui.view === 'more') return renderMoreV6();
     if (ui.view === 'weeks') return renderWeeks(true);
@@ -707,12 +709,13 @@ function renderMoreV6() {
   const officeDirect = isOfficeRole() ? '<section class="card card-pad section"><h2>Direkt zu Büroaufgaben</h2><div class="quick-grid"><button class="secondary" data-action="navigate" data-view="times">Zeiten prüfen</button><button class="secondary" data-action="navigate" data-view="weeks">Wochenzettel</button><button class="secondary" data-action="navigate" data-view="extras">Zusatzarbeiten</button><button class="secondary" data-action="navigate" data-view="material">Material</button><button class="secondary" data-action="navigate" data-view="leave">Urlaub</button></div></section>' : '';
   return head('Mehr', 'Rollenwechsel, Demo-Steuerung und seltene Bereiche') +
     '<section class="card card-pad"><h2>Demo-Konto wechseln</h2><p>Dieselben synthetischen Vorgänge mit vier Verwaltungs-Konten sowie Vorarbeiter- und Mitarbeiteransicht prüfen.</p><div class="role-grid">' + roleButtons + '</div></section>' +
-    operations + officeDirect + (isOfficeRole() ? renderPilotScenarioCard() : '') +
+    operations + officeDirect + (isOfficeRole() ? window.MMPraxisTest.renderEntryCard() + renderPilotScenarioCard() : '') +
     '<div class="more-grid section"><section class="card more-card"><h2>Fahrzeuggerät</h2><p>Benutzerwahl, 6-stelliger Demo-PIN und Sperre testen.</p><button class="primary" data-action="navigate" data-view="shared-device">Gemeinsames iPad öffnen</button></section><section class="card more-card"><h2>Anmeldung</h2><p>Vorschau der späteren Anmeldung.</p><button class="secondary" data-action="show-login">Anmeldeseite ansehen</button></section><section class="card more-card"><h2>Demo zurücksetzen</h2><p>Alle erfundenen Ausgangsdaten wiederherstellen.</p><button class="danger-button" data-action="reset-demo">Demo-Daten zurücksetzen</button></section><section class="card more-card"><h2>Benachrichtigungen</h2><p>Hinweise öffnen direkt die passende Wochenübersicht.</p><button class="secondary" data-action="navigate" data-view="notifications">Hinweise öffnen</button></section><section class="card more-card"><h2>Dokumente & Exporte</h2><p>Originalnahe Formulare, Wochenplanung und Nachkalkulationsdateien.</p><button class="primary" data-action="navigate" data-view="exports">Bereich öffnen</button></section></div>' +
-    '<details class="developer-area"><summary>Entwickler- und Testinformationen</summary><p>Statische Demo ohne Backend und echte serverseitige Rechte. Die vier Verwaltungs-Konten simulieren denselben umfangreichen Adminzugriff; produktiv muss dies serverseitig erzwungen werden. Änderungen, Snapshots und gezeichnete Demo-Unterschriften bleiben nur lokal in diesem Browser.</p><p>Offline, PIN, Spracheingabe, Planveröffentlichung und Synchronisierung sind ausdrücklich Bedienungssimulationen. Browser-localStorage und die Demo-Datenstruktur sind kein Produktivdatenmodell.</p><p>Browser-Benachrichtigungen funktionieren nur nach Erlaubnis und nur solange die statische Seite aktiv ist. Geschlossene-App-Push benötigt später Backend, Push-Service, Service Worker und Benutzer-/Gerätezuordnung.</p><p>Demo-Version 16 · vollständig synthetisch. Die Excel-Struktur ist anonymisiert abgeglichen; historische Formeln und der frei erfundene Kalkulationssatz sind keine beschlossenen Betriebsregeln.</p></details>';
+    '<details class="developer-area"><summary>Entwickler- und Testinformationen</summary><p>Statische Demo ohne Backend und echte serverseitige Rechte. Die vier Verwaltungs-Konten simulieren denselben umfangreichen Adminzugriff; produktiv muss dies serverseitig erzwungen werden. Änderungen, Snapshots und gezeichnete Demo-Unterschriften bleiben nur lokal in diesem Browser.</p><p>Offline, PIN, Spracheingabe, Planveröffentlichung und Synchronisierung sind ausdrücklich Bedienungssimulationen. Browser-localStorage und die Demo-Datenstruktur sind kein Produktivdatenmodell.</p><p>Browser-Benachrichtigungen funktionieren nur nach Erlaubnis und nur solange die statische Seite aktiv ist. Geschlossene-App-Push benötigt später Backend, Push-Service, Service Worker und Benutzer-/Gerätezuordnung.</p><p>Demo-Version 17 · vollständig synthetisch. Der interaktive Praxistest speichert keine Audioaufnahme und übermittelt nichts automatisch. Die Excel-Struktur ist anonymisiert abgeglichen; historische Formeln und der frei erfundene Kalkulationssatz sind keine beschlossenen Betriebsregeln.</p></details>';
 }
 
 app.addEventListener('input', function (event) {
+  if (window.MMPraxisTest.handleInput(event.target)) return;
   if (event.target.id !== 'global-search') return;
   ui.query = event.target.value;
   render();
@@ -766,6 +769,8 @@ app.addEventListener('submit', async function (event) {
   const form = event.target.closest('form');
   if (!form) return;
   event.preventDefault();
+  if (window.MMPraxisTest.handleSubmit(form, { render: render, toast: toast })) return;
+  window.MMPraxisTest.recordForm(form, { view: ui.view, role: ui.role });
   const values = new FormData(form);
 
   if (window.MMExports.handleSubmit(form, values, db, { save: saveDb, toast: toast })) return;
@@ -1046,6 +1051,8 @@ app.addEventListener('click', async function (event) {
   if (!target) return;
   event.preventDefault();
   const action = target.dataset.action;
+  if (window.MMPraxisTest.handleAction(target, { db: db, navigate: navigate, render: render, toast: toast, setRole: function (role) { ui.role = role; ui.selectedSite = null; ui.selectedWeek = null; } })) return;
+  window.MMPraxisTest.recordInteraction(target, { view: ui.view, role: ui.role });
   if (target.dataset.mmAction && window.MMExports.handleAction(target, db, { save: saveDb, toast: toast })) return;
   if (window.MMFinal.handleAction(db, target, { ui: ui, makeId: makeId, actor: actor, dateTimeNow: dateTimeNow, audit: audit, saveDb: saveDb, toast: toast, render: render })) return;
   if (action === 'submit-correction') {

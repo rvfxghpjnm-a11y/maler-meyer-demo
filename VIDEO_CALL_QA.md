@@ -1,6 +1,20 @@
-# Interner Torben-Praxistest – Demo-Version 16
+# Interner Torben-Praxistest – Demo-Version 17
 
-Stand: 30. September 2026. Alle Fälle verwenden ausschließlich synthetische Daten. „Bestanden“ bezeichnet die Bedienungsdemo, nicht die Produktivreife. Die Begriffs-, Navigations- und Responsive-Korrekturen aus dem Familientest sind eingearbeitet; die neuen fachlichen Rückfragen werden mit Torben entschieden.
+Stand: 30. September 2026. Alle Fälle verwenden ausschließlich synthetische Daten. „Bestanden“ bezeichnet die Bedienungsdemo, nicht die Produktivreife. Die Aufgaben können jetzt zusätzlich im geführten interaktiven Praxistest bearbeitet werden. Audio wird nicht aufgenommen; eine iPad-Aufnahme läuft getrennt.
+
+## Interaktiver Testmodus
+
+- Einstieg über `Mehr → Interaktiver Praxistest`
+- 34 Bedienaufgaben und 12 Fachfragen
+- feste Steuerleiste während der normalen Demo-Bedienung
+- Erledigt, Unklar, Fehler oder Übersprungen je Punkt
+- Vor, Zurück und direkter Sprung über die Gesamtübersicht
+- Pause und späteres Fortsetzen
+- JSON-Zwischenstand beim Pausieren
+- vollständige JSON-Ergebnisdatei beim Beenden
+- lokale Speicherung im jeweiligen Browser
+- keine Audioaufnahme, kein Upload und keine automatische Übermittlung
+- Ergebnisdatei und externes iPad-Transkript anschließend gemeinsam an Codex übergeben
 
 ## Bestehende Bedienfälle 1–24
 
@@ -54,6 +68,7 @@ Stand: 30. September 2026. Alle Fälle verwenden ausschließlich synthetische Da
 - `qa-year-week.cjs`: unabhängige Planung und XLSX-Blätter für gleiche Kalenderwochennummern verschiedener Jahre
 - `qa-mobile-workflows.cjs`: zusätzlich Bürokorrektur bis zu den datierten Stunden des Projekt-Unterkontos verfolgt
 - `qa-family-feedback.cjs`: Familientest-Korrekturen für Startseite, Funktionssuche, getrennte Anlagewege, Projektfelder, Zusatzarbeitsfilter, Drucknavigation und horizontale Layoutgrenzen
+- `qa-interactive-test.cjs`: Start, Aufgaben/Fachfragen, feste Steuerung, Pause, Zwischenstandsdownload, Zurück/Überspringen/Direktsprung, Abschlussdownload sowie iPhone-/iPad-Layout
 
 ## Bewusste Grenzen
 
