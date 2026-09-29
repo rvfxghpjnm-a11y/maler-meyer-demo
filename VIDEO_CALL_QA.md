@@ -1,6 +1,6 @@
-# Interner Torben-Praxistest – Demo-Version 15
+# Interner Torben-Praxistest – Demo-Version 16
 
-Stand: 19. September 2026. Alle Fälle verwenden ausschließlich synthetische Daten. „Bestanden“ bezeichnet die Bedienungsdemo, nicht die Produktivreife.
+Stand: 30. September 2026. Alle Fälle verwenden ausschließlich synthetische Daten. „Bestanden“ bezeichnet die Bedienungsdemo, nicht die Produktivreife. Die Begriffs-, Navigations- und Responsive-Korrekturen aus dem Familientest sind eingearbeitet; die neuen fachlichen Rückfragen werden mit Torben entschieden.
 
 ## Bestehende Bedienfälle 1–24
 
@@ -25,9 +25,9 @@ Stand: 19. September 2026. Alle Fälle verwenden ausschließlich synthetische Da
 19. „Rechnung schreiben?“ öffnen – bestanden
 20. Nachkalkulation / Projekt-Unterkonto prüfen und exportieren – bestanden
 21. Arbeitszettel, Materialanforderung und Aufmaß öffnen – bestanden
-22. Neues Projekt anlegen – bestanden
-23. Neuen Mitarbeiter anlegen – bestanden
-24. Feedback / Bedienproblem melden – bestanden
+22. Neues Projekt in eigenständigem Ablauf anlegen – bestanden; ohne vermischte Mitarbeiteranlage
+23. Neuen Mitarbeiter in eigenständigem Ablauf anlegen – bestanden; ohne automatische Baustellenzuordnung
+24. Feedback / Bedienproblem über globale Suche finden, melden und Fall aufklappen – bestanden
 
 ## Neue Bedienfälle 25–34
 
@@ -53,6 +53,7 @@ Stand: 19. September 2026. Alle Fälle verwenden ausschließlich synthetische Da
 - `qa-source-excel.cjs`: datierte akzeptierte Projektstunden, Wochenwerte, Summenanker und Fortsetzung über 54 Kalenderwochen
 - `qa-year-week.cjs`: unabhängige Planung und XLSX-Blätter für gleiche Kalenderwochennummern verschiedener Jahre
 - `qa-mobile-workflows.cjs`: zusätzlich Bürokorrektur bis zu den datierten Stunden des Projekt-Unterkontos verfolgt
+- `qa-family-feedback.cjs`: Familientest-Korrekturen für Startseite, Funktionssuche, getrennte Anlagewege, Projektfelder, Zusatzarbeitsfilter, Drucknavigation und horizontale Layoutgrenzen
 
 ## Bewusste Grenzen
 

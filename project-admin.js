@@ -58,16 +58,16 @@
     const number = function (name) { return finance[name] ? esc(finance[name]) : ''; };
     return `<details class="project-detail-fields" open><summary>Weitere Projektdetails · optional</summary>
       <p class="meta">Diese Angaben können bei der Anlage oder später in den Projektstammdaten ergänzt werden.</p>
-      <fieldset class="project-detail-group"><legend>Einsatz und Zugang</legend><div class="form-grid">
+      <fieldset class="project-detail-group"><legend>Ausführung und Baustellenzugang</legend><div class="form-grid">
         <label>Geplanter Beginn<input type="date" name="plannedStart" value="${value('plannedStart')}"></label>
         <label>Geplantes Ende<input type="date" name="plannedEnd" value="${value('plannedEnd')}"></label>
-        <label>Baustellenleitung vor Ort<input name="siteLead" value="${value('siteLead')}" placeholder="synthetischer Kontakt"></label>
-        <label>Zugang / Schlüssel<input name="access" value="${value('access')}" placeholder="z. B. Schlüssel im Büro"></label>
+        <label>Bauleitung vor Ort<input name="siteLead" value="${value('siteLead')}" placeholder="synthetischer Kontakt"></label>
+        <label>Baustellenzugang / Schlüssel<input name="access" value="${value('access')}" placeholder="z. B. Schlüssel im Büro"></label>
         <label class="full">Projektbeschreibung / Leistungsumfang<textarea name="description" placeholder="Was ist grundsätzlich vorgesehen?">${value('description')}</textarea></label>
       </div></fieldset>
       <fieldset class="project-detail-group"><legend>Aufgaben und Material</legend><div class="form-grid">
         <label class="full">Weitere geplante Aufgaben · je Zeile<textarea name="extraTasks" placeholder="Weitere geplante Tätigkeiten, keine bestätigten Zusatzarbeiten">${list('extraTasks')}</textarea></label>
-        <label class="full">Materialhinweise · je Zeile<textarea name="materials" placeholder="Was wird voraussichtlich benötigt?">${list('materials')}</textarea></label>
+        <label class="full">Voraussichtlicher Materialbedarf · je Zeile<textarea name="materials" placeholder="Was wird voraussichtlich benötigt?">${list('materials')}</textarea></label>
       </div></fieldset>
       <fieldset class="project-detail-group"><legend>Büro und kaufmännische Eckdaten</legend><div class="form-grid">
         <label>Auftragswert netto · synthetisch<input type="number" name="offerNet" min="0" step="0.01" inputmode="decimal" value="${number('offerNet')}" placeholder="optional"></label>

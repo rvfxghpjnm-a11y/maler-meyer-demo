@@ -166,7 +166,7 @@
     { id: 'A-003', type: 'EXTRA_DECIDED', entity: 'ZA-204', title: 'Zusatzarbeit kaufmännisch geprüft', before: 'Prüfung offen', after: 'Nicht abrechenbar', actor: 'Torben · Geschäftsführung', time: '08:15', reason: 'Synthetische Beispielentscheidung' }
   ];
 
-  window.DEMO_DATA_VERSION = 6;
+  window.DEMO_DATA_VERSION = 7;
   window.createDemoSeed = function createDemoSeed() {
     return JSON.parse(JSON.stringify({
       employees: employees,

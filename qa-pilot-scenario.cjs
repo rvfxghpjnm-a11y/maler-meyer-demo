@@ -24,7 +24,7 @@ fs.mkdirSync(outputDir, { recursive: true });
       await page.evaluate(() => localStorage.clear());
       await page.reload({ waitUntil: 'networkidle' });
       await page.locator('[data-action="load-torben-pilot"]:visible').first().click();
-      await page.getByRole('heading', { name: /Projekt Stephan \(Demo\)/ }).first().waitFor();
+      await page.getByRole('heading', { name: /Guten/ }).first().waitFor();
       const report = await page.evaluate(key => {
         const db = JSON.parse(localStorage.getItem(key)).data;
         const scenario = db.pilotScenario;
@@ -62,6 +62,8 @@ fs.mkdirSync(outputDir, { recursive: true });
         travel: 2, materials: 120, lift: 80, billed: 1200, total: 1160, result: 40 });
       assert.equal(report.sheetName, report.scenario.projectNumber);
       assert.equal(report.sheetInvoice, 1200);
+      await page.locator('[data-action="open-site"][data-id="' + report.scenario.projectNumber + '"]:visible').first().click();
+      await page.getByRole('heading', { name: /Projekt Stephan \(Demo\)/ }).first().waitFor();
       assert.equal(await page.locator('.commercial-project').getByText('40,00 €').count() > 0, true);
       const downloadPromise = page.waitForEvent('download');
       await page.locator('[data-mm-action="xlsx-project"][data-site="' + report.scenario.projectNumber + '"]').click();

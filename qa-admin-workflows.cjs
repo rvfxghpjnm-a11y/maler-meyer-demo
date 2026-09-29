@@ -21,6 +21,9 @@ async function freshPage(browser, viewport) {
 }
 
 async function openAdmin(page) {
+  if (!await page.locator('[data-action="navigate"][data-view="admin"]:visible').count()) {
+    await page.locator('[data-action="navigate"][data-view="more"]:visible').first().click();
+  }
   await page.locator('[data-action="navigate"][data-view="admin"]:visible').first().click();
   await page.getByRole('heading', { name: 'Verwaltung', exact: true }).waitFor();
 }
@@ -38,6 +41,7 @@ async function openAdmin(page) {
     }
     checks.push('vier umfangreich berechtigte Verwaltungs-Konten sichtbar');
 
+    await page.locator('[data-action="open-project-create"]').click();
     const projectForm = page.locator('form[data-form="admin-project-create"]');
     await projectForm.locator('[name="number"]').fill('26-107');
     await projectForm.locator('[name="name"]').fill('Wohnhaus Regenbogen');
@@ -47,19 +51,21 @@ async function openAdmin(page) {
     await projectForm.locator('[name="tasks"]').fill('Räume abdecken\nWandflächen vorbereiten');
     await projectForm.getByRole('button', { name: 'Projekt anlegen' }).click();
     await page.getByText(/Projekt 26-107 wurde angelegt/).waitFor();
-    assert.equal(await page.getByText(/Bau-Nr\. 26-107 · Wohnhaus Regenbogen/).count() >= 1, true);
+    assert.equal(await page.evaluate(key => JSON.parse(localStorage.getItem(key)).data.sites.some(item => item.number === '26-107' && item.name === 'Wohnhaus Regenbogen'), storageKey), true);
     checks.push('Projekt anlegen und mit Audit-Struktur verbinden');
 
+    await openAdmin(page);
+    await page.locator('[data-action="open-employee-create"]').click();
     const employeeForm = page.locator('form[data-form="admin-employee-create"]');
     await employeeForm.locator('[name="name"]').fill('Nora Prüfling');
-    await employeeForm.locator('[name="job"]').fill('Mitarbeiterin');
-    await employeeForm.locator('[name="site"]').selectOption('26-107');
+    await employeeForm.locator('[name="job"]').selectOption({ label: 'Geselle / Gesellin' });
+    assert.equal(await employeeForm.locator('[name="site"]').count(), 0);
     await employeeForm.getByRole('button', { name: 'Mitarbeiter anlegen' }).click();
     await page.getByText(/Nora Prüfling wurde als M-0030 angelegt/).waitFor();
 
     await page.locator('[data-action="navigate"][data-view="employees"]:visible').first().click();
-    if (!await page.getByRole('button', { name: 'Deaktivieren' }).count()) await page.getByText('Nora Prüfling', { exact: true }).click();
-    await page.getByRole('button', { name: 'Im Büro helfen' }).click();
+    if (!await page.getByRole('button', { name: 'Mitarbeiter deaktivieren' }).count()) await page.getByText('Nora Prüfling', { exact: true }).click();
+    await page.getByRole('button', { name: 'Telefonisch unterstützen' }).click();
     const support = page.locator('form[data-form="admin-support-action"]');
     await support.locator('[name="event"]').selectOption('WORK_START');
     await support.locator('[name="reason"]').fill('Telefonisch gemeldet, Handy heute nicht verfügbar.');
@@ -76,13 +82,13 @@ async function openAdmin(page) {
     checks.push('telefonische Büro-Hilfe als getrennte stellvertretende Buchung protokolliert');
 
     await page.locator('[data-action="navigate"][data-view="employees"]:visible').first().click();
-    if (!await page.getByRole('button', { name: 'Deaktivieren' }).count()) await page.getByText('Nora Prüfling', { exact: true }).click();
-    await page.getByRole('button', { name: 'Deaktivieren' }).click();
+    if (!await page.getByRole('button', { name: 'Mitarbeiter deaktivieren' }).count()) await page.getByText('Nora Prüfling', { exact: true }).click();
+    await page.getByRole('button', { name: 'Mitarbeiter deaktivieren' }).click();
     await page.getByText(/wurde deaktiviert; Historie bleibt erhalten/).waitFor();
     saved = await page.evaluate(key => JSON.parse(localStorage.getItem(key)).data, storageKey);
     assert.equal(saved.employees.find(item => item.id === created.id).active, false);
     assert.equal(saved.events.some(item => item.employeeId === created.id && item.type === 'WORK_START'), true);
-    await page.getByRole('button', { name: 'Deaktiviert', exact: true }).click();
+    await page.locator('[data-action="employee-filter"][data-status="INACTIVE"]:visible').click();
     if (!await page.getByRole('button', { name: 'Reaktivieren' }).count()) await page.getByText('Nora Prüfling', { exact: true }).click();
     await page.getByRole('button', { name: 'Reaktivieren' }).click();
     checks.push('Deaktivieren und Reaktivieren ohne Verlust historischer Zeitereignisse');

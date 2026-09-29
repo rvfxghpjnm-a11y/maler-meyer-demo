@@ -165,7 +165,7 @@ async function assertClean(page, errors, external, label) {
       await page.getByText('Urlaub', { exact: true }).first().waitFor();
       await navigate(page, 'sites');
       await page.locator('[data-action="open-site"][data-id="26-103"]').first().click();
-      await page.getByRole('heading', { name: 'Materialverlauf' }).waitFor();
+      await page.locator('details.project-secondary').filter({ hasText: 'Materialverlauf' }).locator(':scope > summary').waitFor();
       await navigate(page, 'admin');
       await page.getByRole('heading', { name: 'Verwaltung', exact: true }).waitFor();
       await navigate(page, 'exports');
@@ -174,7 +174,7 @@ async function assertClean(page, errors, external, label) {
       await navigate(page, 'more');
       await page.locator('[data-action="reset-demo"]').click();
       const resetState = await page.evaluate(key => JSON.parse(localStorage.getItem(key)), storageKey);
-      assert.equal(resetState.version, 11, 'Demo-Version nach Reset');
+      assert.equal(resetState.version, 12, 'Demo-Version nach Reset');
       assert.equal(resetState.data.materialRecords.length, 3, 'synthetischer Material-Ausgangsstand nach Reset');
       await assertClean(page, errors, external, 'Desktop');
       await context.close();

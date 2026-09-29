@@ -1,6 +1,6 @@
 # Offene fachliche Punkte
 
-Stand: 19. September 2026. Der beantwortete Vorab-Fragebogen und vier Original-Arbeitsmappen wurden nur lokal gelesen. Der anonymisierte Audit, das 200-Blatt-Register und das Formel-Mapping wurden als Referenz geprüft, nicht veröffentlicht. Diese Datei enthält keine Originaldaten. Demo-Annahmen dürfen nicht als Betriebsregel in die Produktivversion übernommen werden.
+Stand: 30. September 2026. Der beantwortete Vorab-Fragebogen und vier Original-Arbeitsmappen wurden nur lokal gelesen. Der anonymisierte Audit, das 200-Blatt-Register und das Formel-Mapping wurden als Referenz geprüft, nicht veröffentlicht. Zusätzlich wurden Beobachtungen aus einem ersten Familientest vor dem Torben-Termin aufgenommen. Diese Datei enthält keine Originaldaten. Demo-Annahmen dürfen nicht als Betriebsregel in die Produktivversion übernommen werden.
 
 ## Durch den Vorab-Fragebogen geklärt (fachliche Zielrichtung)
 
@@ -46,3 +46,11 @@ Zusätzlich offen bleiben das endgültige Material-Bewertungsmodell, die Auswahl
 29. Eingangsrechnungen: Umsatzsteuerbehandlung, Prüfschritte, Kontierung und OCR-Zeitpunkt
 30. Geschriebene Rechnungen: Verhältnis zwischen Projekt-Unterkonto, „Rechnung schreiben?“-Liste und späterem Rechnungssystem
 31. Pilotbetrieb: Welcher bisherige Nachweis bleibt bis zur Abnahme führend, welche ein bis zwei Baustellen werden verglichen und wer zeichnet tägliche bzw. wöchentliche Differenzen fachlich ab?
+32. Projektkontakte: Sind Kunde/Auftraggeber, Ansprechpartner beim Bauvorhaben, externe Bauleitung und interner Maler-Meyer-Ansprechpartner fachlich richtig getrennt und verständlich benannt?
+33. Projektansicht: Welche Felder braucht Torben täglich sichtbar, welche nur aufklappbar und welche sollen ganz entfallen?
+34. Mitarbeiteransicht: Welche Projekt- und Kontaktdaten dürfen normale Mitarbeiter sehen; welche Stunden-, Kosten- und Abrechnungsdaten bleiben ausschließlich bei Geschäftsführung/Büro?
+35. Mitarbeiterabwesenheit: Wo erfasst das Büro Krank von/bis? Reicht eine Planungsmarkierung mit Audit oder wird ein eigener Ablauf am Mitarbeiter benötigt?
+36. Materialbegriffe: Ist „Materialbedarf“ die geplante Projektliste und „zusätzliche Materialanforderung“ eine spätere Meldung der Baustelle? Wer prüft die Anforderung und wer erhält wann einen Hinweis?
+37. Zusatzarbeit: Muss zusätzlich zur Beschreibung ein strukturierter Bedarf für Lift, Gerüst, Material oder weitere Personen erfasst werden? Wer gibt die Ausführung frei?
+38. Abrechnungshinweis: Wird Freitext benötigt oder eine Auswahl wie Festpreis, Stundenlohn, Nachbesserung/Garantie? Wer darf den Hinweis sehen?
+39. Mitarbeiterdaten: Soll es bewusst bei Organisationsdaten ohne Personalakte bleiben? Interne Einsatzhinweise oder sensible Leistungs-/Gesundheitsnotizen sind ohne klare Rechtsgrundlage, Zweckbindung und Sichtbarkeitsregel nicht einzuführen.

@@ -268,5 +268,5 @@
   }
 
   window.MMFinal = { days: DAYS, costTypes: COST_TYPES, renderPlanning: renderPlanning, renderPlanModal: renderPlanModal, renderCommercial: renderCommercial, renderMyWeek: renderMyWeek, renderTaskHub: renderTaskHub, renderInvoiceList: renderInvoiceList, handleForm: handleForm, handleAction: handleAction, dynamicAccount: dynamicAccount, categoryTotal: categoryTotal, dateFor: dateFor, weekInfo: weekInfo };
-  window.DEMO_DATA_VERSION = 11;
+  window.DEMO_DATA_VERSION = 12;
 }());

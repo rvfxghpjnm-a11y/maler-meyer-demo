@@ -8,11 +8,13 @@ Für einen nachvollziehbaren Torben-Praxistest kann auf der Geschäftsführer-St
 
 Neu angelegte Demo-Mitarbeiter können auf dem simulierten Fahrzeuggerät mit einem sichtbar angezeigten synthetischen PIN ihre eigene Wochenansicht prüfen. Diese bewusst einfache Browserprüfung ist **keine produktive PIN-Sicherheit**.
 
-Vier Perspektiven sind bedienbar: Geschäftsführung, Büro, Vorarbeiter und Mitarbeiter. Planung, Zeitereignisse, Korrekturen, Zusatzarbeiten, Baustellenmappe und Wochenzettel verwenden einen gemeinsamen synthetischen Demo-Zustand. Der erweiterte Datensatz umfasst mehrere editierbare Planungswochen und einen synthetischen Arbeitszeitverlauf vom 3. August bis 11. September 2026. Aktueller Stand ist Demo-Version 15.
+Vier Perspektiven sind bedienbar: Geschäftsführung, Büro, Vorarbeiter und Mitarbeiter. Planung, Zeitereignisse, Korrekturen, Zusatzarbeiten, Baustellenmappe und Wochenzettel verwenden einen gemeinsamen synthetischen Demo-Zustand. Der erweiterte Datensatz umfasst mehrere editierbare Planungswochen und einen synthetischen Arbeitszeitverlauf vom 3. August bis 11. September 2026. Aktueller Stand ist Demo-Version 16.
+
+Demo-Version 16 verarbeitet die Erkenntnisse aus dem ersten Familientest vor dem Torben-Termin: „Praxistest laden“ lässt den Morgencheck auf **Heute** geöffnet; die globale Suche findet neben Bau-Nrn. und Mitarbeitern auch Funktionen. Projekt- und Mitarbeiteranlage sind getrennte Abläufe, neue Mitarbeiter erhalten keine automatische Baustellenzuordnung. Projektbegriffe, Status der Tagesübersicht, Materialschritte, Zusatzarbeitsfilter und der projektbezogene Excel-Export sind verständlicher benannt. Geöffnete Baustellen verwenden auf Tablets die verfügbare Breite; Stammdaten, Kostenzeilen und Formulare umbrechen auch auf schmalen Bildschirmen ohne Überlagerung. Druckansichten besitzen eine sichtbare Rückkehr zur App.
 
 Demo-Version 15 ordnet synthetische akzeptierte Zeitminuten einer Bau-Nr. und Kalenderwoche zu; diese datierten Werte speisen die Stunden- und Fahrzeit-Rohwerte im Projekt-Unterkonto und in der Bauliste. Eine eindeutige Bürokorrektur des Wochenzettels aktualisiert die zugehörige Demo-Zeitprojektion, ohne den alten bestätigten Snapshot zu verändern. Die Planung identifiziert Wochen jetzt über den konkreten Montag und die ISO-Kalenderwoche **mit Jahr**; KW 1 verschiedener Jahre kann dadurch unabhängig geplant und exportiert werden. Bei mehr als 54 Projektwochen setzt der XLSX-Export die Zeitdaten sichtbar fort, statt sie abzuschneiden. Dies ersetzt weder eine produktive Freigabelogik noch die serverseitige Verarbeitung unveränderbarer Rohereignisse.
 
-Wer bereits einen lokalen Demo-Zustand aus einer älteren Version hat, kann über „Demo zurücksetzen“ die konsistenten synthetischen Ausgangsdaten von Version 15 laden. Dabei werden nur lokale Demo-Änderungen dieses Browsers verworfen.
+Wer bereits einen lokalen Demo-Zustand aus einer älteren Version hat, erhält durch den Versionswechsel automatisch die konsistenten synthetischen Ausgangsdaten von Version 16. Über „Demo zurücksetzen“ können spätere lokale Änderungen erneut verworfen werden.
 
 In der Wochenmatrix werden Bau-Nr. und Baustellenname gemeinsam angezeigt. Die mobile Mitarbeiterauswahl für Kolonnen-/Mehrtagesplanung ist ohne überlappende Checkboxen oder Namen bedienbar; die breite Wochenmatrix wird auf Smartphones seitlich gewischt.
 
@@ -63,7 +65,7 @@ Der technische und fachliche Ablauf ist in [MOBILE_BESTAETIGUNG.md](./MOBILE_BES
 
 Die neuen Abläufe und ihre Grenzen stehen in [ERWEITERTE_WORKFLOWS_V10.md](./ERWEITERTE_WORKFLOWS_V10.md).
 
-Der vollständige interne Praxistest mit 34 Bedienfällen ist in [VIDEO_CALL_QA.md](./VIDEO_CALL_QA.md) dokumentiert.
+Der vollständige interne Praxistest mit 34 Bedienfällen ist in [VIDEO_CALL_QA.md](./VIDEO_CALL_QA.md) dokumentiert. Der ausdruckbare Gesprächsleitfaden für den Torben-Termin liegt als [aktuelle PDF](./Maler-Meyer-Video-Call-Praxistest-aktuell.pdf) direkt im Repository.
 
 ## Echtbetrieb erfordert noch
 

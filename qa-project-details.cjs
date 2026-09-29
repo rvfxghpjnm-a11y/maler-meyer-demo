@@ -5,6 +5,9 @@ const url = process.env.DEMO_URL || 'http://127.0.0.1:4173/';
 const key = 'maler-meyer-demo-v11';
 
 async function openAdmin(page) {
+  if (!await page.locator('[data-action="navigate"][data-view="admin"]:visible').count()) {
+    await page.locator('[data-action="navigate"][data-view="more"]:visible').first().click();
+  }
   await page.locator('[data-action="navigate"][data-view="admin"]:visible').first().click();
   await page.getByRole('heading', { name: 'Verwaltung', exact: true }).waitFor();
 }
@@ -21,6 +24,7 @@ async function openAdmin(page) {
     await page.evaluate(() => localStorage.clear());
     await page.reload({ waitUntil: 'networkidle' });
     await openAdmin(page);
+    await page.locator('[data-action="open-project-create"]').click();
     const create = page.locator('form[data-form="admin-project-create"]');
     assert.equal(await create.locator('[name="number"]').inputValue(), '26-107');
     assert.equal(await create.locator('[name="number"]').isEditable(), true);
@@ -70,6 +74,7 @@ async function openAdmin(page) {
     assert.equal(account.plannedHours, 80);
     checks.push('weitere Projektdetails und sichere Rohwerte werden gespeichert');
 
+    await openAdmin(page);
     const record = page.locator('details.admin-record').filter({ hasText: '26-107' });
     await record.locator(':scope > summary').click();
     const edit = record.locator('form[data-form="admin-project-edit"]');
@@ -92,7 +97,16 @@ async function openAdmin(page) {
 
     for (const width of [390, 820]) {
       await page.setViewportSize({ width, height: 900 });
-      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 2), true, 'Seitenüberlauf bei ' + width);
+      const layout = await page.evaluate(() => ({
+        ok: document.documentElement.scrollWidth <= innerWidth + 2,
+        scrollWidth: document.documentElement.scrollWidth,
+        innerWidth,
+        offenders: Array.from(document.querySelectorAll('body *')).map(element => {
+          const rect = element.getBoundingClientRect();
+          return { tag: element.tagName, cls: element.className || '', right: Math.round(rect.right), width: Math.round(rect.width) };
+        }).filter(item => item.right > innerWidth + 2 || item.width > innerWidth + 2).sort((a, b) => b.right - a.right).slice(0, 8)
+      }));
+      assert.equal(layout.ok, true, 'Seitenüberlauf bei ' + width + ': ' + JSON.stringify(layout));
     }
     assert.deepEqual(errors, []);
     checks.push('Smartphone/Tablet ohne Seitenüberlauf oder JavaScript-Fehler');
