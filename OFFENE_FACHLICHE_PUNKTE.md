@@ -2,6 +2,21 @@
 
 Stand: 30. September 2026. Der beantwortete Vorab-Fragebogen und vier Original-Arbeitsmappen wurden nur lokal gelesen. Der anonymisierte Audit, das 200-Blatt-Register und das Formel-Mapping wurden als Referenz geprüft, nicht veröffentlicht. Zusätzlich wurden Beobachtungen aus einem ersten Familientest vor dem Torben-Termin aufgenommen. Diese Datei enthält keine Originaldaten. Demo-Annahmen dürfen nicht als Betriebsregel in die Produktivversion übernommen werden.
 
+## Nach dem Torben-Praxistest vom 30. September 2026
+
+Nicht mehr grundsätzlich offen sind: gleiche operative Verwaltungsrechte für Torben, Steffen und Büro; leere neue Planungswochen; Entwurf/Veröffentlichung; lesende Gesamtplanung für Mitarbeitende; Zusatzarbeit ohne Vor-Ort-Unterschrift oder automatische Rechnungsfreigabe; Pilotstart mit drei Mitarbeitern und ihren relevanten Baustellen.
+
+Weiterhin offen beziehungsweise vor Produktivbetrieb formal zu spezifizieren:
+
+- DATEV-Zielprodukt, Schnittstelle/Dateiformat, Pflichtfelder, Upload-Verantwortung und Fehlerbehandlung
+- exakte Standardpausen je Wochentag sowie Korrektur- und Ausnahmefälle
+- Fahrzeitregel: die drei Varianten sind fachlich beschrieben, benötigen aber verbindliche Beispielsfälle, Grenzfälle und Abnahmetests für Lohn/Überstunden
+- Excel-Leseintegration: Dateispeicher, Berechtigung, Aktualisierungszeitpunkt und Trennung importierter Werte von manuellen Pilotwerten
+- Offline-Konflikte: Entscheidung, Audit und Benachrichtigung bei mehreren Geräten
+- produktive Authentifizierung, Einmalpasswort-/PIN-Reset, Gerätezulassung und Sperre
+- Aufbewahrung, Löschung, AVV, Backup, Domain und Betreiberverantwortung
+- digitale Personalakte und Urlaubsanspruch bleiben ausdrücklich außerhalb des ersten Piloten
+
 ## Durch den Vorab-Fragebogen geklärt (fachliche Zielrichtung)
 
 - Geschäftsführung und Büro dürfen Projekte und Mitarbeiter verwalten, planen, Zeitkorrekturen und stellvertretende Buchungen bearbeiten, Wochenzettel prüfen sowie Material und kaufmännische Vorgänge einsehen bzw. bearbeiten. Die endgültige Urlaubsentscheidung liegt bei den beiden Geschäftsführungsrollen. Produktive Einzelberechtigungen sind trotzdem noch zu spezifizieren und serverseitig durchzusetzen.
@@ -54,3 +69,4 @@ Zusätzlich offen bleiben das endgültige Material-Bewertungsmodell, die Auswahl
 37. Zusatzarbeit: Muss zusätzlich zur Beschreibung ein strukturierter Bedarf für Lift, Gerüst, Material oder weitere Personen erfasst werden? Wer gibt die Ausführung frei?
 38. Abrechnungshinweis: Wird Freitext benötigt oder eine Auswahl wie Festpreis, Stundenlohn, Nachbesserung/Garantie? Wer darf den Hinweis sehen?
 39. Mitarbeiterdaten: Soll es bewusst bei Organisationsdaten ohne Personalakte bleiben? Interne Einsatzhinweise oder sensible Leistungs-/Gesundheitsnotizen sind ohne klare Rechtsgrundlage, Zweckbindung und Sichtbarkeitsregel nicht einzuführen.
+

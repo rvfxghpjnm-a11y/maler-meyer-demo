@@ -150,15 +150,10 @@ async function drawMouse(page) {
     await navigate(page, 'today');
     await page.locator('[data-action="open-employee-action"][data-kind="extra"]').first().click();
     await page.locator('[data-action="load-extra-scenario"]').click();
-    await page.locator('form[data-form="employee-action"] input[name="confirmAfter"]').check();
     await page.getByRole('button', { name: 'Speichern', exact: true }).click();
-    await page.locator('form[data-form="extra-confirm-details"]').waitFor();
-    await page.locator('form[data-form="extra-confirm-details"] button.primary').click();
-    await drawTouch(page);
-    await page.locator('[data-signature-save]').click();
     const newExtraId = await page.evaluate(key => JSON.parse(localStorage.getItem(key)).data.extras[0].id, storageKey);
-    await page.waitForFunction(({ key, id }) => JSON.parse(localStorage.getItem(key)).data.extraConfirmations.some(item => item.extraId === id && item.content.quantity === '18'), { key: storageKey, id: newExtraId });
-    checks.push('Zusatzarbeit 26-104 mit Vor-Ort-Bestätigung und 18 m²');
+    await page.waitForFunction(({ key, id }) => { const item = JSON.parse(localStorage.getItem(key)).data.extras.find(entry => entry.id === id); return item && item.quantity === '18' && item.need.includes('Lift'); }, { key: storageKey, id: newExtraId });
+    checks.push('Zusatzarbeit 26-104 ohne Vor-Ort-Unterschrift mit Zusatzbedarf gemeldet');
 
     await page.locator(`[data-action="edit-extra"][data-id="${newExtraId}"]`).click();
     await page.locator('form[data-form="extra-edit"] input[name="quantity"]').fill('24');
@@ -166,21 +161,9 @@ async function drawMouse(page) {
     await page.waitForFunction(({ key, id }) => {
       const data = JSON.parse(localStorage.getItem(key)).data;
       const extra = data.extras.find(item => item.id === id);
-      const first = data.extraConfirmations.find(item => item.extraId === id);
-      return extra.quantity === '24' && first.content.quantity === '18';
+      return extra.quantity === '24' && !data.extraConfirmations.some(item => item.extraId === id);
     }, { key: storageKey, id: newExtraId });
-    checks.push('Änderung 18 m² auf 24 m² lässt alten Snapshot unverändert');
-
-    await page.locator(`[data-action="confirm-extra"][data-id="${newExtraId}"]`).click();
-    await page.locator('form[data-form="extra-confirm-details"] input[name="confirmerName"]').fill('Robin Muster');
-    await page.locator('form[data-form="extra-confirm-details"] input[name="confirmerRole"]').fill('Bauleitung (synthetisch)');
-    await page.locator('form[data-form="extra-confirm-details"] button.primary').click();
-    await page.locator('[data-signature-without]').click();
-    await page.waitForFunction(({ key, id }) => {
-      const records = JSON.parse(localStorage.getItem(key)).data.extraConfirmations.filter(item => item.extraId === id);
-      return records.length === 2 && records.some(item => item.content.quantity === '18') && records.some(item => item.content.quantity === '24');
-    }, { key: storageKey, id: newExtraId });
-    checks.push('neue Bestätigung für geänderten Zusatzarbeitsstand');
+    checks.push('Zusatzarbeit 18 m² auf 24 m² geändert und ohne Signaturzwang gespeichert');
 
     await navigate(page, 'weeks');
     if (!await page.locator('.week-detail').count()) await page.locator('[data-action="open-week"][data-id="W-001"]').click();
@@ -190,15 +173,7 @@ async function drawMouse(page) {
     await weekPopup.waitForLoadState('domcontentloaded');
     await weekPopup.pdf({ path: path.join(outputDir, 'confirmed-weekly-sheet-demo.pdf'), format: 'A4', landscape: true, printBackground: true });
 
-    await navigate(page, 'today');
-    await page.locator('.confirmation-history summary').first().click();
-    const printExtra = page.locator(`[data-action="print-extra-confirmation"]`).first();
-    const extraPopupPromise = page.waitForEvent('popup');
-    await printExtra.click();
-    const extraPopup = await extraPopupPromise;
-    await extraPopup.waitForLoadState('domcontentloaded');
-    await extraPopup.pdf({ path: path.join(outputDir, 'extra-work-confirmation-demo.pdf'), format: 'A4', printBackground: true });
-    checks.push('beide bestätigten Druckansichten als PDF gerendert');
+    checks.push('bestätigter Wochenzettel als PDF gerendert');
 
     assert.deepEqual(mobile.errors, []);
     await mobile.context.close();
@@ -226,3 +201,4 @@ async function drawMouse(page) {
     await browser.close();
   }
 })().catch(error => { console.error(error); process.exit(1); });
+

@@ -113,11 +113,8 @@ async function clickNav(page, view) {
       await clickNav(page, 'extras');
       await page.getByText('Synthetische Zusatzarbeit für den Browsertest', { exact: true }).waitFor();
       if (size.name === 'desktop') {
-        await page.locator('[data-action="decide-extra"][data-id="ZA-201"]').click();
-        await page.locator('form[data-form="extra-decision"] select[name="decision"]').selectOption('NOT_BILLABLE');
-        await page.locator('form[data-form="extra-decision"] textarea[name="reason"]').fill('Synthetische kaufmännische Entscheidung');
-        await page.locator('form[data-form="extra-decision"] button.primary').click();
-        await page.getByText('Entscheidung gespeichert; Vorgang bleibt erhalten.', { exact: true }).waitFor();
+        await page.locator('.extra-card').filter({ hasText: 'Synthetische Zusatzarbeit für den Browsertest' }).locator('[data-action="complete-extra"]').click();
+        await page.getByText('Zusatzarbeit als angesehen markiert.', { exact: true }).waitFor();
       }
 
       await clickNav(page, 'more');
@@ -176,3 +173,4 @@ async function clickNav(page, view) {
   console.error(error);
   process.exitCode = 1;
 });
+

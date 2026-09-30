@@ -203,11 +203,16 @@
     return { title: 'Bestätigung Zusatzarbeit ' + record.site, body: '<main class="page extra-confirm-doc">' + docHeader('Bestätigung der dokumentierten Zusatzarbeit') + '<div class="frozen-box"><div class="field"><strong>Bau-Nr.:</strong><div class="line">' + h(record.site) + '</div></div><div class="field"><strong>Baustelle:</strong><div class="line">' + h(record.project) + '</div></div><div class="field"><strong>Beschreibung:</strong><div class="line">' + h(record.content.description) + '</div></div><div class="field"><strong>Menge / Einheit:</strong><div class="line">' + h(record.content.quantity + ' ' + record.content.unit) + '</div></div><div class="field"><strong>Zeitaufwand:</strong><div class="line">' + h(record.content.minutes ? record.content.minutes + ' Min. (Rohangabe)' : 'nicht angegeben') + '</div></div></div><div class="confirmation-band"><span><small>Name</small><strong>' + h(record.confirmerName) + '</strong></span><span><small>Funktion</small><strong>' + h(record.confirmerRole) + '</strong></span><span><small>Zeitpunkt</small><strong>' + h(record.confirmedAt) + '</strong></span><span><small>Demo-Hash</small><strong>' + h(record.contentHash) + '</strong></span></div><h3>Dokumentation bestätigt</h3>' + signature + '<p class="small"><strong>Bestätigungs-ID:</strong> ' + h(record.id) + '</p><p class="small">Diese Bestätigung behauptet weder rechtsverbindliche Beauftragung noch Abnahme, Rechnungsfreigabe oder qualifizierte elektronische Signatur.</p></main>' };
   }
 
+  function planningCellText(db, plan, row, dayIndex) {
+    const details = plan.dayDetails && plan.dayDetails[row.employeeId + ':' + dayIndex];
+    const entries = details && details.length ? details : [{ value: row.values[dayIndex] || '', time: '' }];
+    return entries.map(function (entry) { const site = db.sites.find(function (item) { return item.number === entry.value; }); return (entry.time ? entry.time + ' · ' : '') + (entry.freeText || (site ? site.number + ' · ' + site.name : entry.value)); }).filter(Boolean).join(' / ');
+  }
   function planningHtml(db, pick) {
     const plan = db.weekPlans.find(function (item) { return item.monday === pick.planMonday; }) || db.weekPlans[0];
     const monday = new Date(plan.monday + 'T12:00:00');
     const dates = new Array(6).fill(0).map(function (_, index) { const date = new Date(monday); date.setDate(date.getDate() + index); return isoToDe(date.toISOString().slice(0, 10)); });
-    const group = function (name) { const rows = plan.rows.filter(function (row) { return row.group === name; }); return '<tr><th colspan="8" style="background:#d9ead3">' + h(name) + '</th></tr>' + rows.map(function (row, index) { const who = row.displayName || employee(db, row.employeeId).name; return '<tr><td>' + (index + 1) + '</td><td class="bold">' + h(who) + '</td>' + row.values.map(function (value) { const color = value === 'Krank' ? 'color:#c62828;font-weight:700' : value === 'Urlaub' ? 'color:#2f8a43;font-weight:700' : ''; const site = db.sites.find(function (item) { return item.number === value; }); return '<td style="' + color + '">' + h(site ? site.number + ' · ' + site.name : value) + '</td>'; }).join('') + '</tr>'; }).join(''); };
+    const group = function (name) { const rows = plan.rows.filter(function (row) { return row.group === name; }); return '<tr><th colspan="8" style="background:#d9ead3">' + h(name) + '</th></tr>' + rows.map(function (row, index) { const who = row.displayName || employee(db, row.employeeId).name; return '<tr><td>' + (index + 1) + '</td><td class="bold">' + h(who) + '</td>' + row.values.map(function (value, dayIndex) { const color = value === 'Krank' ? 'color:#c62828;font-weight:700' : value === 'Urlaub' ? 'color:#2f8a43;font-weight:700' : ''; return '<td style="' + color + '">' + h(planningCellText(db, plan, row, dayIndex)) + '</td>'; }).join('') + '</tr>'; }).join(''); };
     const year = window.MMFinal.weekInfo(plan.monday).year;
     return { title: 'Wochenplanung ' + year, orientation: 'landscape', body: '<main class="page planning-doc">' + docHeader('Wochenplanung ' + year) + '<table><thead><tr><th>KW ' + plan.week + '/' + year + '</th><th></th>' + ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'].map(function (d,i){return '<th class="center">'+d+'<br><span class="small">'+dates[i]+'</span></th>';}).join('') + '</tr></thead><tbody>' + group('Mitarbeiter') + group('Auszubildende / Praktikum') + group('Subunternehmer') + '</tbody></table></main>' };
   }
@@ -277,7 +282,7 @@
       ['Mitarbeiter', 'Auszubildende / Praktikum', 'Subunternehmer'].forEach(function (group, index) {
         if (index) { rows.push([cell('KW ' + info.week + '/' + info.year, 0, 'A2')]); rows.push(['', ''].concat(dates.map(function (d, i) { return cell(monday + i, 7, String.fromCharCode(67 + i) + '3'); }))); }
         else rows.push([cell(group, 3)]);
-        plan.rows.filter(function (r) { return r.group === group; }).forEach(function (r, i) { rows.push([i + 1, r.displayName || employee(db, r.employeeId).name].concat(r.values.map(label))); });
+        plan.rows.filter(function (r) { return r.group === group; }).forEach(function (r, i) { rows.push([i + 1, r.displayName || employee(db, r.employeeId).name].concat(r.values.map(function (_, dayIndex) { return planningCellText(db, plan, r, dayIndex); }))); });
         rows.push([]);
       });
       return { name: title, rows: rows, widths: [8, 24, 29, 29, 29, 29, 29, 29], freeze: { rows: 3, cols: 2 }, landscape: true };
@@ -298,3 +303,4 @@
 
   window.MMExports = { render: render, handleAction: handleAction, handleSubmit: handleSubmit, openPrint: openPrint, buildXlsx: buildXlsx };
 }());
+

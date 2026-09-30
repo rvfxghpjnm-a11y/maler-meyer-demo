@@ -100,7 +100,7 @@ async function assertClean(page, errors, external, label) {
       await navigate(page, 'leave');
       await page.locator('form[data-form="leave-request"] [name="from"]').fill('2026-10-12');
       await page.locator('form[data-form="leave-request"] [name="to"]').fill('2026-10-16');
-      await page.getByRole('button', { name: 'Urlaub beantragen' }).click();
+      await page.getByRole('button', { name: 'Antrag stellen' }).click();
       await navigate(page, 'feedback');
       await page.locator('form[data-form="feedback-case"] [name="description"]').fill('Synthetischer Smartphone-Testfall.');
       await page.getByRole('button', { name: 'Demo-Fall anlegen' }).click();
@@ -155,10 +155,7 @@ async function assertClean(page, errors, external, label) {
       await page.getByText('In Bearbeitung', { exact: true }).first().waitFor();
       await switchRole(page, 'office');
       await navigate(page, 'leave');
-      assert.equal(await page.locator('form[data-form="leave-decision"]').count(), 0, 'Büro sieht Urlaubsanträge ohne Entscheidungsaktion');
-      await page.getByText(/endgültige Entscheidung trifft die Geschäftsführung/).first().waitFor();
-      await switchRole(page, 'management');
-      await navigate(page, 'leave');
+      assert.ok(await page.locator('form[data-form="leave-decision"]').count() > 0, 'Büro darf Urlaubsanträge entscheiden');
       await page.locator('form[data-form="leave-decision"][data-id="U-001"] [name="reason"]').fill('Synthetische Demo-Genehmigung.');
       await page.locator('form[data-form="leave-decision"][data-id="U-001"] button[value="APPROVED"]').click();
       await navigate(page, 'planning');
@@ -174,7 +171,7 @@ async function assertClean(page, errors, external, label) {
       await navigate(page, 'more');
       await page.locator('[data-action="reset-demo"]').click();
       const resetState = await page.evaluate(key => JSON.parse(localStorage.getItem(key)), storageKey);
-      assert.equal(resetState.version, 12, 'Demo-Version nach Reset');
+      assert.equal(resetState.version, 19, 'Demo-Version nach Reset');
       assert.equal(resetState.data.materialRecords.length, 3, 'synthetischer Material-Ausgangsstand nach Reset');
       await assertClean(page, errors, external, 'Desktop');
       await context.close();
@@ -184,3 +181,4 @@ async function assertClean(page, errors, external, label) {
     await browser.close();
   }
 })().catch(error => { console.error(error); process.exitCode = 1; });
+

@@ -37,7 +37,7 @@ async function assertNoHorizontalOverflow(page, label) {
     let page = phone.page;
     await page.locator('[data-action="load-torben-pilot"]:visible').first().click();
     assert.match(await page.locator('h1').first().innerText(), /Guten/);
-    assert.equal((await page.evaluate(key => JSON.parse(localStorage.getItem(key)).version, storageKey)), 12);
+    assert.equal((await page.evaluate(key => JSON.parse(localStorage.getItem(key)).version, storageKey)), 19);
     await assertNoHorizontalOverflow(page, 'Startseite läuft auf dem iPhone horizontal über');
     checks.push('Praxistest bleibt nach dem Laden im Morgencheck auf Heute');
 
@@ -119,3 +119,4 @@ async function assertNoHorizontalOverflow(page, label) {
     await browser.close();
   }
 })().catch(error => { console.error(error); process.exitCode = 1; });
+

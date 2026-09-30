@@ -1,6 +1,8 @@
-# Interner Torben-Praxistest – Demo-Version 18
+# Interner Torben-Praxistest – Demo-Version 19
 
 Stand: 30. September 2026. Alle Fälle verwenden ausschließlich synthetische Daten. „Bestanden“ bezeichnet die Bedienungsdemo, nicht die Produktivreife. Die Aufgaben können jetzt zusätzlich im geführten interaktiven Praxistest bearbeitet werden. Audio wird nicht aufgenommen; eine iPad-Aufnahme läuft getrennt.
+
+Der echte Torben-Praxistest wurde durchgeführt und als JSON plus zwei Transkripte ausgewertet: 60 von 64 Punkten wurden im Test als erledigt gespeichert, ein zunächst nicht gefundener Urlaubsablauf wurde später im Gespräch gefunden, drei Punkte wurden übersprungen. Die daraus abgeleiteten Änderungen und offenen Produktionsfragen stehen in `TORBEN_PRAXISTEST_AUSWERTUNG_2026-09-30.md`.
 
 ## Interaktiver Testmodus
 
@@ -75,3 +77,4 @@ Die 30 Abschlussfragen sind mit dem PDF-Gesprächsleitfaden abgeglichen. Sie dec
 ## Bewusste Grenzen
 
 Entwurf/Veröffentlichung, Mehrfachplanung, Statusauswahl und Erinnerungen sind UI-Vorschläge. Rechte, Push, Offline-Synchronisation, Sicherheit, Original-Excel-Formeln, kaufmännische Freigaben, Umsatzsteuer- und Kontierungslogik bleiben offen beziehungsweise produktiv neu umzusetzen.
+

@@ -36,6 +36,9 @@
       description: get('description'),
       extraTasks: lines('extraTasks'),
       materials: lines('materials'),
+      firstDayMaterials: lines('firstDayMaterials'),
+      machines: lines('machines'),
+      travelRule: get('travelRule') || 'NONE',
       invoice: get('invoice') || 'Noch nicht bewertet',
       internalNote: get('internalNote'),
       offerNet: Number(get('offerNet') || 0),
@@ -67,7 +70,12 @@
       </div></fieldset>
       <fieldset class="project-detail-group"><legend>Aufgaben und Material</legend><div class="form-grid">
         <label class="full">Weitere geplante Aufgaben · je Zeile<textarea name="extraTasks" placeholder="Weitere geplante Tätigkeiten, keine bestätigten Zusatzarbeiten">${list('extraTasks')}</textarea></label>
-        <label class="full">Voraussichtlicher Materialbedarf · je Zeile<textarea name="materials" placeholder="Was wird voraussichtlich benötigt?">${list('materials')}</textarea></label>
+        <label class="full">Material für den ersten Arbeitstag · je Zeile<textarea name="firstDayMaterials" placeholder="Was soll am ersten Tag sicher mitgenommen werden?">${list('firstDayMaterials')}</textarea></label>
+        <label class="full">Voraussichtlicher Materialbedarf gesamt · je Zeile<textarea name="materials" placeholder="Was wird voraussichtlich insgesamt benötigt?">${list('materials')}</textarea></label>
+        <label class="full">Maschinenbedarf · je Zeile<textarea name="machines" placeholder="z. B. Schleifmaschine, Arbeitsbühne">${list('machines')}</textarea></label>
+      </div></fieldset>
+      <fieldset class="project-detail-group"><legend>Fahrzeitregel der Baustelle</legend><div class="form-grid">
+        <label class="full">Regel auswählen<select name="travelRule"><option value="NONE" ${item.travelRule === 'NONE' || !item.travelRule ? 'selected' : ''}>Keine besondere Fahrzeitregel</option><option value="OVER_45" ${item.travelRule === 'OVER_45' ? 'selected' : ''}>Google-Maps-Fahrzeit über 45 Minuten · 30 Minuten Zeitgutschrift</option><option value="OVER_60" ${item.travelRule === 'OVER_60' ? 'selected' : ''}>Google-Maps-Fahrzeit über 60 Minuten · 30 Minuten Zeitgutschrift und früheres Baustellenende</option></select><small>Im Torben-Praxistest beschrieben. Die produktive Abrechnung muss noch exakt spezifiziert und getestet werden.</small></label>
       </div></fieldset>
       <fieldset class="project-detail-group"><legend>Büro und kaufmännische Eckdaten</legend><div class="form-grid">
         <label>Auftragswert netto · synthetisch<input type="number" name="offerNet" min="0" step="0.01" inputmode="decimal" value="${number('offerNet')}" placeholder="optional"></label>
@@ -80,3 +88,4 @@
 
   window.MMProjectAdmin = { nextNumber: nextNumber, detailsFrom: detailsFrom, validDetails: validDetails, renderDetails: renderDetails };
 })();
+

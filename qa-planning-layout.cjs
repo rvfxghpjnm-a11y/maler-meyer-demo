@@ -27,9 +27,8 @@ const url = process.env.DEMO_URL || 'http://127.0.0.1:4175/';
       assert.ok(nameBox.x + nameBox.width <= labelBox.x + labelBox.width + 1, `Name ragt bei ${width}px aus Auswahl`);
 
       const cell = page.locator('.planning-cell[data-employee="M-0001"][data-day="0"]');
-      assert.equal((await cell.locator('strong').textContent()).trim(), '26-102');
-      assert.ok((await cell.locator('.planning-site-name').textContent()).trim().length > 2, `Baustellenname fehlt bei ${width}px`);
-      assert.ok((await cell.getAttribute('title')).includes('26-102'));
+      assert.match((await cell.locator('strong').first().textContent()).trim(), /^26-102 · .+/);
+      assert.equal(await cell.getAttribute('title'), 'Planung bearbeiten');
 
       const weekSelect = page.locator('form[data-form="plan-batch"] select[name="week"]');
       assert.equal(await weekSelect.inputValue(), '2026-09-07', 'Planungsbox muss die angezeigte KW vorauswählen');
@@ -71,3 +70,4 @@ const url = process.env.DEMO_URL || 'http://127.0.0.1:4175/';
     await browser.close();
   }
 })().catch(error => { console.error(error); process.exitCode = 1; });
+

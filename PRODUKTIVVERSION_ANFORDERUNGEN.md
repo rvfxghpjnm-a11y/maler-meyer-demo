@@ -185,4 +185,17 @@ Der interaktive Praxistest der öffentlichen Demo ist ein lokales Erhebungswerkz
 
 Demo-Version 18 enthält neben 34 Bedienaufgaben einen mit dem PDF-Gesprächsleitfaden abgeglichenen Katalog aus 30 fachlichen Abschlussfragen. Er trennt Kernentscheidungen für den ersten Pilot von Punkten, die bewusst später beziehungsweise zwingend vor Echtbetrieb geklärt werden können. Eine im Test notierte Antwort wird erst nach Auswertung und Übernahme in die verbindlichen Entscheidungs- und Spezifikationsdokumente zur Projektentscheidung; die JSON-Datei selbst ist kein produktives Pflichtenheft.
 
+## Ergänzung aus dem Torben-Praxistest vom 30. September 2026
+
+- Der erste Pilot beginnt leer beziehungsweise mit einem kontrollierten Import und zunächst drei Mitarbeitern samt relevanter Baustellen. Niemals Demo-localStorage übernehmen.
+- Torben, Steffen und das Büro benötigen dieselben operativen Verwaltungsrechte; produktiv werden sie serverseitig erzwungen und auditiert.
+- Planung benötigt Entwurf/Veröffentlichung, leere neue Wochen, Mehrfachzuweisung, mehrere Tagesstationen mit optionaler Zeit, freie Stundenlohnbezeichnung, Wochenhinweise und Abwesenheit von–bis.
+- Mitarbeitende sehen ihre eigene und die veröffentlichte aktuelle Gesamtplanung nur lesend. Entwürfe sind nicht sichtbar.
+- Zeitdaten müssen einzelne Start-, Pausen-, Wechsel- und Endereignisse erhalten. Getrennte Pausen bleiben einzeln korrigierbar; jede Korrektur an einem bestätigten Wochenzettel erzeugt eine neue Version und erneute Bestätigung.
+- Nach Mitarbeiterbestätigung und Bürofreigabe muss eine DATEV-Übergabe möglich sein. Vor Umsetzung sind DATEV-Zielsystem, Importformat/API, Pflichtfelder, Validierung und Rückmeldung verbindlich festzulegen.
+- Materialworkflow: Bedarf möglichst auf der Baustelle erfassen, Positionen ergänzen, Mitnahme bestätigen, projektbezogen aggregieren und Korrektur/Rückgabe protokollieren. Keine Lagerwirtschaft im ersten Pilot.
+- Zusatzarbeiten sind im ersten Pilot reine Meldungen an das Büro. Keine Vor-Ort-Signatur und keine automatische Arbeits-, Abnahme- oder Rechnungsfreigabe.
+- Die bestehenden Excel-Dateien bleiben in der Übergangsphase für kaufmännische Daten führend. Eine spätere Leseintegration darf importierte Excel-Werte nicht mit manuellen Pilotwerten vermischen.
+
 Falls ein vergleichbarer Ablauf später produktiv verwendet werden soll, sind Zweck, Rechtsgrundlage, Einwilligung beziehungsweise betriebliche Mitbestimmung, Rollen, Aufbewahrung, Löschung, Zugriff, sichere Übertragung und Datenminimierung vorher festzulegen. Ein produktives System darf keine Passwörter, PINs, Formulareingaben oder unnötigen Personen-/Kundendaten protokollieren. Audio oder Transkription wären ein eigenes, separat zu prüfendes Modul und werden aus dieser Demo nicht abgeleitet.
+
