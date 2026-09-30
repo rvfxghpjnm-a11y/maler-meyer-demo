@@ -18,7 +18,7 @@ Demo-Version 16 verarbeitet die Erkenntnisse aus dem ersten Familientest vor dem
 
 Demo-Version 15 ordnet synthetische akzeptierte Zeitminuten einer Bau-Nr. und Kalenderwoche zu; diese datierten Werte speisen die Stunden- und Fahrzeit-Rohwerte im Projekt-Unterkonto und in der Bauliste. Eine eindeutige Bürokorrektur des Wochenzettels aktualisiert die zugehörige Demo-Zeitprojektion, ohne den alten bestätigten Snapshot zu verändern. Die Planung identifiziert Wochen jetzt über den konkreten Montag und die ISO-Kalenderwoche **mit Jahr**; KW 1 verschiedener Jahre kann dadurch unabhängig geplant und exportiert werden. Bei mehr als 54 Projektwochen setzt der XLSX-Export die Zeitdaten sichtbar fort, statt sie abzuschneiden. Dies ersetzt weder eine produktive Freigabelogik noch die serverseitige Verarbeitung unveränderbarer Rohereignisse.
 
-Wer bereits einen lokalen Demo-Zustand aus einer älteren Version hat, erhält durch den Versionswechsel automatisch die konsistenten synthetischen Ausgangsdaten von Version 16. Über „Demo zurücksetzen“ können spätere lokale Änderungen erneut verworfen werden.
+Wer bereits einen lokalen Demo-Zustand aus einer älteren Version hat, erhält durch den Versionswechsel automatisch die konsistenten synthetischen Ausgangsdaten von Version 19. Über „Demo zurücksetzen“ können spätere lokale Änderungen erneut verworfen werden.
 
 In der Wochenmatrix werden Bau-Nr. und Baustellenname gemeinsam angezeigt. Die mobile Mitarbeiterauswahl für Kolonnen-/Mehrtagesplanung ist ohne überlappende Checkboxen oder Namen bedienbar; die breite Wochenmatrix wird auf Smartphones seitlich gewischt.
 
