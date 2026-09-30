@@ -104,7 +104,7 @@ def on_page(canvas, doc):
     canvas.setFillColor(colors.white)
     canvas.drawString(LEFT, PAGE_H - 8.5 * mm, "MALER MEYER  |  PRAXISTEST")
     canvas.setFont("MM-Regular", 8)
-    canvas.drawRightString(PAGE_W - RIGHT, PAGE_H - 8.5 * mm, "Demo-Version 16  |  Stand 30.09.2026")
+    canvas.drawRightString(PAGE_W - RIGHT, PAGE_H - 8.5 * mm, "Demo-Version 18  |  Stand 30.09.2026")
     canvas.setStrokeColor(MID)
     canvas.line(LEFT, 13 * mm, PAGE_W - RIGHT, 13 * mm)
     canvas.setFont("MM-Regular", 7.5)
@@ -184,11 +184,11 @@ story += [
     Spacer(1, 14 * mm),
     p("Maler Meyer", "MMTitle"),
     p("Praxistest fuer den Video-Call", "MMTitle"),
-    p("Aktuelle Aufgabenliste mit Ergebnisfeldern, Abschlussfragen und Fehlerprotokoll", "MMSubtitle"),
+    p("34 Bedienaufgaben und 30 fachliche Abschlussfragen - deckungsgleich mit dem interaktiven Test", "MMSubtitle"),
     Spacer(1, 6 * mm),
     callout(
         "Heute testen",
-        "Der Familientest hat bereits konkrete Verbesserungen geliefert. Diese aktualisierte Fassung wird morgen mit Torben vollstaendig durchgegangen; neue Fachentscheidungen werden direkt notiert.",
+        "Diese Fassung ist fuer das letzte fachliche Treffen vor dem Aufbau der echten Pilot-App vorgesehen. Bedienergebnisse, Entscheidungen und bewusst offene Punkte werden vollstaendig festgehalten.",
         GREEN,
     ),
     Spacer(1, 4 * mm),
@@ -359,70 +359,63 @@ qt.setStyle(TableStyle([
 ]))
 story += [qt, Spacer(1, 6 * mm), notes_box(27 * mm, "Die drei wichtigsten Verbesserungen") , PageBreak()]
 
-# Questions for Torben - 2 pages
-story += [
-    p("Fachliche Rueckfragen - Teil 1", "MMH1"),
-    p("Vater und Freundin markieren hier vor allem, was unklar wirkt. Torben beantwortet spaeter die fachliche Entscheidung.", "MMBody"),
+# Questions for Torben - exactly the same 30 topics as in the interactive test
+decision_rows = [
+    ("Q01", "Umfang erste Version", "Welche Funktionen muessen beim ersten produktionsnahen Pilot zwingend funktionieren und welche duerfen ausdruecklich spaeter kommen?", "Kernentscheidung"),
+    ("Q02", "Planung", "Sind Entwurf, Veroeffentlichung, Vorwoche kopieren und Aenderungsmeldungen gewuenscht? Wer darf veroeffentlichen, aendern und zurueckziehen?", "Kernentscheidung"),
+    ("Q03", "Rollen und Rechte", "Welche Rechte benoetigen Torben, Steffen, die beiden Buerokraefte, Vorarbeiter und Mitarbeiter jeweils? Wer vertritt wen?", "Kernentscheidung"),
+    ("Q04", "Projektkontakte", "Sind Auftraggeber, Ansprechpartner mit Telefonnummer, externe Bauleitung und interner Maler-Meyer-Ansprechpartner richtig getrennt und benannt?", "Kernentscheidung"),
+    ("Q05", "Projektansicht", "Welche Felder braucht Torben taeglich sichtbar, welche nur aufklappbar und welche ueberhaupt nicht?", "Kernentscheidung"),
+    ("Q06", "Mitarbeitersicht", "Welche Projekt-, Kontakt-, Foto-, Zeichnungs-, Stunden- und Kostendaten duerfen normale Mitarbeiter sehen?", "Kernentscheidung"),
+    ("Q07", "Mitarbeiterdaten", "Bleibt die App bewusst bei Organisationsdaten ohne Personalakte? Sind interne Einsatzhinweise gewuenscht und wer darf sie sehen?", "Kernentscheidung"),
+    ("Q08", "Krank / Abwesenheit", "Wo und durch wen wird Krankheit von/bis erfasst? Sind Schule, Fortbildung und sonstige Abwesenheit feste Status?", "Kernentscheidung"),
+    ("Q09", "Zeit und Korrekturen", "Passen Start, Pause, Baustellenwechsel, Fahrt, Feierabend, Korrekturanfrage und stellvertretende Buchung zum echten Alltag?", "Kernentscheidung"),
+    ("Q10", "Fahrzeit / Zeitregeln", "Welche Fahrzeit-, Ueberstunden-, Ruestzeit- und Nachtregeln gelten genau? Unklare Regeln bleiben bis zur Freigabe reine Rohdaten.", "Kernentscheidung"),
+    ("Q11", "Wochenzettel", "Wer gibt nach der Mitarbeiterbestaetigung final frei und welche Korrekturen muessen zwingend eine neue Version erzeugen?", "Kernentscheidung"),
+    ("Q12", "Material", "Sind Materialbedarf, zusaetzliche Anforderung, Entnahme und tatsaechlicher Einsatz richtig getrennt? Wer prueft und wird informiert?", "Kernentscheidung"),
+    ("Q13", "Zusatzarbeit", "Wer gibt die Ausfuehrung frei, wer prueft kaufmaennisch und wie werden Lift, Geruest, Material oder zusaetzliche Personen festgehalten?", "Kernentscheidung"),
+    ("Q14", "Abrechnungshinweis", "Wird Freitext oder eine Auswahl wie Festpreis, Stundenlohn und Nachbesserung benoetigt? Wer darf den Hinweis sehen?", "Kernentscheidung"),
+    ("Q15", "Rechnung schreiben", "Welche Status, Verantwortlichen und Abschlusskriterien benoetigt die Liste 'Rechnung schreiben?'?", "Kernentscheidung"),
+    ("Q16", "Urlaub", "Wer genehmigt final und wie werden halbe Tage, Sonderurlaub, unbezahlter Urlaub und Resturlaub behandelt?", "Kernentscheidung"),
+    ("Q17", "Bau-Nr.", "Wann wird sie vergeben, wer darf sie aendern und wie wird bei gleichzeitiger Projektanlage die naechste Nummer reserviert?", "Kernentscheidung"),
+    ("Q18", "Startdaten", "Welche Mitarbeiter, aktiven Baustellen, Bau-Nrn., offenen Vorgaenge und optionalen Artikel muessen zum Pilotstart uebernommen werden? Wer prueft sie?", "Kernentscheidung"),
+    ("Q19", "Dokumente / Exporte", "Welche Papierformulare, PDF-, CSV- und Excel-Ausgaben muessen beim ersten Pilot vollstaendig verfuegbar und von wem abgenommen sein?", "Kernentscheidung"),
+    ("Q20", "Excel / Kennzahlen", "Welche Kennzahlen aus Hauptliste und Projektblaettern werden wirklich benoetigt und wie sollen die wichtigen Werte eindeutig heissen?", "Kernentscheidung"),
+    ("Q21", "Excel-Abweichungen", "Sollen historische Materialformel- und Kostenabweichungen erhalten, fachlich korrigiert oder durch eine neue bestaetigte Regel ersetzt werden?", "Darf offen bleiben"),
+    ("Q22", "Kostenuebersicht", "Soll die unternehmensweite Jahreskostenuebersicht Teil der ersten Version sein? Welche Kategorien gehoeren in Monats- und Jahressummen?", "Darf offen bleiben"),
+    ("Q23", "Eingangsrechnung / OCR", "Soll OCR in die erste Version oder spaeter? Welche Rechnungsdaten und Pruefschritte sind unabhaengig davon erforderlich?", "Darf offen bleiben"),
+    ("Q24", "Geraet / Anmeldung", "Welche Geraete werden verwendet? Wie sollen persoenlicher PIN, vergessenes Kennwort, Geraetesperre und Benutzerwechsel im Betrieb ablaufen?", "Kernentscheidung"),
+    ("Q25", "Offline / mehrere Geraete", "Welche Vorgaenge muessen zwingend offline funktionieren und wie soll das Buero bei widerspruechlichen Aenderungen mehrerer Geraete entscheiden?", "Kernentscheidung"),
+    ("Q26", "Benachrichtigungen", "Welche Meldungen sind wichtig, wer erhaelt sie und zu welchen Zeitpunkten? Freitag 16:00 bleibt nur ein Beispiel.", "Darf offen bleiben"),
+    ("Q27", "Datenschutz", "Sind Betriebsrat oder Mitbestimmung betroffen? Wer klaert Aufbewahrung, Loeschung, Betreiberrolle, AVV sowie Foto- und Signaturdaten?", "Vor Echtbetrieb klaeren"),
+    ("Q28", "Betrieb / Support", "Wer verantwortet Server, Domain, Backups und Wiederherstellung? Wie wird zeitlich begrenzter ShoreLogic-Support freigegeben?", "Vor Echtbetrieb klaeren"),
+    ("Q29", "Pilotbetrieb", "Welche ein bis zwei Baustellen und Personen eignen sich? Welche alte Unterlage bleibt vorerst fuehrend und wie werden Abweichungen verglichen?", "Kernentscheidung"),
+    ("Q30", "Abnahme", "Woran erkennt Torben, dass der Pilot erfolgreich ist, wer nimmt ihn ab und wann wird ueber den breiteren Echtbetrieb entschieden?", "Kernentscheidung"),
 ]
-decision_rows_1 = [
-    ("Planung", "Sind Entwurf / veroeffentlicht und Vorwoche kopieren hilfreich oder unnoetig?"),
-    ("Rollen", "Welche Rechte haben Torben, Steffen, Buero, Vorarbeiter und Mitarbeiter endgueltig?"),
-    ("Projektkontakte", "Sind Auftraggeber/Firma, Ansprechpartner mit Telefon, externe Bauleitung und interner Maler-Meyer-Ansprechpartner so richtig getrennt und benannt?"),
-    ("Sichtbarkeit", "Welche Projekt-, Kontakt-, Foto- und Zeichnungsdaten duerfen normale Mitarbeiter sehen? Welche Geld-/Stundenvorgaben auf keinen Fall?"),
-    ("Fahrzeit", "Welche Rohfahrt wird spaeter wie bewertet? Schwellen, Beginn/Ende und Freigabe sind noch festzulegen."),
-    ("Zeit", "Wie gelten Ueberstunden, Ruestzeit sowie Nacht-/Mitternachtsfaelle?"),
-    ("Wochenzettel", "Wer darf nach Mitarbeiterbestaetigung final freigeben und welche Korrektur ist versionsrelevant?"),
-    ("Zusatzarbeit", "Wer gibt die Ausfuehrung frei, wer prueft kaufmaennisch und wo werden zusaetzliches Material, Lift oder Geruestbedarf festgehalten?"),
-    ("Material", "Ist 'Materialbedarf' die geplante Projektliste und 'zusaetzliche Materialanforderung' die spaetere Meldung? Wer prueft sie und wer wird benachrichtigt?"),
-    ("Urlaub", "Wer genehmigt final? Wie sollen halber Urlaub, Sonderurlaub, unbezahlt und Resturlaub behandelt werden?"),
-    ("Abwesenheit", "Wo meldet das Buero Krank von/bis? Reicht Planung plus Verlauf oder wird ein eigener Mitarbeiter-Ablauf benoetigt?"),
-    ("Fahrzeug-PIN", "Darf PIN-Entsperrung offline funktionieren und nach welcher Zeit wird automatisch gesperrt?"),
-]
-ddata = [[p("Thema", "MMWhite"), p("Frage", "MMWhite"), p("Entscheidung / Notiz", "MMWhite")]]
-for theme, question in decision_rows_1:
-    ddata.append([p(theme, "MMTableBold"), p(question, "MMTable"), ""])
-dt = Table(ddata, colWidths=[31 * mm, 89 * mm, 58 * mm], rowHeights=[9 * mm] + [16 * mm] * len(decision_rows_1), repeatRows=1)
-dt.setStyle(TableStyle([
-    ("BACKGROUND", (0, 0), (-1, 0), NAVY),
-    ("GRID", (0, 0), (-1, -1), 0.55, MID),
-    ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, LIGHT]),
-    ("VALIGN", (0, 0), (-1, -1), "TOP"),
-    ("LEFTPADDING", (0, 0), (-1, -1), 2 * mm),
-    ("RIGHTPADDING", (0, 0), (-1, -1), 2 * mm),
-    ("TOPPADDING", (0, 1), (-1, -1), 2 * mm),
-]))
-story += [dt, PageBreak()]
 
-story += [p("Fachliche Rueckfragen - Teil 2", "MMH1")]
-decision_rows_2 = [
-    ("Hinweise / Push", "Welche Meldungen sind wichtig und zu welchen Zeitpunkten? Freitag 16:00 ist bisher nur Beispiel."),
-    ("Rechnung schreiben?", "Welche endgueltigen Status, Verantwortlichen und Abschlusskriterien werden gebraucht?"),
-    ("Eingangsrechnung", "Soll OCR in die erste Produktivversion oder spaeter? Welche Daten muessen geprueft werden?"),
-    ("Bau-Nr.", "Wann wird sie vergeben, wer darf sie aendern und wie wird eine Nummer reserviert?"),
-    ("Projektfelder", "Welche sichtbaren Felder braucht Torben wirklich taeglich, welche nur aufklappbar und welche gar nicht?"),
-    ("Abrechnungshinweis", "Freitext oder Auswahl wie Festpreis, Stundenlohn, Nachbesserung/Garantie? Wer darf den Hinweis sehen?"),
-    ("Mitarbeiterdaten", "Bleibt es bewusst bei Organisationsdaten ohne Personalakte? Sind interne Einsatzhinweise ueberhaupt gewuenscht und datenschutzrechtlich vertretbar?"),
-    ("Excel", "Welche sichtbaren Kennzahlen aus Hauptliste und Projektblatt werden wirklich gebraucht? Welche Namen sind fuer R/S/T am klarsten?"),
-    ("Excel-Abweichungen", "Historisch verschobene Materialformeln und Kosten-Anomalien: erhalten, korrigieren oder nach neuer Fachregel ersetzen?"),
-    ("Kostenuebersicht", "Soll die unternehmensweite Jahreskostenmappe Teil der ersten Produktivversion sein? Welche Kategorien gehoeren in Monats-/Jahressummen?"),
-    ("Datenschutz", "Aufbewahrung, Loeschfristen, Betriebsrat/Mitbestimmung, Betreiber und AVV festlegen."),
-    ("Betrieb", "Backup-Ziele, Wiederherstellungszeit, Supportzugriff und finale Produktivdomain festlegen."),
-    ("Parallelphase", "Welche 1-2 Baustellen eignen sich fuer einen gesicherten Pilot und welche alte Unterlage bleibt wie lange fuehrend?"),
-]
-ddata2 = [[p("Thema", "MMWhite"), p("Frage", "MMWhite"), p("Entscheidung / Notiz", "MMWhite")]]
-for theme, question in decision_rows_2:
-    ddata2.append([p(theme, "MMTableBold"), p(question, "MMTable"), ""])
-dt2 = Table(ddata2, colWidths=[31 * mm, 89 * mm, 58 * mm], rowHeights=[9 * mm] + [15 * mm] * len(decision_rows_2), repeatRows=1)
-dt2.setStyle(TableStyle([
-    ("BACKGROUND", (0, 0), (-1, 0), NAVY),
-    ("GRID", (0, 0), (-1, -1), 0.55, MID),
-    ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, LIGHT]),
-    ("VALIGN", (0, 0), (-1, -1), "TOP"),
-    ("LEFTPADDING", (0, 0), (-1, -1), 2 * mm),
-    ("RIGHTPADDING", (0, 0), (-1, -1), 2 * mm),
-    ("TOPPADDING", (0, 1), (-1, -1), 2 * mm),
-]))
-story += [dt2, PageBreak()]
+
+def decision_table(rows):
+    data = [[p("Nr.", "MMWhite"), p("Thema", "MMWhite"), p("Frage", "MMWhite"), p("Entscheidung / Notiz", "MMWhite")]]
+    for qid, theme, question, priority in rows:
+        data.append([p(qid, "MMTableBold"), p(theme + "<br/><font color='#667684'>" + priority + "</font>", "MMTableBold"), p(question, "MMTable"), ""])
+    table = Table(data, colWidths=[13 * mm, 38 * mm, 79 * mm, 48 * mm], rowHeights=[9 * mm] + [18 * mm] * len(rows), repeatRows=1)
+    table.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), NAVY),
+        ("GRID", (0, 0), (-1, -1), 0.55, MID),
+        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, LIGHT]),
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 2 * mm),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 2 * mm),
+        ("TOPPADDING", (0, 1), (-1, -1), 1.8 * mm),
+    ]))
+    return table
+
+
+for part, start in enumerate(range(0, len(decision_rows), 10), start=1):
+    story += [p(f"Fachliche Abschlussfragen - Teil {part} von 3", "MMH1")]
+    if part == 1:
+        story += [p("Diese 30 Punkte sind mit dem interaktiven Test identisch. Eine Frage darf beantwortet oder bewusst als spaeter/offen markiert werden. Keine unklare Betriebsregel wird automatisch festgelegt.", "MMBody")]
+    story += [decision_table(decision_rows[start:start + 10]), PageBreak()]
 
 # Defect log
 story += [
@@ -456,16 +449,16 @@ story += [
     Spacer(1, 5 * mm),
     notes_box(30 * mm, "Was war am unklarsten oder an der falschen Stelle?"),
     Spacer(1, 5 * mm),
-    notes_box(30 * mm, "Welche eine Aenderung sollte vor dem Torben-Call unbedingt erfolgen?"),
+    notes_box(30 * mm, "Welche eine Aenderung muss vor dem Aufbau der echten Pilot-App unbedingt erfolgen?"),
     Spacer(1, 6 * mm),
-    p("Darf dieser Stand Torben gezeigt werden?", "MMH2"),
-    checkbox_line(["ja", "ja, nach kleinen Korrekturen", "nein, erst wesentliche Fehler beheben"]),
+    p("Reicht dieser fachliche Stand fuer den Aufbau der ersten echten Pilot-App?", "MMH2"),
+    checkbox_line(["ja", "ja, offene Punkte sind bewusst vertagt", "nein, zuerst wesentliche Fragen klaeren"]),
     Spacer(1, 8 * mm),
     p("Testperson: _____________________________________&nbsp;&nbsp;&nbsp; Dauer: __________ Minuten", "MMBody"),
     Spacer(1, 4 * mm),
     callout(
         "Nach dem Test",
-        "PDF oder Fotos der ausgefuellten Seiten zusammen mit den Screenshots sammeln. Fuer den Torben-Termin die gleiche PDF frisch ausdrucken oder digital verwenden, damit Bewertungen direkt vergleichbar bleiben.",
+        "Beim interaktiven Test die JSON-Ergebnisdatei herunterladen. PDF-Notizen, Screenshots und die separat erstellte Sprachmemo beziehungsweise deren Transkript gemeinsam mit der JSON-Datei an Codex uebergeben.",
         GREEN,
     ),
 ]

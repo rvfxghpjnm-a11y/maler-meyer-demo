@@ -1,11 +1,11 @@
-# Interner Torben-Praxistest – Demo-Version 17
+# Interner Torben-Praxistest – Demo-Version 18
 
 Stand: 30. September 2026. Alle Fälle verwenden ausschließlich synthetische Daten. „Bestanden“ bezeichnet die Bedienungsdemo, nicht die Produktivreife. Die Aufgaben können jetzt zusätzlich im geführten interaktiven Praxistest bearbeitet werden. Audio wird nicht aufgenommen; eine iPad-Aufnahme läuft getrennt.
 
 ## Interaktiver Testmodus
 
 - Einstieg über `Mehr → Interaktiver Praxistest`
-- 34 Bedienaufgaben und 12 Fachfragen
+- 34 Bedienaufgaben und 30 fachliche Abschlussfragen
 - feste Steuerleiste während der normalen Demo-Bedienung
 - Erledigt, Unklar, Fehler oder Übersprungen je Punkt
 - Vor, Zurück und direkter Sprung über die Gesamtübersicht
@@ -15,6 +15,8 @@ Stand: 30. September 2026. Alle Fälle verwenden ausschließlich synthetische Da
 - lokale Speicherung im jeweiligen Browser
 - keine Audioaufnahme, kein Upload und keine automatische Übermittlung
 - Ergebnisdatei und externes iPad-Transkript anschließend gemeinsam an Codex übergeben
+
+Die 30 Abschlussfragen sind mit dem PDF-Gesprächsleitfaden abgeglichen. Sie decken den benötigten Produktumfang, Rollen, Sichtbarkeit, Zeit- und Freigabeabläufe, Startdaten, Dokumente und Exporte, Excel, Geräte, Offline-Betrieb, Datenschutz, Pilot und Abnahme ab. Punkte, die Torben nicht abschließend entscheiden kann oder soll, werden ausdrücklich als später beziehungsweise vor Echtbetrieb zu klären festgehalten; sie werden nicht stillschweigend zur Geschäftsregel.
 
 ## Bestehende Bedienfälle 1–24
 

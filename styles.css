@@ -531,6 +531,7 @@ legend { margin-bottom: .65rem; color: var(--navy); font-weight: 900; }
 .practice-current-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
 .practice-current-head small { color: var(--muted); font-weight: 800; }
 .practice-current-head h2 { margin: .25rem 0 0; }
+.practice-priority { display: inline-flex; margin-top: .35rem; padding: .22rem .5rem; border-radius: 999px; background: #eaf1f6; color: #31536d; font-size: .75rem; font-weight: 800; }
 .practice-status { flex: 0 0 auto; padding: .35rem .65rem; border-radius: 999px; background: #eef3f7; color: var(--navy); font-size: .8rem; font-weight: 900; }
 .practice-status.done,.practice-item-row.done small { color: #1d6633; }
 .practice-status.unclear,.practice-item-row.unclear small { color: #805b00; }

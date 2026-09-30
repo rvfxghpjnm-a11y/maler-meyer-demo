@@ -1,8 +1,8 @@
 'use strict';
 
 (function () {
-  const STORAGE_KEY = 'maler-meyer-interactive-test-v1';
-  const VERSION = 1;
+  const STORAGE_KEY = 'maler-meyer-interactive-test-v2';
+  const VERSION = 2;
 
   const tasks = [
     ['T01', '1', 'Geschäftsführer-Morgencheck', 'Startseite ohne Erklärung ansehen. Innerhalb von fünf Sekunden sollen offene Punkte, Planung und Schnellaktionen verständlich sein.', 'today', 'management'],
@@ -44,20 +44,38 @@
   });
 
   const questions = [
-    ['Q01', 'Projektkontakte', 'Sind Auftraggeber, Ansprechpartner beim Bauvorhaben, externe Bauleitung und interner Maler-Meyer-Ansprechpartner richtig getrennt und benannt?'],
-    ['Q02', 'Projektansicht', 'Welche Felder braucht Torben täglich sichtbar, welche nur aufklappbar und welche überhaupt nicht?'],
-    ['Q03', 'Mitarbeitersicht', 'Welche Projekt-, Kontakt-, Stunden- und Kostendaten dürfen normale Mitarbeiter sehen?'],
-    ['Q04', 'Krankmeldung', 'Wo und durch wen wird Krankheit von/bis erfasst und wie erscheint sie in der Planung?'],
-    ['Q05', 'Material', 'Sind Materialbedarf, zusätzliche Anforderung, Entnahme und tatsächlicher Einsatz richtig getrennt? Wer prüft und wird informiert?'],
-    ['Q06', 'Zusatzarbeit', 'Wer gibt die Ausführung frei und wie werden Lift, Gerüst, Material oder zusätzliche Personen festgehalten?'],
-    ['Q07', 'Abrechnungshinweis', 'Wird Freitext oder eine Auswahl wie Festpreis, Stundenlohn und Nachbesserung benötigt?'],
-    ['Q08', 'Rollen und Rechte', 'Welche endgültigen Rechte benötigen Geschäftsführung, Büro, Vorarbeiter und Mitarbeiter?'],
-    ['Q09', 'Zeitregeln', 'Welche Fahrzeit-, Überstunden-, Rüstzeit- und Nachtregeln gelten? Diese Regeln werden heute nur aufgenommen, nicht automatisiert.'],
-    ['Q10', 'Urlaub', 'Wer genehmigt final und wie werden halbe Tage, Sonderurlaub und Resturlaub behandelt?'],
-    ['Q11', 'Excel und Kennzahlen', 'Welche sichtbaren Kennzahlen aus Hauptliste, Projektblättern und Kostenübersicht werden wirklich benötigt?'],
-    ['Q12', 'Pilotbetrieb', 'Welche ein bis zwei Baustellen eignen sich für den Paralleltest und welche bisherige Unterlage bleibt vorerst führend?']
+    ['Q01', 'Umfang der ersten echten Version', 'Welche Funktionen müssen beim ersten produktionsnahen Pilot zwingend funktionieren und welche dürfen ausdrücklich später kommen?', 'Kernentscheidung'],
+    ['Q02', 'Planung', 'Sind Entwurf, Veröffentlichung, Vorwoche kopieren und Änderungsmeldungen gewünscht? Wer darf veröffentlichen, ändern und zurückziehen?', 'Kernentscheidung'],
+    ['Q03', 'Rollen und Rechte', 'Welche Rechte benötigen Torben, Steffen, die beiden Bürokräfte, Vorarbeiter und Mitarbeiter jeweils? Wer vertritt wen?', 'Kernentscheidung'],
+    ['Q04', 'Projektkontakte', 'Sind Auftraggeber, Ansprechpartner mit Telefonnummer, externe Bauleitung und interner Maler-Meyer-Ansprechpartner richtig getrennt und benannt?', 'Kernentscheidung'],
+    ['Q05', 'Projektansicht', 'Welche Felder braucht Torben täglich sichtbar, welche nur aufklappbar und welche überhaupt nicht?', 'Kernentscheidung'],
+    ['Q06', 'Mitarbeitersicht', 'Welche Projekt-, Kontakt-, Foto-, Zeichnungs-, Stunden- und Kostendaten dürfen normale Mitarbeiter sehen?', 'Kernentscheidung'],
+    ['Q07', 'Mitarbeiterdaten', 'Bleibt die App bewusst bei Organisationsdaten ohne Personalakte? Sind interne Einsatzhinweise gewünscht und wer darf sie sehen?', 'Kernentscheidung'],
+    ['Q08', 'Krankmeldung und Abwesenheit', 'Wo und durch wen wird Krankheit von/bis erfasst? Sind Schule, Fortbildung und sonstige Abwesenheit feste Status?', 'Kernentscheidung'],
+    ['Q09', 'Zeitablauf und Korrekturen', 'Passen Start, Pause, Baustellenwechsel, Fahrt, Feierabend, Korrekturanfrage und stellvertretende Buchung zum echten Alltag?', 'Kernentscheidung'],
+    ['Q10', 'Fahrzeit und Zeitregeln', 'Welche Fahrzeit-, Überstunden-, Rüstzeit- und Nachtregeln gelten genau? Unklare Regeln bleiben bis zur Freigabe reine Rohdaten.', 'Kernentscheidung'],
+    ['Q11', 'Wochenzettel', 'Wer gibt nach der Mitarbeiterbestätigung final frei und welche Korrekturen müssen zwingend eine neue Version erzeugen?', 'Kernentscheidung'],
+    ['Q12', 'Material', 'Sind Materialbedarf, zusätzliche Anforderung, Entnahme und tatsächlicher Einsatz richtig getrennt? Wer prüft und wird informiert?', 'Kernentscheidung'],
+    ['Q13', 'Zusatzarbeit', 'Wer gibt die Ausführung frei, wer prüft kaufmännisch und wie werden Lift, Gerüst, Material oder zusätzliche Personen festgehalten?', 'Kernentscheidung'],
+    ['Q14', 'Abrechnungshinweis', 'Wird Freitext oder eine Auswahl wie Festpreis, Stundenlohn und Nachbesserung benötigt? Wer darf den Hinweis sehen?', 'Kernentscheidung'],
+    ['Q15', 'Rechnung schreiben', 'Welche Status, Verantwortlichen und Abschlusskriterien benötigt die Liste „Rechnung schreiben?“?', 'Kernentscheidung'],
+    ['Q16', 'Urlaub', 'Wer genehmigt final und wie werden halbe Tage, Sonderurlaub, unbezahlter Urlaub und Resturlaub behandelt?', 'Kernentscheidung'],
+    ['Q17', 'Bau-Nr.', 'Wann wird sie vergeben, wer darf sie ändern und wie wird bei gleichzeitiger Projektanlage die nächste Nummer reserviert?', 'Kernentscheidung'],
+    ['Q18', 'Startdaten', 'Welche Mitarbeiter, aktiven Baustellen, Bau-Nrn., offenen Vorgänge und optionalen Artikel müssen zum Pilotstart übernommen werden? Wer prüft sie?', 'Kernentscheidung'],
+    ['Q19', 'Dokumente und Exporte', 'Welche Papierformulare, PDF-, CSV- und Excel-Ausgaben müssen beim ersten Pilot vollständig verfügbar und von wem abgenommen sein?', 'Kernentscheidung'],
+    ['Q20', 'Excel und Kennzahlen', 'Welche Kennzahlen aus Hauptliste und Projektblättern werden wirklich benötigt und wie sollen die wichtigen Werte eindeutig heißen?', 'Kernentscheidung'],
+    ['Q21', 'Excel-Abweichungen', 'Sollen historische Materialformel- und Kostenabweichungen erhalten, fachlich korrigiert oder durch eine neue bestätigte Regel ersetzt werden?', 'Darf offen bleiben'],
+    ['Q22', 'Kostenübersicht', 'Soll die unternehmensweite Jahreskostenübersicht Teil der ersten Version sein? Welche Kategorien gehören in Monats- und Jahressummen?', 'Darf offen bleiben'],
+    ['Q23', 'Eingangsrechnung und OCR', 'Soll OCR in die erste Version oder später? Welche Rechnungsdaten und Prüfschritte sind unabhängig davon erforderlich?', 'Darf offen bleiben'],
+    ['Q24', 'Fahrzeuggerät und Anmeldung', 'Welche Geräte werden verwendet? Wie sollen persönlicher PIN, vergessenes Kennwort, Gerätesperre und Benutzerwechsel im Betrieb ablaufen?', 'Kernentscheidung'],
+    ['Q25', 'Offline und mehrere Geräte', 'Welche Vorgänge müssen zwingend offline funktionieren und wie soll das Büro bei widersprüchlichen Änderungen mehrerer Geräte entscheiden?', 'Kernentscheidung'],
+    ['Q26', 'Benachrichtigungen', 'Welche Meldungen sind wichtig, wer erhält sie und zu welchen Zeitpunkten? Freitag 16:00 bleibt nur ein Beispiel.', 'Darf offen bleiben'],
+    ['Q27', 'Datenschutz und Mitbestimmung', 'Sind Betriebsrat oder Mitbestimmung betroffen? Wer klärt Aufbewahrung, Löschung, Betreiberrolle, AVV sowie Foto- und Signaturdaten?', 'Vor Echtbetrieb klären'],
+    ['Q28', 'Betrieb und Support', 'Wer verantwortet Server, Domain, Backups und Wiederherstellung? Wie wird zeitlich begrenzter ShoreLogic-Support freigegeben?', 'Vor Echtbetrieb klären'],
+    ['Q29', 'Pilotbetrieb', 'Welche ein bis zwei Baustellen und Personen eignen sich? Welche alte Unterlage bleibt vorerst führend und wie werden Abweichungen verglichen?', 'Kernentscheidung'],
+    ['Q30', 'Abnahme und nächster Test', 'Woran erkennt Torben, dass der Pilot erfolgreich ist, wer nimmt ihn ab und wann wird über den breiteren Echtbetrieb entschieden?', 'Kernentscheidung']
   ].map(function (item, index) {
-    return { id: item[0], number: String(index + 1), kind: 'Fachfrage', title: item[1], instruction: item[2], view: '', role: 'management' };
+    return { id: item[0], number: String(index + 1), kind: 'Fachfrage', title: item[1], instruction: item[2], priority: item[3], view: '', role: 'management' };
   });
 
   const items = tasks.concat(questions);
@@ -163,11 +181,11 @@
   }
   function renderStart() {
     return '<div class="page-head"><div><h1>Interaktiver Praxistest</h1><p>Ersatz für den gedruckten Fragenkatalog</p></div><span class="demo-context">Lokal</span></div>' +
-      '<section class="card card-pad practice-intro"><h2>Was wird gespeichert?</h2><ul><li>Aufgabenfortschritt und Bewertungen</li><li>Notizen zu jeder Aufgabe oder Fachfrage</li><li>angeklickte Demo-Funktionen und Zeitpunkte</li><li>JavaScript-Fehler und Geräteinformationen</li><li>der aktuelle vollständig synthetische Demo-Zustand beim Download</li></ul><p class="legal-note"><strong>Keine Audioaufnahme:</strong> Das Mikrofon oder eine Aufnahme-App auf dem iPad läuft unabhängig von dieser Demo. Es erfolgt kein Upload.</p><form data-form="practice-start"><label>Name der Testperson oder Testgruppe<input name="tester" value="Torben-Praxistest" maxlength="80"></label><button class="primary">Test starten</button></form></section>';
+      '<section class="card card-pad practice-intro"><h2>Was wird gespeichert?</h2><p>Der Test enthält 34 Bedienaufgaben und 30 fachliche Abschlussfragen. Eine Entscheidung darf ausdrücklich als später oder offen notiert werden.</p><ul><li>Aufgabenfortschritt und Bewertungen</li><li>Notizen zu jeder Aufgabe oder Fachfrage</li><li>angeklickte Demo-Funktionen und Zeitpunkte</li><li>JavaScript-Fehler und Geräteinformationen</li><li>der aktuelle vollständig synthetische Demo-Zustand beim Download</li></ul><p class="legal-note"><strong>Keine Audioaufnahme:</strong> Das Mikrofon oder eine Aufnahme-App auf dem iPad läuft unabhängig von dieser Demo. Es erfolgt kein Upload.</p><form data-form="practice-start"><label>Name der Testperson oder Testgruppe<input name="tester" value="Torben-Praxistest" maxlength="80"></label><button class="primary">Test starten</button></form></section>';
   }
   function renderCurrent(item, result) {
     const phase = item.kind === 'Aufgabe' ? 'Bedienaufgabe ' + item.number + ' von 34' : 'Fachfrage ' + item.number + ' von ' + questions.length;
-    return '<section class="card card-pad practice-current"><div class="practice-current-head"><span><small>' + esc(phase) + '</small><h2>' + esc(item.title) + '</h2></span><span class="practice-status ' + statusClass(result.status) + '">' + esc(statusText(result.status)) + '</span></div><p class="practice-instruction">' + esc(item.instruction) + '</p>' +
+    return '<section class="card card-pad practice-current"><div class="practice-current-head"><span><small>' + esc(phase) + '</small><h2>' + esc(item.title) + '</h2>' + (item.priority ? '<span class="practice-priority">' + esc(item.priority) + '</span>' : '') + '</span><span class="practice-status ' + statusClass(result.status) + '">' + esc(statusText(result.status)) + '</span></div><p class="practice-instruction">' + esc(item.instruction) + '</p>' +
       (item.view ? '<button class="primary" data-action="practice-open-item">Aufgabe in der Demo öffnen</button>' : '<p class="info-note">Antwort bitte aussprechen und die Kernaussage zusätzlich kurz im Notizfeld festhalten.</p>') +
       '<label class="practice-note">Notiz zu diesem Punkt<textarea data-practice-note data-item-id="' + item.id + '" placeholder="Was war klar, unklar, falsch oder fehlte?">' + esc(result.note) + '</textarea></label>' +
       '<div class="practice-rating"><button class="success-button" data-action="practice-outcome" data-status="DONE">Erledigt</button><button class="secondary" data-action="practice-outcome" data-status="UNCLEAR">Unklar</button><button class="danger-button" data-action="practice-outcome" data-status="ERROR">Fehler</button><button class="quiet" data-action="practice-skip">Überspringen</button></div>' +

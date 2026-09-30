@@ -34,7 +34,7 @@ async function assertNoOverflow(page, label) {
   try {
     const desktop = await openFresh(browser, { width: 1440, height: 1000 });
     const page = desktop.page;
-    assert.equal(await page.evaluate(() => window.MMPraxisTest.getItems().length), 46);
+    assert.equal(await page.evaluate(() => window.MMPraxisTest.getItems().length), 64);
     await page.locator('[data-action="navigate"][data-view="more"]:visible').first().click();
     await page.getByRole('button', { name: 'Interaktiven Test starten' }).click();
     await page.locator('form[data-form="practice-start"] input[name="tester"]').fill('Familientest Beispiel');
@@ -42,7 +42,7 @@ async function assertNoOverflow(page, label) {
     assert.match(await page.locator('.practice-current h2').innerText(), /Morgencheck/);
     assert.equal(await page.getByText(/Keine Audioaufnahme/).count() >= 1, true);
     await page.screenshot({ path: path.join(outputDir, 'interactive-test-desktop.png'), fullPage: true });
-    checks.push('Test startet lokal mit 34 Bedienaufgaben und 12 Fachfragen ohne Audioaufnahme');
+    checks.push('Test startet lokal mit 34 Bedienaufgaben und 30 Fachfragen ohne Audioaufnahme');
 
     await page.getByRole('button', { name: 'Aufgabe in der Demo öffnen' }).click();
     await page.getByRole('heading', { name: /Guten/ }).waitFor();
@@ -76,8 +76,8 @@ async function assertNoOverflow(page, label) {
     checks.push('Zurückspringen, Notiz und Bewertung bleiben lokal erhalten');
 
     await page.locator('details.practice-overview > summary').click();
-    await page.locator('[data-action="practice-jump"][data-id="Q12"]').click();
-    assert.match(await page.locator('.practice-current h2').innerText(), /Pilotbetrieb/);
+    await page.locator('[data-action="practice-jump"][data-id="Q30"]').click();
+    assert.match(await page.locator('.practice-current h2').innerText(), /Abnahme/);
     await page.locator('.practice-current').getByRole('button', { name: 'Überspringen', exact: true }).click();
     await page.getByRole('button', { name: 'Test beenden' }).click();
     await page.getByRole('heading', { name: 'Praxistest beendet' }).waitFor();
@@ -89,7 +89,7 @@ async function assertNoOverflow(page, label) {
     await finalDownload.saveAs(finalPath);
     const finalResult = JSON.parse(fs.readFileSync(finalPath, 'utf8'));
     assert.equal(finalResult.session.status, 'ENDED');
-    assert.equal(finalResult.items.length, 46);
+    assert.equal(finalResult.items.length, 64);
     assert.ok(finalResult.session.interactions.length >= 2);
     assert.equal(finalResult.session.errors.length, 0);
     checks.push('Direktsprung, Ende und vollständige Ergebnisdatei funktionieren');
